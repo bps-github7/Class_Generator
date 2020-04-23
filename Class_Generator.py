@@ -48,7 +48,7 @@ parser.add_argument("-e", "--exporting", type=str, metavar='', choices=['tgz', '
 #read arguments passed to the console.
 args = parser.parse_args()
 
-#default path for testing purposes- delete in look into problem areas b4 git -ing
+#default path for testing purposes- 
 default = r"C:\Users\Ben\Desktop\Grad school- MSIS program\misc"
 
 
