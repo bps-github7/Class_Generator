@@ -77,6 +77,13 @@ Does the same thing as the inherit function in misc_functions.py
 #this function call stack is a pain, looks ugly, doesnt do anything paticularly useful
 #BUT it was needed to properly implement inheritance in this file, given scope and dictionary immutability
 # keys cannot change while being looped over, so we needed two seperate dictionaries in different scope>>> bad design...
+
+#critical thought- the below call stack assumes that we are working with a dictionary as the storage data structure
+# the work flow has changed... 
+
+#<input: file, cmdline argument or user input> ---<list: each element is an inline format spec> -> -> <inheritance()> -> 
+#<one inline format spec == 1 to many specs in dictionary> -> <each line gets updated() to main dict containing all classes 2b generated>
+
 def controller():
     """"""
     for entries in class_container:
