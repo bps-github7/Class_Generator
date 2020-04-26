@@ -13,15 +13,24 @@ a dictionary (global scope: class_container) containing class_dict objects as th
     will read each line into a class_dict object, update class_container with the full file contents.
 -inheriter(): parses each entry in class_container, handles inheritance by applying inheritance rules
     to the existing class_dicts.
--executor(): uses the class generator to produce the classes specified by existing entries in class_container
-
-
 """
 import itertools
 import datetime
 import os
 
-class_container = []
+def get_confirmation(opt_code, line):
+    """Asks user if they are satisfied with their choice"""
+    opts = {1: "line no.{} has no colons- meaning your class has no attributes or methods,\
+        \n or this line was incorrectly defined".format(line),
+    2: "No attributes provided for specs on line no. {}".format(line), 
+    3: "No methods provided for specs on line no. {}".format(line)}
+    print(opts[opt_code])
+    while True:
+        ans = input("Do you wish to proceed with generating this line? (y/n)")
+        if ans in ("y","yes"):
+            return True
+        elif ans in ("n","no"):
+            return False
 
 def from_file(f, results = []):
         """
@@ -30,31 +39,35 @@ def from_file(f, results = []):
         """
         #need to account for lack of .txt in POSIX systems
         with open("{}.txt".format(f), "r") as file:
-            for lines in file:
-                if not lines.count(":"):
-                    NotImplemented
-                    #then the user passed in only class names, or the format is wrong.
-                elif lines.count(":") == 1:
-                    NotImplemented
-                    #methods were skipped (normal), or format is incorrect
+            for num, line in enumerate(file):
+                copy = line.strip("\n")
+                line = line.split(":")
+                if line[0] in (""," ","\t","\t\t",None):
+                    print("Cannot produce a class/classes without name(s).\n\
+Please review/revise the following class specification:\n {}on line no.{}\n".format(copy, num))
+                elif line[1] in (""," ","\t","\t\t",None):
+                    if get_confirmation(2, num):
+                        results.append(copy)
+                elif line[2] in (""," ","\t","\t\t"," \n"," \t\n","\t\t\n" "\n",None):
+                    if get_confirmation(3, num):
+                        results.append(copy)
                 else:
-                    #base/default case- for error reporting, but how do we know it's wrong?
-                    NotImplemented
-                results.append(lines.strip("\n"))
+                    results.append(copy)
             return results
 
-def inheritance(name, attr, methods, parent = object, new = {}):
+def inheritance(line, parent = object, new = {}):
     """
 Does the same thing as the inherit function in misc_functions.py
     """
-    family, family_attr, family_methods = name.split(">"),
-    attr.split(">"), methods.split(">")
+    #would be nice to have the conditional tuple unpacking here.
+    # TODO: can we define something like that? (not sure how to define new language syntax)
+    line = line.split(":")
+    family, family_attr, family_methods = line[0].split(">"), line[1].split(">"), line[2].split(">")
     if len(family) != len(family_attr):
         print("Did not provide sufficient data to\
             define both parent and child classes.")
         return 0
-    parents, parent_attr, parent_methods = family[0].split(","),
-    family_attr[0].split("/"), family_methods[0].split("/")
+    parents, parent_attr, parent_methods = family[0].split(","), family_attr[0].split("/"), family_methods[0].split("/")
     for a, b, c in zip(parents, parent_attr, parent_methods):
         #this conditional ensures that classes who have parents
         #according to the hierachry arre defined as such
@@ -64,49 +77,83 @@ Does the same thing as the inherit function in misc_functions.py
             new.update({a : (b,c)})
     #prep work for the next recursive call- 
     # define new arguments and delete irrelevant data
+
+    #family[0] is a list 
     parent = family[0]
     del family[0], family_attr[0], family_methods[0]
-    name, attr, methods = ">".join(family), ">".join(family_attr),
-    ">".join(family_methods)
+    name, attr, methods = ">".join(family), ">".join(family_attr), ">".join(family_methods)
     #recursive call and base case
     if len(family) > 0:
         return inheritance(name, attr, methods, parent = parent)
     else:
         return new
 
-#this function call stack is a pain, looks ugly, doesnt do anything paticularly useful
-#BUT it was needed to properly implement inheritance in this file, given scope and dictionary immutability
-# keys cannot change while being looped over, so we needed two seperate dictionaries in different scope>>> bad design...
+    
+def only_name_inheritance(line, parent = object, new = {}):
+    """Custom inheritance engine for only when name is provided in inline"""
+    if line.count(":") == 1:
+        #allot of ambiguity to work around here...
+        # need to strip whitespace out of second item first.
+        pass
+    elif line.count(":") == 2:
+        pass
 
-#critical thought- the below call stack assumes that we are working with a dictionary as the storage data structure
-# the work flow has changed... 
+def no_attribute_inheritance(line, parent = object, new = {}):
+    """Custom inheritance engine for attributeless class specs"""
+    NotImplemented
+
+def no_method_inheritance(line, parent = object, new = {}):
+    """Custom inheritance engine for methodless class specs"""
+
+def inheriter(line):
+    """
+top level function for error handling with inheritance
+
+so that it wont freak out if it gets undefined attr, method,
+if name is undefined then return False- that shouldnt happen @ this point
+    """
+    copy = line
+    line = line.split(":")
+    if not copy.count(":"):
+        NotImplemented
+        # only_name_inheritance()
+    elif line[1] in (""," ","  ","   ","\t","\t\t"," \n"," \t\n","\t\t\n" "\n",None):
+        NotImplemented
+        # no_attribute_inheritance()
+    elif line[2] in (""," ","  ","   ","\t","\t\t"," \n"," \t\n","\t\t\n" "\n",None):
+        NotImplemented
+        # no_method_inheritance()
+    #ideal case- fully specified inline spec
+    else:
+        inheritance(copy)
+
 
 #<input: file, cmdline argument or user input> ---<list: each element is an inline format spec> -> -> <inheritance()> -> 
 #<one inline format spec == 1 to many specs in dictionary> -> <each line gets updated() to main dict containing all classes 2b generated>
 
 def controller():
-    """"""
-    for entries in class_container:
-        if entries.count(">") > 0:
-            new = inheritance(entries, class_container[entries][0], class_container[entries][1])
-            old = entries
-            break
+    """
+Does the overhead work for inheritance.
+Turns inline format strings into class specification dict.
+creates specific class hierarchies if inline specs call for this. 
+    """
+    for items in inline:
+        if items.split(":")[0].count(">"):
+            class_dict.update(inheritance(items))
         else:
-            return 0
-    del class_container[entries]
-    class_container.update(new)
-    return True
+            items = items.split(":")
+            if len(items) == 1:
+                class_dict.update({items : ("parent = {}".format("Object"))})
+            elif len(items) == 2:
+                #how can we assure that items[1] is attributes, not methods?
+                class_dict.update({items[0] : (items[1],"parent = {}".format("Object"))})
+            else:
+                class_dict.update({items[0] : (items[1], items[2], "parent = {}".format("Object"))})
 
-def top():
-    loop = True
-    while loop:
-        loop = controller()
 
 
-# del class_container[edited[0]]
-# class_container.update
 
-#parse()
-#edit()
-class_container = from_file("classes")
-print(class_container)
+class_dict = {}
+inline = from_file("classes")
+# controller()
+# print(class_dict)
