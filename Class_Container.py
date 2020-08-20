@@ -59,8 +59,6 @@ def inheritance(line, parent = object, new = {}):
     """
 Does the same thing as the inherit function in misc_functions.py
     """
-    #would be nice to have the conditional tuple unpacking here.
-    # TODO: can we define something like that? (not sure how to define new language syntax)
     line = line.split(":")
     family, family_attr, family_methods = line[0].split(">"), line[1].split(">"), line[2].split(">")
     if len(family) != len(family_attr):
@@ -100,10 +98,11 @@ def only_name_inheritance(line, parent = object, new = {}):
 
 def no_attribute_inheritance(line, parent = object, new = {}):
     """Custom inheritance engine for attributeless class specs"""
-    NotImplemented
+    return NotImplemented
 
 def no_method_inheritance(line, parent = object, new = {}):
     """Custom inheritance engine for methodless class specs"""
+    return NotImplemented
 
 def inheriter(line):
     """
@@ -115,13 +114,13 @@ if name is undefined then return False- that shouldnt happen @ this point
     copy = line
     line = line.split(":")
     if not copy.count(":"):
-        NotImplemented
+        return NotImplemented
         # only_name_inheritance()
     elif line[1] in (""," ","  ","   ","\t","\t\t"," \n"," \t\n","\t\t\n" "\n",None):
-        NotImplemented
+        return NotImplemented
         # no_attribute_inheritance()
     elif line[2] in (""," ","  ","   ","\t","\t\t"," \n"," \t\n","\t\t\n" "\n",None):
-        NotImplemented
+        return NotImplemented
         # no_method_inheritance()
     #ideal case- fully specified inline spec
     else:
