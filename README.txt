@@ -3,10 +3,6 @@ Python 3.8 which automatically generates class files.
 programmer: Ben P. Sehnert
 date: 2/11/2020
 
-    DEV NOTES: Thurs 4/16/2020 8:24 EST- need to find some way to dumb this down/ simplify the workload
-    how can we get phil in the loop/ git init sooner. need help with this
-    need to finish it quicker. write todos, think about pros and cons of deleting/improving class_dict. not very oop now!
-
 Index:
     1. Usage
     2. Features
@@ -26,16 +22,19 @@ Index:
 
 2) Features:
 
-    2.1 all classes generated include:
+    2.1 all components of PEP8 new style class are generated, including:
         -constructor(__init__)
         -__str__, __repr__
-        -getters and setters for all attributes
-        -if __name__ == "__main__":
-	        print("Running class file. Nothing to do here")
-        or a customized message
+        -script stub: 
+	```
+	if __name__ == "__main__":
+	        print("Running class file. Nothing to do here", {or a customizable message})
+	```
     2.2 All classes are generated in new object syntax, meaning
-        getters and setters are implemented prepended with the decorators 
-        @property and @attribute_name.setter.
+        getters and setters are not implemented by default.
+	
+	if the class is specified as 'protected' (by prepending the class name with one or two dashed)
+	its attributes will be generated with methods, in accordance with the descriptor protocol.
     2.3 the base generator can implement the following:
         -multiple inheritance
             commas to delimit multiple parents or children
@@ -90,7 +89,7 @@ Index:
         method body functionality cannot be implemented due to the limited nature of this software.
         for this reason, decorators and other new_style syntax rules will be adhered to.
         however, all method bodies instantiated via passing in argument via cmd line or input file
-        will include only the keyword 'NotImplemented'
+        will return only the keyword 'NotImplemented'
 
         In cmd line mode or by using the file, you can designate a method as static or class method
         by prepending SM for static methods or CM for class method to the class name, for example
@@ -108,7 +107,8 @@ Index:
 
         <syntax for the input file>
 
-        seperate classes with a single newline character (type <ENTER> on most systems while in typing mode)
+        in the input file, seperate classes with a single newline character 
+	(type <ENTER> on most systems while in typing mode)
         class, attribute and methods should be delimited with a colon (:)
         individual attributes or methods should be delimited with a comma (,)
 
@@ -123,10 +123,7 @@ Index:
         class_1 > class_2, class_3, class_4 : attr1, attr2 > attr3, attr4 / attr5, attr6 / attr7, attr8
 
         class_1 : attr1, attr2, attr3 : method_1, method_2, SMmethod_3, CMmethod_4 //where method 1 and 2 are regular methods, 3 and 4 are static and class methods
-
-
-        TODO implement functionalities for this.
-
+	
 5) Running in interactive mode
 
     5.1 How To:
