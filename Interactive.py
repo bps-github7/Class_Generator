@@ -4,9 +4,8 @@
 to trigger i mode, vs 1 arg for file input mode and > 1 for cmd line
 should I design a better way to do this
 
-TODO also start using git'''
+'''
 
-import re
 from Misc_Functions import list_to_str
 import argparse
 import sys
@@ -92,27 +91,9 @@ type c, d, continue or done to exit this mode\n"
         elif response.lower() in ("q","e","quit","exit"):
             sys.exit(1)
         response = input()
-        if validate_inline(response):
-            lines.append(response)
-            continue
-
-
-def validate_classes(classes):
-    for item in classes:
-        if item[0] == '0':
-            print("first character of identifier cannot be 0")
-        for i in item:
-            if i not in re.match('[a-zA-Z_][a-zA-Z0-9_]*'):
-                return "a class provided contained an illegal character."
-
-
-
-def validate_inline(inline):
-    classes = inline.split(":")[0]
-    if len(classes):
-        validate_classes(classes)
-    else:
-        print("cannot define a class with no name. ")
+        # if validate_inline(response):
+        #     lines.append(response)
+        #     continue
 
 def prompt_mode():
     """
