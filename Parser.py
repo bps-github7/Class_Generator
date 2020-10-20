@@ -21,19 +21,33 @@ def is_identifier(ident: str) -> bool:
     return True
 
 def parse_inline(inline):
-    classes = inline.split(":")[0]
-    validate(classes)
+    inline = inline.split(":")
+    return { validate(inline[0]) : (validate(inline[1], item_type="attribute"), validate(inline[2], item_type="method")) }
+
+    #what if methods is not provided?
+    # classes, attributes, methods = validate(inline[0], item_type="class"), validate(inline[1], item_type="attribute"), validate(inline[2], item_type="method")
+    # if classes:
+    #     print("skonedalone!")
+    #     return { classes : () }
+
+
+
             
 
 def validate(items, item_type="class"):
     container = []
-    for i in items.split(("," if (item_type == 'class' ) else "/")):
+    ### this line only applies if there is inheritance nesting- test it seperately!!!
+    # token = "," if (item_type == 'class' ) else "/"
+    token = ","
+    for i in items.split(token):
         trimmed = i.strip()
         if is_identifier(trimmed):
             continue
         else:
             print("{} is not a valid identifier.".format(trimmed))
+            return 0
         container.append(case_check(trimmed))
+    return container
 
 def case_check(item, item_type="class"):
     if item_type == "class":
@@ -54,6 +68,6 @@ def case_check(item, item_type="class"):
 
 
 def main():
-    parse_inline("skone, fuckme, shitspread : shit, bisk, chalp : asspie, dessert")
+    return parse_inline("skone, fuckme, shitspread : shit, bisk, chalp : asspie, dessert")
 
-main()
+print(main())
