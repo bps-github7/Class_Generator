@@ -14,11 +14,100 @@ Index:
 1) Usage: varies according to user preference.
 
     -1.1 INPUTS: methods include (1)command line arguments, (2)input file(s) and (3)interactive mode
-    -1.2 OUTPUTS: Generates a directory containing class files built in the manner specified in arugments.
+    -1.2 OUTPUTS: Generates a (optionally nested) directory containing class files, unit tests, documentation structuring.
     -1.3 DETAILS: defaults to creation of a new directory, labeled with project name, that contains
     all generated files. This directory will be produced as a subdirectory in the same directory
     where the Class_Generator.py script is run. Options exist to customize the path for output 
     (see 'customization with .rc file' or 'Running in cmd line mode')
+
+    -1.4 ADDITIONAL: features include:
+        - allows specification of nested packages, for organization of the generated classes.
+            note that this overrides the default behaivor of generating files in a new directory 
+            created in the current working directory. All new packages are generated with __init__.py
+        - testing- with use of a switch, you can generate unit tests for any or all class files. 
+            the specifics of unittesting can be configured in the .rc file, but 
+            default to unittests in a parralel sibbling directory with name test_<directory_name> and all classes titled Test_<class_name>    
+        -exporting- do you want to do anything with these newly generated packages- compress, send to an email address, init git repo?
+            need to worry about this feature at the end.
+
+    Quick reference for easy use:
+
+        inline Summary: the inline spec is used for quick writing of class specs. it consists of a single line
+        of text with 1-3 sets of identifiers, delimited by colons, which seperate class names from attributes or methods
+
+        class_dict: implementation details- optionally you can use as an Command line argument. but it is cumbersome
+
+
+        #basic inline
+
+        class_name : attrA, attrB, attrC : method1, method2
+
+        class1, class2, ... ClassN : attr1, attr2 / attr1, attr2 / ... / attr1, attr2 : method / method / ... / method
+
+        # colon seperates classname, attributes and methods
+        # comma seperates non grouped arguments - list of sibling classes, lone list of attributes or methods
+        # / forward slash delimits groups in grouped arguments- in the second example it is nessecary to denote where class1 attributes end and class2 attributes begin.
+
+        NOTE: that you can withhold either sets of fields, but not the class name. to do so, include the standard 2 semicolons,
+        but leave a white space, or no text as argument for the fields you want to not include
+
+        # class with no fields
+
+        class_name : : or class_name::
+
+        # class with only attributes
+
+        class_name:attr1,attr2:
+
+        # class with only methods
+
+        class_name::method1,method2
+
+
+        # inline with inheritance specifications 
+
+        class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB
+        # - this inline specifies that class2 is a descendant of class1 and inherits any fields or methods unique to the parent class1.
+
+
+        #when nessecary, use the basic inline grouping syntax to specify multiple inheritances
+
+        classA, classB, classC > classD : A1, A2, A3 / B1, B2,B3 / C1, C2, C3 > D1, D2, D3 : Amethod / Bmethod / Cmethod > Dmethod
+
+
+        # specification of package structuring
+
+
+        <p: package_name c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)> 
+
+        # creates
+
+        DIR <package_name>
+        -__init__.py
+        -classA.py
+        -classB.py
+        -classC.py
+
+        #include the additional argument 'n:' to specify nested children
+
+        <p: package_name n: (sounds, textures) c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)> 
+
+        # creates
+
+        DIR <package_name>
+        -__init__.py
+        -classA.py
+        -classB.py
+        -classC.py
+        -DIR<sounds>
+        -DIR<textures>
+
+        # the interpretter will double back and get the specifications for the nested directories, if all you had provided was their names.
+        # You have the option of providing the specification inline, but this proves to be very cumbersome for a command line argument ( it will surely span multiple lines )
+
+        #NOTE: that there is not an argument (or functionality) provided for nesting upwards (towards the file system root)
+
+        
 
 2) Features:
 
@@ -58,6 +147,7 @@ Index:
         $ python Class_Generator.py --name "my project" -c 
         "{'class 1' : ('attrA, attrB, attrC','method1,SMmethod2,CMmethod3') 'class 2': 'attrA, attrB, attrC'}" -d '/some/new/path'
 
+        ^^^this is bad.. see if you can get rid of extra quotation marks among other things
     4.2 Command line mode:
         
             Optional Arguments:
@@ -86,16 +176,18 @@ Index:
         argument list: names, attributes, methods = None, parent = 'object', runs = 0
 
     4.5 note on methods: 
-        method body functionality cannot be implemented due to the limited nature of this software.
-        for this reason, decorators and other new_style syntax rules will be adhered to.
+        method body functionality cannot be implemented due to the limited nature of this small CLI program.
         however, all method bodies instantiated via passing in argument via cmd line or input file
-        will return only the keyword 'NotImplemented'
+        will return only the keyword 'NotImplemented' and a auto-generated function stub in adherence to PEP8 standards.
 
         In cmd line mode or by using the file, you can designate a method as static or class method
         by prepending SM for static methods or CM for class method to the class name, for example
 
         static methods: SMstatic_method_1, SMthis_is_an_example
         class methods: CMclass_method_1, CMyadda_yadda_yadda
+
+        doing so will cause the method to be generated in adherence to the typical way these methods are written.
+        making use of decorator, and a first parameter of cls for class methods
 
     4.6 input file for argument
 
