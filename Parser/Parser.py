@@ -7,44 +7,6 @@ import sys
 import keyword
 
 
-class Inline:
-
-    # not worried about validation here because these constructors meant to only be used from within this script.
-
-    def __init__(self, classes=None, attributes=None, methods=None, parents=object):
-        self.classes = classes
-        self.attributes = attributes
-        self.methods = methods
-        self.parents = parents
-
-    # alternative constructor
-    @classmethod
-    def from_inline(cls, inline: str):
-        return Inline(*inline.split(":"))
-
-
-class Class_Dict:
-    def __init__(self, classes=None, attributes=None, methods=None, parents=object):
-        self.classes = classes
-        self.attributes = attributes
-        self.methods = methods
-        self.parents = parents
-
-    def __repr__(self):
-        return {self.classes: (self.attributes, self.methods, "parents = {}".format(self.parents))}
-
-    def __str__(self):
-        return str(self.__repr__())
-
-    @classmethod
-    def to_classdict(cls, inline):
-        return Class_Dict(*inline.split(":"))
-
-
-print(Class_Dict.to_classdict(
-    " skipper : fuck, me, pancakes : SMpaste, CMteeth"))
-
-
 def is_identifier(ident: str) -> bool:
     """Determines if string is valid Python identifier."""
 
