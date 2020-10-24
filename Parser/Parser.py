@@ -5,6 +5,8 @@
 
 import sys
 import keyword
+import Inline
+import Class_Dict
 
 
 def is_identifier(ident: str) -> bool:
@@ -82,18 +84,18 @@ def validate(items, item_type="class"):
 def case_check(item, item_type="class"):
     if item_type == "class":
         if item.istitle():
-            return item
+            return item.strip()
         else:
             answer = input(
-                "your class name is not capitalized. Would you like this corrected? (y/n)")
-            return (item.title() if (answer.lower() in ('yes', 'y', 'yea', 'yeah', 'yup')) else item)
+                "your class name {} is not capitalized. Would you like this corrected? (y/n)".format(item))
+            return (item.title() if (answer.lower() in ('yes', 'y', 'yea', 'yeah', 'yup')) else item).strip()
     elif item_type in ("attribute", "method"):
         if item.islower():
-            return item
+            return item.strip()
         else:
             answer = input(
-                "your attribute or method is not lowercase. Would you like this corrected? (y/n)")
-            return (item.lower() if (answer.lower() in ('yes', 'y', 'yea', 'yeah', 'yup')) else item)
+                "your attribute or method {} is not lowercase. Would you like this corrected? (y/n)".format(item))
+            return (item.lower() if (answer.lower() in ('yes', 'y', 'yea', 'yeah', 'yup')) else item).strip()
 
 
 def main():
@@ -101,3 +103,5 @@ def main():
 
 
 # print(main())
+for i in "shit, bisk, cand, nard, Asspie".split(","):
+    print(case_check(i))

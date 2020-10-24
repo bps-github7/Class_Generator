@@ -142,26 +142,26 @@ if name is undefined then return False- that shouldnt happen @ this point
 # <input: file, cmdline argument or user input> ---<list: each element is an inline format spec> -> -> <inheritance()> ->
 # <one inline format spec == 1 to many specs in dictionary> -> <each line gets updated() to main dict containing all classes 2b generated>
 
-def controller():
-    """
-Does the overhead work for inheritance.
-Turns inline format strings into class specification dict.
-creates specific class hierarchies if inline specs call for this. 
-    """
-    for items in inline:
-        if items.split(":")[0].count(">"):
-            class_dict.update(inheritance(items))
-        else:
-            items = items.split(":")
-            if len(items) == 1:
-                class_dict.update({items: ("parent = {}".format("Object"))})
-            elif len(items) == 2:
-                # how can we assure that items[1] is attributes, not methods?
-                class_dict.update(
-                    {items[0]: (items[1], "parent = {}".format("Object"))})
-            else:
-                class_dict.update(
-                    {items[0]: (items[1], items[2], "parent = {}".format("Object"))})
+# def controller():
+#     """
+# Does the overhead work for inheritance.
+# Turns inline format strings into class specification dict.
+# creates specific class hierarchies if inline specs call for this.
+#     """
+#     for items in inline:
+#         if items.split(":")[0].count(">"):
+#             class_dict.update(inheritance(items))
+#         else:
+#             items = items.split(":")
+#             if len(items) == 1:
+#                 class_dict.update({items: ("parent = {}".format("Object"))})
+#             elif len(items) == 2:
+#                 # how can we assure that items[1] is attributes, not methods?
+#                 class_dict.update(
+#                     {items[0]: (items[1], "parent = {}".format("Object"))})
+#             else:
+#                 class_dict.update(
+#                     {items[0]: (items[1], items[2], "parent = {}".format("Object"))})
 
 
 class_dict = {}
