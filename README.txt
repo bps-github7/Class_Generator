@@ -77,6 +77,12 @@ Index:
 
         # specification of package structuring
 
+        <p: c:> is the base syntax for defining a package structure, where p is the package name and c is the class names
+
+        you can either write a name or names delimited by comas, or supply either or both argumements as inline specs nested inside parentheses
+        note that you can nest an inline spec to define package structuring using the inheritance syntax for classes, where > denotes a child package
+        
+
 
         <p: package_name c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)> 
 
@@ -88,11 +94,11 @@ Index:
         -classB.py
         -classC.py
 
-        #include the additional argument 'n:' to specify nested children
 
-        <p: package_name n: (sounds, textures) c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)> 
+        <p: ( project_name > sounds, textures ) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
+        <p: ( project_name > sounds, textures  : ClassA, classB > classC : -t {ut,cc,st}, -e {email,zip,git} / ... >) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
 
-        # creates
+
 
         DIR <package_name>
         -__init__.py
@@ -107,7 +113,11 @@ Index:
 
         #NOTE: that there is not an argument (or functionality) provided for nesting upwards (towards the file system root)
 
+        alternately, you can nest an inline spec for the packaging structure, and use the inheritance syntax for classes for structuring your  
         
+        note that the full set of arguments in an inline spec denotes differnent meaning.
+
+        package structuring : class file placement within package structuring : options for classes - using flag and json argument
 
 2) Features:
 
