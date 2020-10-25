@@ -1,127 +1,153 @@
 #### Class Generator Program: A utillity program written in
-
 #### Python 3.8 which automatically generates class files.
-
 ###### Programmer: Ben P. Sehnert
-
 ###### Date: 2/11/2020
 
 ## Index:
 
-    1. Usage
-    2. Features
-    3. Customization with .rc file
-    4. Running in command line mode
-    5. Running in interactive mode
-    6. Developer notes, miscelaneous, software specifications
+1. Usage
+2. Features
+3. Customization with .rc file
+4. Running in command line mode
+5. Running in interactive mode
+6. Developer notes, miscelaneous, software specifications
 
-## 1) Usage: varies according to user preference.
+## 1) Usage:
 
-    -1.1 INPUTS: methods include (1)command line arguments, (2)input file(s) and (3)interactive mode
-    -1.2 OUTPUTS: Generates a (optionally nested) directory containing class files, unit tests, documentation structuring.
-    -1.3 DETAILS: defaults to creation of a new directory, labeled with project name, that contains
-    all generated files. This directory will be produced as a subdirectory in the same directory
-    where the Class_Generator.py script is run. Options exist to customize the path for output
-    (see 'customization with .rc file' or 'Running in cmd line mode')
+Input of class specifications can be provided through three different methods:
+1. command line arguments
+2. input file(s)
+3. interactive mode
 
-    -1.4 ADDITIONAL: features include:
-        - allows specification of nested packages, for organization of the generated classes.
-            note that this overrides the default behaivor of generating files in a new directory
-            created in the current working directory. All new packages are generated with __init__.py
-        - testing- with use of a switch, you can generate unit tests for any or all class files.
-            the specifics of unittesting can be configured in the .rc file, but
-            default to unittests in a parralel sibbling directory with name test_<directory_name> and all classes titled Test_<class_name>
-        -exporting- do you want to do anything with these newly generated packages- compress, send to an email address, init git repo?
-            need to worry about this feature at the end.
+_Optional Arguments:_
 
-    Quick reference for easy use:
+    -h, --help                  show this message and exist
 
-        inline Summary: the inline spec is used for quick writing of class specs. it consists of a single line
-        of text with 1-3 sets of identifiers, delimited by colons, which seperate class names from attributes or methods
+    -n, --project-name          Provide the name for the project you are creating. Program execution will
+                                create a new directory with the provided name, located in the default directory
+                                to contain newly generated class files.
 
-        class_dict: implementation details- optionally you can use as an Command line argument. but it is cumbersome
+                                #outdated- needs to get updated when help argument is updated..
+    -c, --class-and-attr        pass in class information string containing dict SYNTAX: '{ "class_name" : "attr, _attr, __attr",
+                                "ABCclass_name" : 'attr1' #abstract base class , "parentclass_name -> childclass_name" : 'p_attr, p_attr2 -> ...child attributes' #inheritance }'
 
 
-        #basic inline
+    -s, --skip-attributes       Use this option to skip defining instance variables for your class.
 
-        class_name : attrA, attrB, attrC : method1, method2
+    -t, --testing               automatically generate unittests, static analysis, code coverage for generated classes
 
-        class1, class2, ... ClassN : attr1, attr2 / attr1, attr2 / ... / attr1, attr2 : method / method / ... / method
+    -e, --exporting             What should be done with the generated project {tgz, zip, tgz and email req arg : 'name@mail.com', zip and email, tgz and ssh, zip and ssh}
 
-        # colon seperates classname, attributes and methods
-        # comma seperates non grouped arguments - list of sibling classes, lone list of attributes or methods
-        # / forward slash delimits groups in grouped arguments- in the second example it is nessecary to denote where class1 attributes end and class2 attributes begin.
+#### 1.1 INPUTS:
+* takes a inline specification (learn more in section 1.5) like so:  
+    * ' class_name : attr1, _attr2, __attr3 : SMmethod, CMmethod'
 
-        NOTE: that you can withhold either sets of fields, but not the class name. to do so, include the standard 2 semicolons,
-        but leave a white space, or no text as argument for the fields you want to not include
+#### 1.2 OUTPUTS: 
+* Generates a (optionally nested) directory containing class files, unit tests, documentation structuring.
 
-        # class with no fields
+#### 1.3 DETAILS: 
+* defaults to creation of a new directory, labeled with project name, that contains all generated files. 
+    * This directory will be produced as a subdirectory in the same directory where the Class_Generator.py script is run.
+    * Options exist to customize the path for output (see 'customization with .rc file' or 'Running in cmd line mode')
 
-        class_name : : or class_name::
+##### 1.4 ADDITIONAL: features include:
 
-        # class with only attributes
+* allows specification of nested packages, for organization of the generated classes.*
+    * note that this overrides the default behaivor of generating files in a new directory created in the current working directory containing __init__.py and README.md
 
-        class_name:attr1,attr2:
+* testing- with use of a switch, you can generate unit tests for any or all class files.*
+    * the specifics of unittesting can be configured in the .rc file, but
+    default to unittests in a parralel sibbling directory with name test_<directory_name> and all classes titled Test_<class_name>
 
-        # class with only methods
+*exporting- do you want to do anything with these newly generated packages- compress, send to an email address, init git repo *
+    * TODO: Implement this featurette.
 
-        class_name::method1,method2
+##### 1.5 Quick reference for easy use:
 
+* inline Summary: the inline spec is used for quick writing of class specs. it consists of a single line of text with 1-3 sets of identifiers, delimited by colons, which seperate class names from attributes or methods
 
-        # inline with inheritance specifications
-
-        class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB
-        # - this inline specifies that class2 is a descendant of class1 and inherits any fields or methods unique to the parent class1.
-
-
-        #when nessecary, use the basic inline grouping syntax to specify multiple inheritances
-
-        classA, classB, classC > classD : A1, A2, A3 / B1, B2,B3 / C1, C2, C3 > D1, D2, D3 : Amethod / Bmethod / Cmethod > Dmethod
-
-
-        # specification of package structuring
-
-        <p: c:> is the base syntax for defining a package structure, where p is the package name and c is the class names
-
-        you can either write a name or names delimited by comas, or supply either or both argumements as inline specs nested inside parentheses
-        note that you can nest an inline spec to define package structuring using the inheritance syntax for classes, where > denotes a child package
+* class_dict: implementation details- optionally you can use as an Command line argument. but it is cumbersome
 
 
+* basic inline
+> class_name : attrA, attrB, attrC : method1, method2
 
-        <p: package_name c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)>
+> class1, class2, ... ClassN : attr1, attr2 / attr1, attr2 / ... / attr1, attr2 : method / method / ... / method
 
-        # creates
+### colon seperates classname, attributes and methods
+### comma seperates non grouped arguments - list of sibling classes, lone list of attributes or methods
+### / forward slash delimits groups in grouped arguments- in the second example it is nessecary to denote where class1 attributes end and class2 attributes begin.
 
-        DIR <package_name>
-        -__init__.py
-        -classA.py
-        -classB.py
-        -classC.py
+__NOTE: that you can withhold either sets of fields, but not the class name. to do so, include the standard 2 semicolons,
+but leave a white space, or no text as argument for the fields you want to not include
+
+* class with no fields
+
+> class_name : : or class_name::
+
+* class with only attributes
+
+> class_name:attr1,attr2:
+
+* class with only methods
+
+> class_name::method1,method2
 
 
-        <p: ( project_name > sounds, textures ) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
-        <p: ( project_name > sounds, textures  : ClassA, classB > classC : -t {ut,cc,st}, -e {email,zip,git} / ... >) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
+* inline with inheritance specifications
+
+> class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB
+* this inline specifies that class2 is a descendant of class1 and inherits any fields or methods unique to the parent class1.
+
+
+* when nessecary, use the basic inline grouping syntax to specify multiple inheritances
+
+> classA, classB, classC > classD : A1, A2, A3 / B1, B2,B3 / C1, C2, C3 > D1, D2, D3 : Amethod / Bmethod / Cmethod > Dmethod
+
+
+* specification of package structuring
+
+> <p: c:> is the base syntax for defining a package structure, where p is the package name and c is the class names
+
+* you can either write a name or names delimited by comas, or supply either or both argumements as inline specs nested inside parentheses
+note that you can nest an inline spec to define package structuring using the inheritance syntax for classes, where > denotes a child package
 
 
 
-        DIR <package_name>
-        -__init__.py
-        -classA.py
-        -classB.py
-        -classC.py
-        -DIR<sounds>
-        -DIR<textures>
+> <p: package_name c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)>
 
-        # the interpretter will double back and get the specifications for the nested directories, if all you had provided was their names.
-        # You have the option of providing the specification inline, but this proves to be very cumbersome for a command line argument ( it will surely span multiple lines )
+* creates
 
-        #NOTE: that there is not an argument (or functionality) provided for nesting upwards (towards the file system root)
+DIR <package_name>
+-__init__.py
+-classA.py
+-classB.py
+-classC.py
 
-        alternately, you can nest an inline spec for the packaging structure, and use the inheritance syntax for classes for structuring your
 
-        note that the full set of arguments in an inline spec denotes differnent meaning.
+> <p: ( project_name > sounds, textures ) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
+> <p: ( project_name > sounds, textures  : ClassA, classB > classC : -t {ut,cc,st}, -e {email,zip,git} / ... >) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
 
-        package structuring : class file placement within package structuring : options for classes - using flag and json argument
+
+
+DIR <package_name>
+-__init__.py
+-classA.py
+-classB.py
+-classC.py
+-DIR<sounds>
+-DIR<textures>
+
+# the interpretter will double back and get the specifications for the nested directories, if all you had provided was their names.
+# You have the option of providing the specification inline, but this proves to be very cumbersome for a command line argument ( it will surely span multiple lines )
+
+#NOTE: that there is not an argument (or functionality) provided for nesting upwards (towards the file system root)
+
+alternately, you can nest an inline spec for the packaging structure, and use the inheritance syntax for classes for structuring your
+
+note that the full set of arguments in an inline spec denotes differnent meaning.
+
+package structuring : class file placement within package structuring : options for classes - using flag and json argument
 
 ## 2) Features:
 
@@ -163,25 +189,7 @@
         "{'class 1' : ('attrA, attrB, attrC','method1,SMmethod2,CMmethod3') 'class 2': 'attrA, attrB, attrC'}" -d '/some/new/path'
 
         ^^^this is bad.. see if you can get rid of extra quotation marks among other things
-    4.2 Command line mode:
-
-            Optional Arguments:
-
-                -h, --help                  show this message and exist
-
-                -n, --project-name          Provide the name for the project you are creating. Program execution will
-                                            create a new directory with the provided name, located in the default directory
-                                            to contain newly generated class files.
-
-                -c, --class-and-attr        pass in class information string containing dict SYNTAX: '{ "class_name" : "attr, _attr, __attr",
-                                            "ABCclass_name" : 'attr1' #abstract base class , "parentclass_name -> childclass_name" : 'p_attr, p_attr2 -> ...child attributes' #inheritance }'
-
-
-                -s, --skip-attributes       Use this option to skip defining instance variables for your class.
-
-                -t, --testing               automatically generate unittests, static analysis, code coverage for generated classes
-
-                -e, --exporting             What should be done with the generated project {tgz, zip, tgz and email req arg : 'name@mail.com', zip and email, tgz and ssh, zip and ssh}
+    4.2  moved to the top of the file/ index
 
     4.3 note on inheritance:
 
