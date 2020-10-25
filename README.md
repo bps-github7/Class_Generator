@@ -20,23 +20,22 @@ _Input of class specifications_ can be provided through three different methods:
 3. interactive mode
 
 _Optional Arguments:_
+* h, --help                  show this message and exist
 
-    -h, --help                  show this message and exist
-
-    -n, --project-name          Provide the name for the project you are creating. Program execution will
+* n, --project-name          Provide the name for the project you are creating. Program execution will
                                 create a new directory with the provided name, located in the default directory
                                 to contain newly generated class files.
 
                                 #outdated- needs to get updated when help argument is updated..
-    -c, --class-and-attr        pass in class information string containing dict SYNTAX: '{ "class_name" : "attr, _attr, __attr",
+* c, --class-and-attr        pass in class information string containing dict SYNTAX: '{ "class_name" : "attr, _attr, __attr",
                                 "ABCclass_name" : 'attr1' #abstract base class , "parentclass_name -> childclass_name" : 'p_attr, p_attr2 -> ...child attributes' #inheritance }'
 
 
-    -s, --skip-attributes       Use this option to skip defining instance variables for your class.
+* s, --skip-attributes       Use this option to skip defining instance variables for your class.
 
-    -t, --testing               automatically generate unittests, static analysis, code coverage for generated classes
+* t, --testing               automatically generate unittests, static analysis, code coverage for generated classes
 
-    -e, --exporting             What should be done with the generated project {tgz, zip, tgz and email req arg : 'name@mail.com', zip and email, tgz and ssh, zip and ssh}
+* e, --exporting             What should be done with the generated project {tgz, zip, tgz and email req arg : 'name@mail.com', zip and email, tgz and ssh, zip and ssh}
 
 #### 1.1 INPUTS:
 * takes a inline specification (learn more in section 1.5) like so:  
@@ -74,9 +73,9 @@ _Optional Arguments:_
 
 > class1, class2, ... ClassN : attr1, attr2 / attr1, attr2 / ... / attr1, attr2 : method / method / ... / method
 
-':' <colon> seperates classname, attributes and methods
-',' <comma> seperates non grouped arguments - list of sibling classes, lone list of attributes or methods
-'/' <forward-slash> delimits groups in grouped arguments-
+* ':' <colon> seperates classname, attributes and methods
+* ',' <comma> seperates non grouped arguments - list of sibling classes, lone list of attributes or methods
+* '/' <forward-slash> delimits groups in grouped arguments-
     * in the second example it is nessecary to denote where class1 attributes end and class2 attributes begin.
 
 *NOTE:* that you can withhold either sets of fields, but not the class name. to do so, include the standard 2 semicolons, but leave a white space, or no text as argument for the fields you want to not include
@@ -84,7 +83,9 @@ _Optional Arguments:_
 * class with no fields
 
 > class_name : : 
+
 or
+
 > class_name::
 
 * class with only attributes
@@ -120,25 +121,27 @@ the inheritance syntax for classes, where > denotes a child package
 
 > <p: package_name c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)>
 
-* creates:
+creates: 
 
 DIR <package_name>
--__init__.py
--classA.py
--classB.py
--classC.py
+* __init__.py
+* classA.py
+* classB.py
+* classC.py
 
 
 > <p: ( project_name > sounds, textures ) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
 > <p: ( project_name > sounds, textures  : ClassA, classB > classC : -t {ut,cc,st}, -e {email,zip,git} / ... >) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
 
+creates: 
+
 DIR <package_name>
--__init__.py
--classA.py
--classB.py
--classC.py
--DIR<sounds>
--DIR<textures>
+* __init__.py
+* classA.py
+* classB.py
+* classC.py
+* DIR<sounds>
+* DIR<textures>
 
 _The interpretter will double back_ and get the specifications for the nested directories,
 if all you had provided was their names. You have the option of providing the specification inline,
