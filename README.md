@@ -4,7 +4,6 @@
 ###### Date: 2/11/2020
 
 ## Index:
-
 1. Usage
 2. Features
 3. Customization with .rc file
@@ -13,12 +12,13 @@
 6. Developer notes, miscelaneous, software specifications
 
 ## Usage:
-
 _Input of class specifications_ can be provided through three different methods:
 1. command line arguments
 2. input file(s)
 3. interactive mode
 
+
+###### Gonna want to replace this whole section when the program is done
 _Optional Arguments:_
 * h, --help                  show this message and exist
 
@@ -38,29 +38,42 @@ _Optional Arguments:_
 * e, --exporting             What should be done with the generated project {tgz, zip, tgz and email req arg : 'name@mail.com', zip and email, tgz and ssh, zip and ssh}
 
 #### 1.1 INPUTS:
-* takes a inline specification (learn more in section 1.5) like so:  
+Takes a inline specification (learn more in section 1.5) like so:  
 > 'class_name : attr1, _attr2, __attr3 : SMmethod, CMmethod'
 
 #### 1.2 OUTPUTS: 
-* Generates a (optionally nested) directory containing class files, unit tests, documentation structuring.
+Generates a (optionally nested) directory containing class files, unit tests, documentation structuring.
 
 #### 1.3 DETAILS: 
-* defaults to creation of a new directory, labeled with project name, that contains all generated files. 
+Defaults to creation of a new directory, labeled with project name, that contains all generated files. 
     * This directory will be produced as a subdirectory in the same directory where the Class_Generator.py script is run.
     * Options exist to customize the path for output (see 'customization with .rc file' or 'Running in cmd line mode')
 
 ##### 1.4 ADDITIONAL: features include:
+Allows specification of nested packages, for organization of the generated classes, containing __init__.py and README.md.
+  * Note that this overrides the default behaivor of generating files in a new directory created in the current working directory
 
-* allows specification of nested packages, for organization of the generated classes.*
-    * note that this overrides the default behaivor of generating files in a new directory created in the current working directory containing __init__.py and README.md
+Syntax for switches within the inline specification:
+1. Append the switch to the end of the spec to apply the switch to the file.
+> 'class_name : attr1, _attr2, _/_attr3 : SMmethod, CMmethod -t{cc,st} -e{comp,send}'
+2. For more complex inline specs, you can apply this technique globally to the package/ generated files
+3. Alternatively, you can apply the switch on a class by class basis
+> ' classA -e{send}, classB -t{cc} > classC -e{vcs,comp,send} -t{cc,st} : ...'
 
-* testing- with use of a switch, you can generate unit tests for any or all class files.*
-    * the specifics of unittesting can be configured in the .rc file, but
-    default to unittests in a parralel sibbling directory with name test_<directory_name> and all classes titled Test_<class_name>
 
-*exporting- do you want to do anything with these newly generated packages- compress, send to an email address, init git repo *
-    * TODO: Implement this featurette.
+Testing- with use of a switch, you can generate unit tests for any or all class files.*
+  * the specifics of unittesting can be configured in the .rc file, but
+  default to unittests in a parralel sibbling directory with name test_<directory_name> and all classes titled Test_<class_name>
 
+ * attach this default/keyword to the end of the inline for including testing in your class file -t{ut,cc,st} for unit-testing, code-coverage or static-analysis
+    
+
+Exporting- do you want to do anything with these newly generated packages- compress, send to an email address, init git repo *
+* attach this default/keyword to the end of the inline for exportation of your class files -e{vsc,comp,send}
+*for:
+1. vcs- git init, branch, stage or commit 
+2. comp- compression options: tar, tgz, zip 
+3. send- email, ssh, 
 ##### 1.5 Quick reference for easy use:
 
 * inline Summary: the inline spec is used for quick writing of class specs. it consists of a single line of text with 1-3 sets of identifiers, delimited by colons, which seperate class names from attributes or methods
