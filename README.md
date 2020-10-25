@@ -12,9 +12,9 @@
 5. Running in interactive mode
 6. Developer notes, miscelaneous, software specifications
 
-## 1) Usage:
+## Usage:
 
-Input of class specifications can be provided through three different methods:
+_Input of class specifications_ can be provided through three different methods:
 1. command line arguments
 2. input file(s)
 3. interactive mode
@@ -40,7 +40,7 @@ _Optional Arguments:_
 
 #### 1.1 INPUTS:
 * takes a inline specification (learn more in section 1.5) like so:  
-    * ' class_name : attr1, _attr2, __attr3 : SMmethod, CMmethod'
+> 'class_name : attr1, _attr2, __attr3 : SMmethod, CMmethod'
 
 #### 1.2 OUTPUTS: 
 * Generates a (optionally nested) directory containing class files, unit tests, documentation structuring.
@@ -74,16 +74,18 @@ _Optional Arguments:_
 
 > class1, class2, ... ClassN : attr1, attr2 / attr1, attr2 / ... / attr1, attr2 : method / method / ... / method
 
-### colon seperates classname, attributes and methods
-### comma seperates non grouped arguments - list of sibling classes, lone list of attributes or methods
-### / forward slash delimits groups in grouped arguments- in the second example it is nessecary to denote where class1 attributes end and class2 attributes begin.
+':' <colon> seperates classname, attributes and methods
+',' <comma> seperates non grouped arguments - list of sibling classes, lone list of attributes or methods
+'/' <forward-slash> delimits groups in grouped arguments-
+    * in the second example it is nessecary to denote where class1 attributes end and class2 attributes begin.
 
-__NOTE: that you can withhold either sets of fields, but not the class name. to do so, include the standard 2 semicolons,
-but leave a white space, or no text as argument for the fields you want to not include
+*NOTE:* that you can withhold either sets of fields, but not the class name. to do so, include the standard 2 semicolons, but leave a white space, or no text as argument for the fields you want to not include
 
 * class with no fields
 
-> class_name : : or class_name::
+> class_name : : 
+or
+> class_name::
 
 * class with only attributes
 
@@ -96,7 +98,7 @@ but leave a white space, or no text as argument for the fields you want to not i
 
 * inline with inheritance specifications
 
-> class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB
+> 'class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB'
 * this inline specifies that class2 is a descendant of class1 and inherits any fields or methods unique to the parent class1.
 
 
@@ -109,14 +111,16 @@ but leave a white space, or no text as argument for the fields you want to not i
 
 > <p: c:> is the base syntax for defining a package structure, where p is the package name and c is the class names
 
-* you can either write a name or names delimited by comas, or supply either or both argumements as inline specs nested inside parentheses
-note that you can nest an inline spec to define package structuring using the inheritance syntax for classes, where > denotes a child package
+you can either write a name or names delimited by comas,
+or supply either or both argumements as inline specs nested inside parentheses
+note that you can nest an inline spec to define package structuring using
+the inheritance syntax for classes, where > denotes a child package
 
 
 
 > <p: package_name c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)>
 
-* creates
+* creates:
 
 DIR <package_name>
 -__init__.py
@@ -128,8 +132,6 @@ DIR <package_name>
 > <p: ( project_name > sounds, textures ) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
 > <p: ( project_name > sounds, textures  : ClassA, classB > classC : -t {ut,cc,st}, -e {email,zip,git} / ... >) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
 
-
-
 DIR <package_name>
 -__init__.py
 -classA.py
@@ -138,10 +140,15 @@ DIR <package_name>
 -DIR<sounds>
 -DIR<textures>
 
-# the interpretter will double back and get the specifications for the nested directories, if all you had provided was their names.
-# You have the option of providing the specification inline, but this proves to be very cumbersome for a command line argument ( it will surely span multiple lines )
+_The interpretter will double back_ and get the specifications for the nested directories,
+if all you had provided was their names. You have the option of providing the specification inline,
+but this proves to be very cumbersome for a command line argument ( it will surely span multiple lines )
 
-#NOTE: that there is not an argument (or functionality) provided for nesting upwards (towards the file system root)
+# NOTE: that there is not an argument (or functionality) provided for nesting upwards (towards the file system root)
+
+
+put a index label here:
+Nesting inline specs
 
 alternately, you can nest an inline spec for the packaging structure, and use the inheritance syntax for classes for structuring your
 
@@ -150,103 +157,91 @@ note that the full set of arguments in an inline spec denotes differnent meaning
 package structuring : class file placement within package structuring : options for classes - using flag and json argument
 
 ## 2) Features:
-
-    2.1 all components of PEP8 new style class are generated, including:
-        -constructor(__init__)
-        -__str__, __repr__
-        -script stub:
-    ```
-    if __name__ == "__main__":
-            print("Running class file. Nothing to do here", {or a customizable message})
-    ```
-    2.2 All classes are generated in new object syntax, meaning
-        getters and setters are not implemented by default.
-
-    if the class is specified as 'protected' (by prepending the class name with one or two dashed)
-    its attributes will be generated with methods, in accordance with the descriptor protocol.
-    2.3 the base generator can implement the following:
-        -multiple inheritance
-            commas to delimit multiple parents or children
-            > arrow to delimit a parent>child relationship
-            -in attributes and methods
-                , to enumerate members
-                / to delimit class groups
-                see the 'notes on inheritance' section for further details.
-        -abstract base classes
-            -by prepending ABC to class names
-        -static methods, class methods
-            -by prepending SM or CM to method names
+* 2.1 all components of PEP8 new style class are generated, including:
+    * constructor(__init__)
+    * __str__, __repr__
+    * header/script stub:
+    > if __name__ == "__main__":
+    >       print("Running class file. Nothing to do here", {or a customizable message})
+* 2.2 All classes are generated in new object syntax, meaning
+    * getters and setters are not implemented by default.
+    * if the class is specified as 'protected' (by prepending the class name with one or two dashed)
+    * its attributes will be generated with methods, in accordance with the descriptor protocol.
+* 2.3 the base generator can implement the following:
+    * multiple inheritance
+        * commas to delimit multiple parents or children
+        > arrow to delimit a parent>child relationship
+        * in attributes and methods
+            , to enumerate members
+            / to delimit class groups
+            see the 'notes on inheritance' section for further details.
+        * abstract base classes
+            * by prepending ABC to class names
+        * static methods, class methods
+            * by prepending SM or CM to method names
 
 ## 3) Customization with .rc file:
-
-    TODO need to implement functionality for this
+TODO need to implement functionality for this
 
 ## 4) Running in cmd line mode:
+* 4.1 interpret the file, passing in the following positional arguments
 
-    4.1 interpret the file, passing in the following positional arguments
+_double back when the program is finished and replace this_
+        
+* 4.2  moved to the top of the file/ index
 
-        $ python Class_Generator.py --name "my project" -c
-        "{'class 1' : ('attrA, attrB, attrC','method1,SMmethod2,CMmethod3') 'class 2': 'attrA, attrB, attrC'}" -d '/some/new/path'
+* 4.3 note on inheritance:
 
-        ^^^this is bad.. see if you can get rid of extra quotation marks among other things
-    4.2  moved to the top of the file/ index
+main inheritance function works recursively to instantiate classes
+according to the hierarchy described by passed in arguments
 
-    4.3 note on inheritance:
+argument list: names, attributes, methods = None, parent = 'object', runs = 0
 
-        main inheritance function works recursively to instantiate classes
-        according to the hierarchy described by passed in arguments
+4.5 note on methods:
+method body functionality cannot be implemented due to the limited nature of this small CLI program.
+however, all method bodies instantiated via passing in argument via cmd line or input file
+will return only the keyword 'NotImplemented' and a auto-generated function stub in adherence to PEP8 standards.
 
-        argument list: names, attributes, methods = None, parent = 'object', runs = 0
+In cmd line mode or by using the file, you can designate a method as static or class method
+by prepending SM for static methods or CM for class method to the class name, for example
 
-    4.5 note on methods:
-        method body functionality cannot be implemented due to the limited nature of this small CLI program.
-        however, all method bodies instantiated via passing in argument via cmd line or input file
-        will return only the keyword 'NotImplemented' and a auto-generated function stub in adherence to PEP8 standards.
+static methods: SMstatic_method_1, SMthis_is_an_example
+class methods: CMclass_method_1, CMyadda_yadda_yadda
 
-        In cmd line mode or by using the file, you can designate a method as static or class method
-        by prepending SM for static methods or CM for class method to the class name, for example
+doing so will cause the method to be generated in adherence to the typical way these methods are written.
+making use of decorator, and a first parameter of cls for class methods
 
-        static methods: SMstatic_method_1, SMthis_is_an_example
-        class methods: CMclass_method_1, CMyadda_yadda_yadda
+* 4.6 input file for argument
+> <Unix>
+> $ ./cls_gen example
 
-        doing so will cause the method to be generated in adherence to the typical way these methods are written.
-        making use of decorator, and a first parameter of cls for class methods
+> <NT>
+> $ python cls_gen.py -f example.txt
 
-    4.6 input file for argument
+* <syntax for the input file>
 
-        <Unix>
-        $ ./cls_gen example
+in the input file, seperate classes with a single newline character
+(type <ENTER> on most systems while in typing mode)
+class, attribute and methods should be delimited with a colon (:)
+individual attributes or methods should be delimited with a comma (,)
 
-        <NT>
-        $ python cls_gen.py -f example.txt
+> class_1 : attr1, attr2, attr3 : method1, method2, method3
+> class_2 : attr1, attr2, attr3 : method1, method2, method3
+> ...
+> class_n : attr1, attr2, attr3 : method1, method2, method3
 
-        <syntax for the input file>
+inheritance and method designation follows the same syntax used in traditional cmd line mode
 
-        in the input file, seperate classes with a single newline character
-    (type <ENTER> on most systems while in typing mode)
-        class, attribute and methods should be delimited with a colon (:)
-        individual attributes or methods should be delimited with a comma (,)
+> class_1, class_2 > class_3 > class_4 : attr1, attr2 / attr3, attr4 > attr5, attr6 > attr7, attr8
+> class_1 > class_2, class_3, class_4 : attr1, attr2 > attr3, attr4 / attr5, attr6 / attr7, attr8
 
-        class_1 : attr1, attr2, attr3 : method1, method2, method3
-        class_2 : attr1, attr2, attr3 : method1, method2, method3
-        ...
-        class_n : attr1, attr2, attr3 : method1, method2, method3
-
-        inheritance and method designation follows the same syntax used in traditional cmd line mode
-
-        class_1, class_2 > class_3 > class_4 : attr1, attr2 / attr3, attr4 > attr5, attr6 > attr7, attr8
-        class_1 > class_2, class_3, class_4 : attr1, attr2 > attr3, attr4 / attr5, attr6 / attr7, attr8
-
-        class_1 : attr1, attr2, attr3 : method_1, method_2, SMmethod_3, CMmethod_4 //where method 1 and 2 are regular methods, 3 and 4 are static and class methods
+> class_1 : attr1, attr2, attr3 : method_1, method_2, SMmethod_3, CMmethod_4 //where method 1 and 2 are regular methods, 3 and 4 are static and class methods
 
 ## 5) Running in interactive mode
-
-    5.1 How To:
-        Running in interactive mode is the default user interface
-        when the program is run without arguments or the option -i is used.
-    5.2
-        note that using the -i flag in conjunction with other options
-        currently will result in errors.
+* 5.1 How To:
+    * Running in interactive mode is the default user interface when the program is run without arguments or the option -i is used.
+* 5.2
+    * note that using the -i flag in conjunction with other options. currently will result in errors.
 
 ## 6) Specificiations, Developer notes, miscelaneous:
 
