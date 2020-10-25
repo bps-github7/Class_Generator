@@ -1,10 +1,10 @@
-# Class Generator Program: A utillity program written in
+#### Class Generator Program: A utillity program written in
 
-# Python 3.8 which automatically generates class files.
+#### Python 3.8 which automatically generates class files.
 
-### Programmer: Ben P. Sehnert
+###### Programmer: Ben P. Sehnert
 
-### Date: 2/11/2020
+###### Date: 2/11/2020
 
 ## Index:
 
