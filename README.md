@@ -1,9 +1,5 @@
-#### Class Generator Program: A utillity program written in
-#### Python 3.8 which automatically generates class files.
-###### Programmer: Ben P. Sehnert
-###### Date: 2/11/2020
-
-## Index:
+#### Class Generator Program: A utillity program written in Python 3.8 which automatically generates class files.
+###### Programmer: Ben P. Sehnert   ~   Date: 2/11/2020
 1. Usage
 2. Features
 3. Customization with .rc file
@@ -22,7 +18,7 @@ _Input of class specifications_ can be provided through three different methods:
 _Optional Arguments:_
 * h, --help                  show this message and exist
 
-* n, --project-name          Provide the name for the project you are creating. Program execution will
+* n, --project-name          Provide the name for the project you are creating. By default, program execution will
                                 create a new directory with the provided name, located in the default directory
                                 to contain newly generated class files.
 
@@ -53,7 +49,9 @@ Defaults to creation of a new directory, labeled with project name, that contain
 Allows specification of nested packages, for organization of the generated classes, containing __init__.py and README.md.
   * Note that this overrides the default behaivor of generating files in a new directory created in the current working directory
 
-Syntax for switches within the inline specification:
+switches: 
+
+##### 1.4.1 Syntax for switches within the inline specification:
 1. Append the switch to the end of the spec to apply the switch to the file.
 > 'class_name : attr1, _attr2, _/_attr3 : SMmethod, CMmethod -t{cc,st} -e{comp,send}'
 2. For more complex inline specs, you can apply this technique globally to the package/ generated files
@@ -61,116 +59,85 @@ Syntax for switches within the inline specification:
 > ' classA -e{send}, classB -t{cc} > classC -e{vcs,comp,send} -t{cc,st} : ...'
 
 
-Testing- with use of a switch, you can generate unit tests for any or all class files.*
-  * the specifics of unittesting can be configured in the .rc file, but
-  default to unittests in a parralel sibbling directory with name test_<directory_name> and all classes titled Test_<class_name>
+##### 1.4.2 Testing
+With use of a switch, you can generate unit tests for any or all class files.
 
- * attach this default/keyword to the end of the inline for including testing in your class file -t{ut,cc,st} for unit-testing, code-coverage or static-analysis
+> -t{ut,cc,st} 
+for: 
+* unit-testing (ut)
+* code-coverage (cc)
+* static-analysis (st)
+
+1. attach this default/keyword to the end of the inline for including testing in ALL your class files
+2. or apply at the end of the class identifier to apply testing selectively. 
     
 
-Exporting- do you want to do anything with these newly generated packages- compress, send to an email address, init git repo *
-* attach this default/keyword to the end of the inline for exportation of your class files -e{vsc,comp,send}
-*for:
+##### 1.4.3 Exporting
+Do you want to do anything with these newly generated packages- compress, send to an email address, init git repo *
+* attach this default/keyword to the end of the inline for exportation of your class files
+> -e{vsc,comp,send}
+for:
 1. vcs- git init, branch, stage or commit 
 2. comp- compression options: tar, tgz, zip 
 3. send- email, ssh, 
-##### 1.5 Quick reference for easy use:
-
-* inline Summary: the inline spec is used for quick writing of class specs. it consists of a single line of text with 1-3 sets of identifiers, delimited by colons, which seperate class names from attributes or methods
-
-* class_dict: implementation details- optionally you can use as an Command line argument. but it is cumbersome
 
 
-* basic inline
-> class_name : attrA, attrB, attrC : method1, method2
+##### 1.5 Inline Quick reference:
+* inline Summary *: the inline spec is used for quick writing of class specs. it consists of a single line of text with 1-3 sets of identifiers, delimited by colons, which seperate class names from attributes or methods
 
-> class1, class2, ... ClassN : attr1, attr2 / attr1, attr2 / ... / attr1, attr2 : method / method / ... / method
+##### 1.5.1 Basic Inline Specification:
+See the developer notes for full documentation.
+you can use the 'inline specification' ( the ClassGen's primary/prefered input ) for
+1. specification of classes and their attributes and or fields ( optionally, with multi level or multiple inheritance(s)).
+2. specification of packaging within your project.
+3. both of these purposes at once
 
+<identifier> : <fields> : <methods>
+
+Throughout these examples, we must keep in mind the following rules...
+1. either attributes or methods can be blank in the inline, but not the class identifier (can't make a nameless class).
+2. to leave either attributes or methods blank, include the typical amount of colons but leave the section blank
+> ClassA::                    creates a classA with no methods or fields       
+> ClassA : : method           creates a classA with only a method
+> ClassA : attr1, attr2 :     creates a classA with only attributes      
+
+the following tokens/ operators have the folllowing meaning in an inline spec:
 * ':' <colon> seperates classname, attributes and methods
 * ',' <comma> seperates non grouped arguments - list of sibling classes, lone list of attributes or methods
 * '/' <forward-slash> delimits groups in grouped arguments-
     * in the second example it is nessecary to denote where class1 attributes end and class2 attributes begin.
 
-*NOTE:* that you can withhold either sets of fields, but not the class name. to do so, include the standard 2 semicolons, but leave a white space, or no text as argument for the fields you want to not include
-
-* class with no fields
-
-> class_name : : 
-
-or
-
-> class_name::
-
-* class with only attributes
-
-> class_name:attr1,attr2:
-
-* class with only methods
-
-> class_name::method1,method2
+basic inline spec: 
+> 'class_name : attrA, attrB, attrC : method1, method2'
 
 
-* inline with inheritance specifications
+inline spec with multiple classes:
+> 'classA, classB, ... ClassN : attrA1, attrA2 / attrB1, attrB2 / ... / attrN1, attrN2 : methodA / methodB / ... / methodN'
 
+
+inline spec with simple inheritance:
 > 'class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB'
-* this inline specifies that class2 is a descendant of class1 and inherits any fields or methods unique to the parent class1.
 
 
-* when nessecary, use the basic inline grouping syntax to specify multiple inheritances
-
-> classA, classB, classC > classD : A1, A2, A3 / B1, B2,B3 / C1, C2, C3 > D1, D2, D3 : Amethod / Bmethod / Cmethod > Dmethod
-
-
-* specification of package structuring
-
-> <p: c:> is the base syntax for defining a package structure, where p is the package name and c is the class names
-
-you can either write a name or names delimited by comas,
-or supply either or both argumements as inline specs nested inside parentheses
-note that you can nest an inline spec to define package structuring using
-the inheritance syntax for classes, where > denotes a child package
+inline spec with complex, hierachircal and/or multiple inheritances:
+> 'classA, classB, classC > classD : A1, A2, A3 / B1, B2,B3 / C1, C2, C3 > D1, D2, D3 : Amethod / Bmethod / Cmethod > Dmethod'
 
 
+package structuring with the inline spec
+> <p: c: > 
+where p: stands for packaging and c: stands for classes
 
-> <p: package_name c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)>
-
-creates: 
-
-DIR <package_name>
-* __init__.py
-* classA.py
-* classB.py
-* classC.py
+you can nest an inline spec inside each of these arguments for p and c,
 
 
-> <p: ( project_name > sounds, textures ) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
-> <p: ( project_name > sounds, textures  : ClassA, classB > classC : -t {ut,cc,st}, -e {email,zip,git} / ... >) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
+<p: package_name c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)>
 
-creates: 
+<p: () c: ()>
 
-DIR <package_name>
-* __init__.py
-* classA.py
-* classB.py
-* classC.py
-* DIR<sounds>
-* DIR<textures>
-
-_The interpretter will double back_ and get the specifications for the nested directories,
-if all you had provided was their names. You have the option of providing the specification inline,
-but this proves to be very cumbersome for a command line argument ( it will surely span multiple lines )
-
-# NOTE: that there is not an argument (or functionality) provided for nesting upwards (towards the file system root)
+<p: () c: >
 
 
-put a index label here:
-Nesting inline specs
 
-alternately, you can nest an inline spec for the packaging structure, and use the inheritance syntax for classes for structuring your
-
-note that the full set of arguments in an inline spec denotes differnent meaning.
-
-package structuring : class file placement within package structuring : options for classes - using flag and json argument
 
 ## 2) Features:
 * 2.1 all components of PEP8 new style class are generated, including:
@@ -341,3 +308,119 @@ inheritance and method designation follows the same syntax used in traditional c
             --attr prepended by __ will create name mangled attribute.
             -- since comma seperates attributes in first list, / will seperate attribute lists of each parent (exception #2)
             --if the method list is included: regular identifier creates instance method, identifier prepended by CM creates class method,  identifier prepended by SM will create static method
+
+
+
+> class_name : attrA, attrB, attrC : method1, method2
+
+> classA, classB, ... ClassN : AttrA1, attrA2 / attrB1, attrB2 / ... / attrN1, attrN2 : methodA / methodB / ... / methodN
+
+* ':' <colon> seperates classname, attributes and methods
+* ',' <comma> seperates non grouped arguments - list of sibling classes, lone list of attributes or methods
+* '/' <forward-slash> delimits groups in grouped arguments-
+    * in the second example it is nessecary to denote where class1 attributes end and class2 attributes begin.
+
+##### 1.5.2 Leaving Arguments Blank in the Specification:
+*NOTE:* that you can withhold either sets of fields, but not the class name. to do so, include the standard 2 semicolons, but leave a white space, or no text as argument for the fields you want to not include
+
+* class with no fields
+
+> class_name : : 
+
+or
+
+> class_name::
+
+* class with only attributes
+
+> class_name:attr1,attr2:
+
+* class with only methods
+
+> class_name::method1,method2
+
+
+##### 1.5.3 Inheritance within the Inline Specification:
+
+This inline specifies that class2 is a descendant of class1 and inherits any fields or methods unique to the parent class1.
+
+> 'class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB'
+
+
+##### 1.5.4 Multiple Inheritances: 
+
+When nessecary, use the basic inline grouping syntax to specify multiple inheritances
+
+> classA, classB, classC > classD : A1, A2, A3 / B1, B2,B3 / C1, C2, C3 > D1, D2, D3 : Amethod / Bmethod / Cmethod > Dmethod
+
+
+##### 1.5.5 Package Structuring within inline specification
+
+The base syntax for defining a package structure, where p is the package name and c is the class names
+
+> <p: c:> 
+
+you can either write a name or names delimited by comas,
+or supply either or both argumements as inline specs nested inside parentheses.
+
+> <p: package_name c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)>
+
+creates: 
+
+DIR <package_name>
+* __init__.py
+* README.md
+* classA.py
+* classB.py
+* classC.py
+
+
+Note that you can nest an inline spec to define package structuring using
+the inheritance syntax for classes, where > denotes a child package
+
+
+> <p: ( audio > sounds, textures ) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
+
+creates: 
+
+DIR audio
+* __init__.py
+* README.md
+* classA.py
+* classB.py
+* classC.py
+* DIR<sounds>
+* DIR<textures>
+
+_The interpretter will double back_ and get the specifications for the nested directories,
+if all you had provided was their names. You have the option of providing the specification inline,
+but this proves to be very cumbersome for a command line argument ( it will surely span multiple lines )
+
+> <p: ( audio > sounds, textures  : ClassA, classB > classC (sounds), classD (textures) : -t {ut,cc,st}, -e {email,zip,git} / ... >) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
+
+in this case, nesting two inline specs (for both the package structuring and classes) is adventageous for two reasons- the third argument within the packaging inline can be used as a space for designating switches on a class per class basis (rather than providing this info in the first argument of the class inline spec, after a specific identifier).
+secondly, we can describe WHERE in the packaging each class will be generated. In the case of the above spec, the generated packaging will look like this:
+
+DIR audio
+* __init__.py
+* README.md
+* classA.py
+* classB.py
+* classC.py
+* DIR<sounds>
+  * __init__.py
+  * README.md
+  * classC.py
+* DIR<textures>
+  * __init__.py
+  * README.md
+  * classD.py
+
+* _NOTE:_ that there is not an argument (or functionality) provided for nesting upwards (towards the file system root), or creating a multi package root package (the root of your project having multiple directories- instead, call the program multiple times and generate individual packages in the same directory).
+
+note that the full set of arguments in an inline spec denotes differnent meaning.
+
+packaging: <package structuring> : <class file placement within package structuring> : options for classes - using flag and json argument
+
+classes: <class Identifiers> : <atributes for an individual class (delimted by , and grouped by /)> : <methods for an individual class (delimted by , and grouped by /)>  
+
