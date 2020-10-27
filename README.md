@@ -1,4 +1,4 @@
-#### Class Generator Program: A utillity program written in Python 3.8 which automatically generates class files.
+#### Class Generator Program: A utillity program written in Python 3.8 that generates class files.
 ###### Programmer: Ben P. Sehnert   ~   Date: 2/11/2020
 1. Usage
 2. Features
@@ -49,37 +49,36 @@ Defaults to creation of a new directory, labeled with project name, that contain
 Allows specification of nested packages, for organization of the generated classes, containing __init__.py and README.md.
   * Note that this overrides the default behaivor of generating files in a new directory created in the current working directory
 
-switches: 
-
 ##### 1.4.1 Syntax for switches within the inline specification:
 1. Append the switch to the end of the spec to apply the switch to the file.
-> 'class_name : attr1, _attr2, _/_attr3 : SMmethod, CMmethod -t{cc,st} -e{comp,send}'
+> 'class_name : attr1, _attr2, _/_attr3 : SMmethod, CMmethod -t -e{comp,send}'
 2. For more complex inline specs, you can apply this technique globally to the package/ generated files
 3. Alternatively, you can apply the switch on a class by class basis
-> ' classA -e{send}, classB -t{cc} > classC -e{vcs,comp,send} -t{cc,st} : ...'
-
+> ' classA -e{send}, classB -t > classC -e{vcs,comp,send} -t : ...'
 
 ##### 1.4.2 Testing
 With use of a switch, you can generate unit tests for any or all class files.
 
-> -t{ut,cc,st} 
-for: 
-* unit-testing (ut)
-* code-coverage (cc)
-* static-analysis (st)
+> -t
 
 1. attach this default/keyword to the end of the inline for including testing in ALL your class files
 2. or apply at the end of the class identifier to apply testing selectively. 
-    
+
 
 ##### 1.4.3 Exporting
 Do you want to do anything with these newly generated packages- compress, send to an email address, init git repo *
 * attach this default/keyword to the end of the inline for exportation of your class files
-> -e{vsc,comp,send}
+
+> -e{vsc : default = 'git init', comp : default = 'tgz', send : default = '' }
+
 for:
 1. vcs- git init, branch, stage or commit 
 2. comp- compression options: tar, tgz, zip 
 3. send- email, ssh, 
+
+for exporting, apply the switch only by name (no keyword argument) to generate the class with each option switched on.
+> class A : attr1, attr2 : method -t -e
+produces ClassA with unittests, version control, compressed and not sent to an email (because default email is blank)
 
 
 ##### 1.5 Inline Quick reference:
@@ -132,7 +131,7 @@ you can nest an inline spec inside each of these arguments for p and c,
 
 <p: package_name c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)>
 
-<p: () c: ()>
+<p: () c: ()> 
 
 <p: () c: >
 
@@ -140,29 +139,48 @@ you can nest an inline spec inside each of these arguments for p and c,
 
 
 ## 2) Features:
-* 2.1 all components of PEP8 new style class are generated, including:
-    * constructor(__init__)
-    * __str__, __repr__
-    * header/script stub:
-    > if __name__ == "__main__":
-    >       print("Running class file. Nothing to do here", {or a customizable message})
-* 2.2 All classes are generated in new object syntax, meaning
-    * getters and setters are not implemented by default.
-    * if the class is specified as 'protected' (by prepending the class name with one or two dashed)
-    * its attributes will be generated with methods, in accordance with the descriptor protocol.
-* 2.3 the base generator can implement the following:
-    * multiple inheritance
-        * commas to delimit multiple parents or children
-        > arrow to delimit a parent>child relationship
-        * in attributes and methods
-            , to enumerate members
-            / to delimit class groups
-            see the 'notes on inheritance' section for further details.
-        * abstract base classes
-            * by prepending ABC to class names
-        * static methods, class methods
-            * by prepending SM or CM to method names
+##### 2.1 all components of PEP8 new style class are generated, including:
+* constructor(__init__)
+* __str__, __repr__
+* header/script stub:
 
+> ClassA:
+> ''' Class level docstring: '''
+> version = 1
+>   def __init__(self, attr):
+>     self.attr = attr
+>   #is this the standard way of writing these check someones source code?
+>   def __str__(self):
+>     return 'attr: {}'.format(self.attr)
+>   def __repr__(self):
+>     return { str(self.attr) : self.attr }
+> if __name__ == "__main__":
+>       print("Running class file. Nothing to do here", {or a customizable message})
+
+
+
+##### 2.2 All classes are generated in new object syntax, meaning
+* getters and setters are not implemented by default.
+* if the class is specified as 'protected' (by prepending the class name with one or two dashed)
+  its attributes will be generated with methods, in accordance with the descriptor protocol.
+
+##### 2.3 the base generator can implement the following:
+* multiple inheritance
+  * commas to delimit multiple parents or children
+  > arrow to delimit a parent>child relationship
+* in attributes and methods
+  , to enumerate members
+  / to delimit class groups
+  * see the 'notes on inheritance' section for further details.
+* abstract base classes
+  * by prepending ABC to class names
+  > ABCmonster : attr1,attr2,attr :        
+  creates an abstract base class called Monster
+* static methods, class methods
+  * by prepending SM or CM to method names
+  > classA : attr1,attr2,attr3 : SMmethod1, CMmethod2, method3
+  creates a ClassA with 3 methods, a static, class and regular method
+ 
 ## 3) Customization with .rc file:
 TODO need to implement functionality for this
 
