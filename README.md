@@ -34,7 +34,7 @@ _Optional Arguments:_
 * e, --exporting             What should be done with the generated project {tgz, zip, tgz and email req arg : 'name@mail.com', zip and email, tgz and ssh, zip and ssh}
 
 #### 1.1 INPUTS:
-Takes a inline specification (learn more in section 1.5) like so:  
+Takes a **inline specification** (learn more in section 1.5) like so:  
 > 'class_name : attr1, _attr2, __attr3 : SMmethod, CMmethod'
 
 #### 1.2 OUTPUTS: 
@@ -61,7 +61,7 @@ With use of a switch, you can generate unit tests for any or all class files.
 
 > -t
 
-1. attach this default/keyword to the end of the inline for including testing in ALL your class files
+1. attach this switch/flag to the end of the inline for including testing in ALL your class files
 2. or apply at the end of the class identifier to apply testing selectively. 
 
 
@@ -74,11 +74,30 @@ Do you want to do anything with these newly generated packages- compress, send t
 for:
 1. vcs- git init, branch, stage or commit 
 2. comp- compression options: tar, tgz, zip 
-3. send- email, ssh, 
+3. send- email, (ssh in the future) 
 
 for exporting, apply the switch only by name (no keyword argument) to generate the class with each option switched on.
 > class A : attr1, attr2 : method -t -e
 produces ClassA with unittests, version control, compressed and not sent to an email (because default email is blank)
+
+Note that you will need to supply an email address to correctly use the following flag and configuration:
+` class A : attr1, attr2, attr3 : method1 -e{send}` 
+
+no email will be sent if the email address argument is not provided, nor will it work if no viable email account is supplied.
+You may either supply an email in the .rc file or supply it at program run time. the program will ask for one if
+the send option is provided. Thus, the effective use of this flag and configuration is as follows:
+
+` class A : attr1, attr2, attr3 : method1 -e{send : 'from: youremail@gmail.com to: example@aol.com' }` 
+
+the parser can infer what type of send option you want to use based on the value you provide for the send key:
+
+The above example will cause the generated classes/packages to be sent from email
+whereas the following will use ssh to send the generated classes/packages with ssh:
+
+` class A : attr1, attr2, attr3 : method1 -e{send : 'username@a:/path/to/destination' }` 
+
+note that any send option will by default have to compress the generated classes for sake of efficiency and avoiding complications. 
+
 
 
 ##### 1.5 Inline Quick reference:
@@ -91,20 +110,23 @@ you can use the 'inline specification' ( the ClassGen's primary/prefered input )
 2. specification of packaging within your project.
 3. both of these purposes at once
 
-<identifier> : <fields> : <methods>
+<identifier -> class name>(,)* : <identifier -> attributes>(,)* : <identifier -> methods>(,)*
 
-Throughout these examples, we must keep in mind the following rules...
+**Throughout these examples, we must keep in mind the following rules...**
 1. either attributes or methods can be blank in the inline, but not the class identifier (can't make a nameless class).
 2. to leave either attributes or methods blank, include the typical amount of colons but leave the section blank
 > ClassA::                    creates a classA with no methods or fields       
 > ClassA : : method           creates a classA with only a method
 > ClassA : attr1, attr2 :     creates a classA with only attributes      
 
-the following tokens/ operators have the folllowing meaning in an inline spec:
+**the following tokens/ operators have the folllowing meaning in an inline spec:**
 * ':' <colon> seperates classname, attributes and methods
-* ',' <comma> seperates non grouped arguments - list of sibling classes, lone list of attributes or methods
-* '/' <forward-slash> delimits groups in grouped arguments-
-    * in the second example it is nessecary to denote where class1 attributes end and class2 attributes begin.
+* ',' <comma> seperates non grouped identifiers - list of sibling classes, lone list of attributes or methods
+* '/' <forward-slash> delimits groups in grouped identifiers-
+    `classA, classB : A_attr1, A_attr2 / B_attr1, B_attr2`
+    * in this second example, a '/' <forward-slash> is nessecary to denote where class1 attributes end and class2 attributes begin.
+
+**the following demonstrate some of the syntactic feaures of the inline specification:**
 
 basic inline spec: 
 > 'class_name : attrA, attrB, attrC : method1, method2'
@@ -130,6 +152,8 @@ you can nest an inline spec inside each of these arguments for p and c,
 
 
 <p: package_name c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)>
+
+# not sure what these two demonstrate- that the parens are not nessecary?
 
 <p: () c: ()> 
 
