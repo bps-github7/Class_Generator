@@ -5,6 +5,18 @@
 """Defines the functions used for writing regular class files."""
 
 
+def make_imports(file, parents, path_to_parents="./"):
+    '''
+Writes the import statements so that a child class
+can properly inherit from its parents
+    '''
+    for items in parents:
+        # any considerations here for system path? do we need to append
+        # to it to import from parent dir? not normally i presume
+        file.write("from {} import {}\n".format(items, items))
+    file.write("\n")
+
+
 def make_init(file, name, attributes, protected=False):
     """
 Completes the init statement by writing attributes to the file
@@ -140,13 +152,21 @@ Please revise your class definition so that there are no duplicates in method na
     return None
 
 
+# why is attributes passed in as a list but methods a string?
 def make_class(name, attributes, methods, parent=object, protected=False):
     """
 main subroutine for class generator
 creates a file with the provided class name
 outputs the appropriate class syntax for what is specified.
     """
+    # coerce adherence to PEP8 by making class identifier titlecase
+    name = name.title()
     with open("{}.py".format(name), "a+") as file:
+        if parent != object:
+            make_imports(file, [parent])
+        else:
+            # prevent writing object as internal type representation.
+            parent = "object"
         file.write("class {}({}):\n".format(name, parent))
         make_init(file, name, attributes, protected=protected)
         make_repr(file, attributes)
@@ -164,5 +184,8 @@ outputs the appropriate class syntax for what is specified.
         \n\tprint('Running class file. Nothing to do here')")
 
 
+# these should be able to take class_dict as an argument!
 make_class("employer", ["employeeID", "name", "salary"],
            "SMstaticmethod1,SMstaticmethod2,CMclassmethod1,CMclassmethod2,normalmethod1", parent="Person")
+make_class("person", ["name", "age", "weight",
+                      "height"], "mystical_beansprout")

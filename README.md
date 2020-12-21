@@ -190,19 +190,50 @@ you can nest an inline spec inside each of these arguments for p and c,
 
 ##### 2.3 the base generator can implement the following:
 * multiple inheritance
-  * commas to delimit multiple parents or children
-  > arrow to delimit a parent>child relationship
+  * `,` <comma> to delimit multiple parents or children 
+  
+  `classA, classB > classC`  classC inherits from both A and B.
+
+  `classA > classB, classC` classA is a parent of both B and C
+  
+    more generally: `A, B, C : :` creates a directory with three non-related sibling classes A, B and C inside.
+
+
+  * `>` <arrow> to delimit a `parent > child` relationship
+
+    note that the amount of arrows must be strictly equivilent within the class identifier, attribute and methods
+    for the inheritance specification to be properly translated into classes. __for example__:
+
+    ` A > B : attr1, attr2 > attr3, attr4` is correct- builds class two classes with two attributes each
+
+    ` A > B > C : attr1, attr2 > attr3, attr4` is ambiguous but works- class C has no attributes to generate
+
+    `A > B > C : attr1 > attr2 > attr3 > attr4` is incorrect, as there are more attribute inheritances
+                                                than classes (exception will be thrown) 
+
+    a more complex, instructive example:
+
+    `A, B > C > D, E : attr1, attr2 / attr3, attr4 > attr5 > attr6` again, ambiguous, but the parser can handle this
+        generated class E will have no attributes
+
 * in attributes and methods
-  , to enumerate members
-  / to delimit class groups
+  * `,` <comma> to enumerate members
+  * `/` <forward-slash> to delimit class groups
   * see the 'notes on inheritance' section for further details.
+  * attribute and method inheritance, for children, is performed using pythons default mechanism, using the super() method.
+
 * abstract base classes
   * by prepending ABC to class names
-  > ABCmonster : attr1,attr2,attr :        
-  creates an abstract base class called Monster
+  
+  `ABCmonster : attr1,attr2,attr : SMstaticmethod1 `       
+  
+  This creates an abstract base class called Monster, with 3 attributes and an unimplemented static method `staticmethod1` 
+
 * static methods, class methods
   * by prepending SM or CM to method names
-  > classA : attr1,attr2,attr3 : SMmethod1, CMmethod2, method3
+
+  `classA : attr1,attr2,attr3 : SMmethod1, CMmethod2, method3`
+  
   creates a ClassA with 3 methods, a static, class and regular method
  
 ## 3) Customization with .rc file:
@@ -215,7 +246,7 @@ _double back when the program is finished and replace this_
         
 * 4.2  moved to the top of the file/ index
 
-* 4.3 note on inheritance:
+* 4.3 dev note on inheritance:
 
 main inheritance function works recursively to instantiate classes
 according to the hierarchy described by passed in arguments
@@ -245,22 +276,26 @@ making use of decorator, and a first parameter of cls for class methods
 
 * <syntax for the input file>
 
-in the input file, seperate classes with a single newline character
+in the input file, seperate inline specifications with a single newline character
 (type <ENTER> on most systems while in typing mode)
 class, attribute and methods should be delimited with a colon (:)
 individual attributes or methods should be delimited with a comma (,)
 
-> class_1 : attr1, attr2, attr3 : method1, method2, method3
-> class_2 : attr1, attr2, attr3 : method1, method2, method3
-> ...
-> class_n : attr1, attr2, attr3 : method1, method2, method3
-
+`
+class_1 : attr1, attr2, attr3 : method1, method2, method3
+class_2 : attr1, attr2, attr3 : method1, method2, method3
+...
+class_n : attr1, attr2, attr3 : method1, method2, method3
+`
 inheritance and method designation follows the same syntax used in traditional cmd line mode
 
-> class_1, class_2 > class_3 > class_4 : attr1, attr2 / attr3, attr4 > attr5, attr6 > attr7, attr8
-> class_1 > class_2, class_3, class_4 : attr1, attr2 > attr3, attr4 / attr5, attr6 / attr7, attr8
+`
+class_1, class_2 > class_3 > class_4 : attr1, attr2 / attr3, attr4 > attr5, attr6 > attr7, attr8
+class_1 > class_2, class_3, class_4 : attr1, attr2 > attr3, attr4 / attr5, attr6 / attr7, attr8
 
-> class_1 : attr1, attr2, attr3 : method_1, method_2, SMmethod_3, CMmethod_4 //where method 1 and 2 are regular methods, 3 and 4 are static and class methods
+class_1 : attr1, attr2, attr3 : method_1, method_2, SMmethod_3, CMmethod_4
+`
+where method 1 and 2 are regular methods, 3 and 4 are static and class methods
 
 ## 5) Running in interactive mode
 * 5.1 How To:
@@ -271,11 +306,7 @@ inheritance and method designation follows the same syntax used in traditional c
 ## 6) Specificiations, Developer notes, miscelaneous:
 
     6.1 files in this software include the following:
-        -Misc
-        -special_class
-        -regular_class
-        -options
-        -main
+
     6.2 inheritance specifications
 
     <parameter: name>
@@ -421,7 +452,7 @@ Note that you can nest an inline spec to define package structuring using
 the inheritance syntax for classes, where > denotes a child package
 
 
-> <p: ( audio > sounds, textures ) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
+`<p: ( audio > sounds, textures ) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>`
 
 creates: 
 
@@ -438,7 +469,7 @@ _The interpretter will double back_ and get the specifications for the nested di
 if all you had provided was their names. You have the option of providing the specification inline,
 but this proves to be very cumbersome for a command line argument ( it will surely span multiple lines )
 
-> <p: ( audio > sounds, textures  : ClassA, classB > classC (sounds), classD (textures) : -t {ut,cc,st}, -e {email,zip,git} / ... >) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>
+`<p: ( audio > sounds, textures  : ClassA, classB > classC (sounds), classD (textures) : -t {ut,cc,st}, -e {email,zip,git} / ... >) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>`
 
 in this case, nesting two inline specs (for both the package structuring and classes) is adventageous for two reasons- the third argument within the packaging inline can be used as a space for designating switches on a class per class basis (rather than providing this info in the first argument of the class inline spec, after a specific identifier).
 secondly, we can describe WHERE in the packaging each class will be generated. In the case of the above spec, the generated packaging will look like this:
@@ -466,3 +497,4 @@ packaging: <package structuring> : <class file placement within package structur
 
 classes: <class Identifiers> : <atributes for an individual class (delimted by , and grouped by /)> : <methods for an individual class (delimted by , and grouped by /)>  
 
+careful because your syntax for identifying tokens (in this doc) just narrowly collides with how the packaging structure inline spec looks and works.
