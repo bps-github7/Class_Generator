@@ -1,8 +1,20 @@
+'''
+Programmer: Ben Sehnert
+Program: Class_Dict Class
+Software: Class Generator
+Date: 12/21/2020
+
+Module level docstring: implementation of Class Dict Class
+'''
+
 class Class_Dict:
-    def __init__(self, classes=None, attributes=None, methods=None, parents=object):
-        self.classes = classes
-        self.attributes = attributes
-        self.methods = methods
+    '''Class Level Docstring: Class_Dict is a dictionary that contains the specifications of a class
+    it is the internal repersentation of the Inline class.'''
+
+    def __init__(self, classes=None, attributes=None, methods=None, parents='object'):
+        self.classes = classes.title()
+        self.attributes = [(x.strip()).lower() for x in attributes.split(',')]
+        self.methods = [(x.strip()).lower() for x in methods.split(',')]
         self.parents = parents
 
     def __repr__(self):
@@ -14,3 +26,6 @@ class Class_Dict:
     @classmethod
     def to_classdict(cls, inline):
         return Class_Dict(*inline.split(":"))
+
+
+print(Class_Dict.to_classdict("american : attr1, attr2 : methodman"))

@@ -49,6 +49,7 @@ inline from (validated) user input.
 
     version = 2.1
 
+    #wouldnt it make more sense to 
     def __init__(self, classes=None, attributes=None, methods=None, global_testing=False, global_exporting=None):
         def cleanse(items: str):
             def clean(x): return x.strip()
@@ -59,6 +60,8 @@ inline from (validated) user input.
         self.methods = cleanse(methods.strip())
         self.global_testing = global_testing
         self.global_exporting = global_exporting
+
+
 
     @classmethod
     def from_inline(cls, inline: str):
@@ -72,6 +75,8 @@ inline from (validated) user input.
                       global_testing=testing(inline),
                       global_exporting=exporting(inline))
 
+    #if global testing/ global exporting set to false, will need to parse
+    # for these later, when translating into a class dict from here
 
 if __name__ == "__main__":
     new_line = Inline.from_inline(
