@@ -13,32 +13,15 @@ _Input of class specifications_ can be provided through three different methods:
 2. input file(s)
 3. interactive mode
 
-
-###### Gonna want to replace this whole section when the program is done
-_Optional Arguments:_
-* h, --help                  show this message and exist
-
-* n, --project-name          Provide the name for the project you are creating. By default, program execution will
-                                create a new directory with the provided name, located in the default directory
-                                to contain newly generated class files.
-
-                                #outdated- needs to get updated when help argument is updated..
-* c, --class-and-attr        pass in class information string containing dict SYNTAX: '{ "class_name" : "attr, _attr, __attr",
-                                "ABCclass_name" : 'attr1' #abstract base class , "parentclass_name -> childclass_name" : 'p_attr, p_attr2 -> ...child attributes' #inheritance }'
-
-
-* s, --skip-attributes       Use this option to skip defining instance variables for your class.
-
-* t, --testing               automatically generate unittests, static analysis, code coverage for generated classes
-
-* e, --exporting             What should be done with the generated project {tgz, zip, tgz and email req arg : 'name@mail.com', zip and email, tgz and ssh, zip and ssh}
-
 #### 1.1 INPUTS:
-Takes a **inline specification** (learn more in section 1.5) like so:  
-> 'class_name : attr1, _attr2, __attr3 : SMmethod, CMmethod'
+In most cases, the program takes a **inline specification** (put a link to section 1.5 on inline specification text) like so:  
+
+`class_name : attr1, _attr2, __attr3 : SMmethod, CMmethod`
+
+The only exception being interactive mode, where you can choose to be walked through building a class, piece by piece.
 
 #### 1.2 OUTPUTS: 
-Generates a (optionally nested) directory containing class files, unit tests, documentation structuring.
+Generates a directory, or series of directories of class files, unit tests, documentation structuring that matches the specifcation provided through input.
 
 #### 1.3 DETAILS: 
 Defaults to creation of a new directory, labeled with project name, that contains all generated files. 
@@ -50,40 +33,71 @@ Allows specification of nested packages, for organization of the generated class
   * Note that this overrides the default behaivor of generating files in a new directory created in the current working directory
 
 ##### 1.4.1 Syntax for switches within the inline specification:
-1. Append the switch to the end of the spec to apply the switch to the file.
-> 'class_name : attr1, _attr2, _/_attr3 : SMmethod, CMmethod -t -e{comp,send}'
-2. For more complex inline specs, you can apply this technique globally to the package/ generated files
+1. Append the switch to the end of a single class spec to apply the switch to the file.
+
+`class_name : attr1, _attr2, _/_attr3 : SMmethod, CMmethod -t -e{comp,send}` 
+generated class will be generated with testing and then be compressed and sent via email.
+
+2. For more complex inline specs, you can apply this technique globally to the package/ generated files (like the above example).
 3. Alternatively, you can apply the switch on a class by class basis
-> ' classA -e{send}, classB -t > classC -e{vcs,comp,send} -t : ...'
+
+`classA -e{send}, classB -t > classC -e{vcs,comp,send} -t : ...`
+
+4. note the default/keyword argument dictionary at the end of the -e option.
+
+Withholding any of the arguments in the dictionary deselects them
+
+`-e{vsc}` 
+exports with source code management, but not compression or email/ssh send
+
+withhold the keyword dictionary entirely to choose all the options with their default arguments
+`-e` 
+This switch selects source code management default of initializing a new repo for the project, compression to a .tgz tarball and sending via email
+
+To switch the keyword to an option other than its default, assign a valid choice to it with a string arugment.
+
+`-e{vsc='commit; merge HEAD'}`
+assuming the program is aware of the repository and git account in use, runs the supplied commands with git.
 
 ##### 1.4.2 Testing
-With use of a switch, you can generate unit tests for any or all class files.
+With use of the `-t` switch, you can generate unit tests for any or all class files.
 
-> -t
+1. attach this to the end of a multi-class inline for including testing in ALL your class files
 
-1. attach this switch/flag to the end of the inline for including testing in ALL your class files
+`A, B, C : attr1, _attr2, _/_attr3 : SMmethod, CMmethod / CMmethod2 -t`
+
+generates unit testing for all the generated classes A, B and C.
+
 2. or apply at the end of the class identifier to apply testing selectively. 
 
 
-##### 1.4.3 Exporting
-Do you want to do anything with these newly generated packages- compress, send to an email address, init git repo *
-* attach this default/keyword to the end of the inline for exportation of your class files
+`A -t, B, C -t : attr1, _attr2, _/_attr3 : SMmethod, CMmethod / CMmethod2`
 
-> -e{vsc : default = 'git init', comp : default = 'tgz', send : default = '' }
+generates unit testing for classes A and C, but not B.
+
+##### 1.4.3 Exporting
+Do you want to do anything with these newly generated packages- compress, send to an email address, init git repo?
+* attach this dictionary to the end of the inline for exportation of your class files
+
+`-e{vsc : default = 'git init', comp : default = 'tgz', send : default = '' }`
 
 for:
 1. vcs- git init, branch, stage or commit 
 2. comp- compression options: tar, tgz, zip 
 3. send- email, (ssh in the future) 
 
+
+
 for exporting, apply the switch only by name (no keyword argument) to generate the class with each option switched on.
-> class A : attr1, attr2 : method -t -e
+
+`class A : attr1, attr2 : method -t -e`
 produces ClassA with unittests, version control, compressed and not sent to an email (because default email is blank)
 
 Note that you will need to supply an email address to correctly use the following flag and configuration:
 ` class A : attr1, attr2, attr3 : method1 -e{send}` 
 
 no email will be sent if the email address argument is not provided, nor will it work if no viable email account is supplied.
+
 You may either supply an email in the .rc file or supply it at program run time. the program will ask for one if
 the send option is provided. Thus, the effective use of this flag and configuration is as follows:
 
@@ -98,19 +112,19 @@ whereas the following will use ssh to send the generated classes/packages with s
 
 note that any send option will by default have to compress the generated classes for sake of efficiency and avoiding complications. 
 
-
-
 ##### 1.5 Inline Quick reference:
-* inline Summary *: the inline spec is used for quick writing of class specs. it consists of a single line of text with 1-3 sets of identifiers, delimited by colons, which seperate class names from attributes or methods
+* inline Summary *: the inline spec is used for quick writing of class specs. 
+it consists of a single line of text with 1-3 sets of identifiers, delimited by colons, which seperate class names from attributes or methods
 
 ##### 1.5.1 Basic Inline Specification:
 See the developer notes for full documentation.
-you can use the 'inline specification' ( the ClassGen's primary/prefered input ) for
+
+You can use the 'inline specification' ( the ClassGen's primary/prefered input ) for
 1. specification of classes and their attributes and or fields ( optionally, with multi level or multiple inheritance(s)).
 2. specification of packaging within your project.
 3. both of these purposes at once
 
-<identifier -> class name>(,)* : <identifier -> attributes>(,)* : <identifier -> methods>(,)*
+`<identifier -> class name>(,)* : <identifier -> attributes>(,)* : <identifier -> methods>(,)*`
 
 **Throughout these examples, we must keep in mind the following rules...**
 1. either attributes or methods can be blank in the inline, but not the class identifier (can't make a nameless class).
@@ -129,59 +143,39 @@ you can use the 'inline specification' ( the ClassGen's primary/prefered input )
 **the following demonstrate some of the syntactic feaures of the inline specification:**
 
 basic inline spec: 
-> 'class_name : attrA, attrB, attrC : method1, method2'
+`class_name : attrA, attrB, attrC : method1, method2`
 
 
 inline spec with multiple classes:
-> 'classA, classB, ... ClassN : attrA1, attrA2 / attrB1, attrB2 / ... / attrN1, attrN2 : methodA / methodB / ... / methodN'
+`classA, classB, ... ClassN : attrA1, attrA2 / attrB1, attrB2 / ... / attrN1, attrN2 : methodA / methodB / ... / methodN`
 
 
 inline spec with simple inheritance:
-> 'class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB'
+`class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB`
 
 
 inline spec with complex, hierachircal and/or multiple inheritances:
-> 'classA, classB, classC > classD : A1, A2, A3 / B1, B2,B3 / C1, C2, C3 > D1, D2, D3 : Amethod / Bmethod / Cmethod > Dmethod'
+`classA, classB, classC > classD : A1, A2, A3 / B1, B2,B3 / C1, C2, C3 > D1, D2, D3 : Amethod / Bmethod / Cmethod > Dmethod`
 
 
 package structuring with the inline spec
-> <p: c: > 
+
+`<p: my_project  c: classA >` 
 where p: stands for packaging and c: stands for classes
+
+effectively, this inline spec prevents you from having to provide the package/project name upon invoking the program
+However, because classA is not provided with a nested inline spec, the class will be uninitialized/unimplemented.
 
 you can nest an inline spec inside each of these arguments for p and c,
 
-
-<p: package_name c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)>
-
-# not sure what these two demonstrate- that the parens are not nessecary?
-
-<p: () c: ()> 
-
-<p: () c: >
-
-
+`<p: package_name c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)>`
 
 
 ## 2) Features:
 ##### 2.1 all components of PEP8 new style class are generated, including:
 * constructor(__init__)
 * __str__, __repr__
-* header/script stub:
-
-> ClassA:
-> ''' Class level docstring: '''
-> version = 1
->   def __init__(self, attr):
->     self.attr = attr
->   #is this the standard way of writing these check someones source code?
->   def __str__(self):
->     return 'attr: {}'.format(self.attr)
->   def __repr__(self):
->     return { str(self.attr) : self.attr }
-> if __name__ == "__main__":
->       print("Running class file. Nothing to do here", {or a customizable message})
-
-
+* header/script stub: `if name == main: ...`
 
 ##### 2.2 All classes are generated in new object syntax, meaning
 * getters and setters are not implemented by default.
@@ -190,7 +184,7 @@ you can nest an inline spec inside each of these arguments for p and c,
 
 ##### 2.3 the base generator can implement the following:
 * multiple inheritance
-  * `,` <comma> to delimit multiple parents or children 
+  * `,` to delimit multiple parents or children 
   
   `classA, classB > classC`  classC inherits from both A and B.
 
@@ -199,7 +193,7 @@ you can nest an inline spec inside each of these arguments for p and c,
     more generally: `A, B, C : :` creates a directory with three non-related sibling classes A, B and C inside.
 
 
-  * `>` <arrow> to delimit a `parent > child` relationship
+  * `>` to delimit a `parent > child` relationship
 
     note that the amount of arrows must be strictly equivilent within the class identifier, attribute and methods
     for the inheritance specification to be properly translated into classes. __for example__:
@@ -217,8 +211,8 @@ you can nest an inline spec inside each of these arguments for p and c,
         generated class E will have no attributes
 
 * in attributes and methods
-  * `,` <comma> to enumerate members
-  * `/` <forward-slash> to delimit class groups
+  * `,` to enumerate members
+  * `/` to delimit class groups
   * see the 'notes on inheritance' section for further details.
   * attribute and method inheritance, for children, is performed using pythons default mechanism, using the super() method.
 
@@ -236,6 +230,78 @@ you can nest an inline spec inside each of these arguments for p and c,
   
   creates a ClassA with 3 methods, a static, class and regular method
  
+
+* Package Structuring within inline specification
+
+The base syntax for defining a package structure where p is the package name and c is the class names
+
+> <p: c:> 
+
+you can either write a name or names delimited by comas,
+or supply either or both argumements as inline specs nested inside parentheses.
+
+> <p: package_name c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)>
+
+creates: 
+
+DIR <package_name>
+* __init__.py
+* README.md
+* classA.py
+* classB.py
+* classC.py
+
+
+Note that you can nest an inline spec to define package structuring using
+the inheritance syntax for classes, where > denotes a child package
+
+
+`<p: ( audio > sounds, textures ) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>`
+
+creates: 
+
+DIR audio
+* __init__.py
+* README.md
+* classA.py
+* classB.py
+* classC.py
+* DIR<sounds>
+* DIR<textures>
+
+_The interpretter will double back_ and get the specifications for the nested directories,
+if all you had provided was their names. You have the option of providing the specification inline,
+but this proves to be very cumbersome for a command line argument ( it will surely span multiple lines )
+
+`<p: ( audio > sounds, textures  : ClassD, classE > classF (sounds), classD (textures) : -t -e {vsc, comp, send} / ... >) c: (classA, classB > classC : attrA, attrB / attrC, attrD > attrE, attrF : method1 / method2 > method3)>`
+
+in this case, nesting two inline specs (for both the package structuring and classes) is adventageous for two reasons- the third argument within the packaging inline can be used as a space for designating switches on a class per class basis (rather than providing this info in the first argument of the class inline spec, after a specific identifier).
+secondly, we can describe WHERE in the packaging each class will be generated. In the case of the above spec, the generated packaging will look like this:
+
+DIR audio
+* __init__.py
+* README.md
+* classA.py
+* classB.py
+* classC.py
+* DIR<sounds>
+  * __init__.py
+  * README.md
+  * classC.py
+* DIR<textures>
+  * __init__.py
+  * README.md
+  * classD.py
+
+* _NOTE:_ that there is not an argument (or functionality) provided for nesting upwards (towards the file system root), or creating a multi package root package (the root of your project having multiple directories- instead, call the program multiple times and generate individual packages in the same directory).
+
+note that the full set of arguments in an inline spec denotes differnent meaning.
+
+packaging: <package structuring> : <class file placement within package structuring> : options for classes - using flag and json argument
+
+classes: <class Identifiers> : <atributes for an individual class (delimted by , and grouped by /)> : <methods for an individual class (delimted by , and grouped by /)>  
+
+careful because your syntax for identifying tokens (in this doc) just narrowly collides with how the packaging structure inline spec looks and works.
 ## 3) Customization with .rc file:
 TODO need to implement functionality for this
 
