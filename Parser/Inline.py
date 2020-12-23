@@ -83,9 +83,9 @@ inline from (validated) user input.
     # for these later, when translating into a class dict from here
 
 
-if __name__ == "__main__":
-    new_line = Inline.from_inline(
-        "classA : attr1, attr2, attr3, attr4 : method1, method2 -t -e{us,ts,er}")
-    print(new_line.__repr__())
+# if __name__ == "__main__":
+#     new_line = Inline.from_inline(
+#         "classA : attr1, attr2, attr3, attr4 : method1, method2 -t -e{us,ts,er}")
+#     print(new_line.__repr__())
 
 # actually not sure how useful this class is since we wont need do any operation on inline except translate it into class_dict

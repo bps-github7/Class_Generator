@@ -11,5 +11,9 @@
     "python.testing.nosetestsEnabled": false,
     "python.testing.unittestEnabled": true,
     "python.linting.pylintEnabled": true,
-    "python.linting.enabled": false
+    "python.linting.enabled": true,
+    "python.linting.pylintPath": "C:\\Users\\Ben\\AppData\\Roaming\\Python\\Python39\\Scripts\\pylint.exe",
+    "python.linting.pylintArgs" : [
+        "--disable=C0111"
+    ]
 }

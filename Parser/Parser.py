@@ -5,8 +5,8 @@
 
 import sys
 import keyword
-import Inline
-import Class_Dict
+from Inline import Inline
+from ClassDict import Class_Dict
 
 
 def is_identifier(ident: str) -> bool:
@@ -100,8 +100,3 @@ def case_check(item, item_type="class"):
 
 def main():
     return parse_inline("skone, fuckme, shitspread : shit, bisk, chalp : asspie, dessert")
-
-
-# print(main())
-for i in "shit, bisk, cand, nard, Asspie".split(","):
-    print(case_check(i))
