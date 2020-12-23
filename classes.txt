@@ -1,2 +1,1 @@
-classA, classB > classC > classD, classE : A1, A2, A3 / B1, B2, B3 > C1, C2, C3 > D1, D2 / E1, E2, E3, E4 : Amethod1, Amethod2 / Bmethod1, Bmethod2 > Cmethod1, Cmethod2 > Dmethod1, Dmethod2 / Emethod1, Emethod2, Emethod3
-methodman > redman > church!!! : m1, m2 > r1, r2 > c1, c2 : method1 > method2 > method3
+package1 > package2 > package3 : file1, file2 > file3, file4 > file5, file6 : -t -e > -e > -t

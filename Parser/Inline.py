@@ -49,7 +49,7 @@ inline from (validated) user input.
 
     version = 2.1
 
-    #wouldnt it make more sense to 
+    # wouldnt it make more sense to
     def __init__(self, classes=None, attributes=None, methods=None, global_testing=False, global_exporting=None):
         def cleanse(items: str):
             def clean(x): return x.strip()
@@ -61,7 +61,9 @@ inline from (validated) user input.
         self.global_testing = global_testing
         self.global_exporting = global_exporting
 
-
+    # no need for str method here. repr will just read the inline back to users
+    def __repr__(self):
+        return "{} : {} : {} {}".format(self.classes, self.attributes, self.methods, "{}{}".format("two ternary expression for testing if testing and/or exporting are enabled"))
 
     @classmethod
     def from_inline(cls, inline: str):
@@ -75,13 +77,14 @@ inline from (validated) user input.
                       global_testing=testing(inline),
                       global_exporting=exporting(inline))
 
-    #if global testing/ global exporting set to false, will need to parse
+    # if global testing/ global exporting set to false, will need to parse
     # for these later, when translating into a class dict from here
+
 
 if __name__ == "__main__":
     new_line = Inline.from_inline(
         "classA : attr1, attr2, attr3, attr4 : method1, method2 -t -e{us,ts,er}")
-    print(new_line.attributes)
+    print(new_line.__repr__())
 
     # future test case- if a field (attr or method) is not provided,
     # the classes attr or method field should be left as None.

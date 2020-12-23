@@ -42,6 +42,9 @@ containing class dict specifications inline format.
     # need to account for lack of .txt in POSIX systems
     with open("{}.txt".format(f), "r") as file:
         for num, line in enumerate(file):
+            if line.startswith("#") or line.startswith("//"):
+                # enables the user to 'comment out' lines with both JS and python style of commenting
+                continue
             copy = line.strip("\n")
             line = line.split(":")
             if line[0] in ("", " ", "\t", "\t\t", None):
@@ -54,6 +57,9 @@ Please review/revise the following class specification:\n {}on line no.{}\n".for
                 if get_confirmation(3, num):
                     results.append(copy)
             else:
+                """ 
+                should call Inline.to_dict
+                 """
                 results.append(copy)
         return results
 
@@ -91,7 +97,7 @@ Does the same thing as the inherit function in misc_functions.py
         family_attr), ">".join(family_methods)
     # recursive call and base case
     if len(family) > 0:
-        return inheritance(name, attr, methods, parent=parent)
+        return inheritance("{} : {} : {}".format(name, attr, methods), parent=parent)
     else:
         return new
 
@@ -142,29 +148,29 @@ if name is undefined then return False- that shouldnt happen @ this point
 # <input: file, cmdline argument or user input> ---<list: each element is an inline format spec> -> -> <inheritance()> ->
 # <one inline format spec == 1 to many specs in dictionary> -> <each line gets updated() to main dict containing all classes 2b generated>
 
-# def controller():
-#     """
-# Does the overhead work for inheritance.
-# Turns inline format strings into class specification dict.
-# creates specific class hierarchies if inline specs call for this.
-#     """
-#     for items in inline:
-#         if items.split(":")[0].count(">"):
-#             class_dict.update(inheritance(items))
-#         else:
-#             items = items.split(":")
-#             if len(items) == 1:
-#                 class_dict.update({items: ("parent = {}".format("Object"))})
-#             elif len(items) == 2:
-#                 # how can we assure that items[1] is attributes, not methods?
-#                 class_dict.update(
-#                     {items[0]: (items[1], "parent = {}".format("Object"))})
-#             else:
-#                 class_dict.update(
-#                     {items[0]: (items[1], items[2], "parent = {}".format("Object"))})
+def controller():
+    """
+Does the overhead work for inheritance.
+Turns inline format strings into class specification dict.
+creates specific class hierarchies if inline specs call for this.
+    """
+    for items in inline:
+        if items.split(":")[0].count(">"):
+            class_dict.update(inheritance(items))
+        else:
+            items = items.split(":")
+            if len(items) == 1:
+                class_dict.update({items: ("parent = {}".format("Object"))})
+            elif len(items) == 2:
+                # how can we assure that items[1] is attributes, not methods?
+                class_dict.update(
+                    {items[0]: (items[1], "parent = {}".format("Object"))})
+            else:
+                class_dict.update(
+                    {items[0]: (items[1], items[2], "parent = {}".format("Object"))})
 
 
 class_dict = {}
 inline = from_file("classes")
-# controller()
-# print(class_dict)
+controller()
+print(class_dict)
