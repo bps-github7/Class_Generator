@@ -63,7 +63,9 @@ inline from (validated) user input.
 
     # no need for str method here. repr will just read the inline back to users
     def __repr__(self):
-        return "{} : {} : {} {}".format(self.classes, self.attributes, self.methods, "{}{}".format("two ternary expression for testing if testing and/or exporting are enabled"))
+        return "{} : {} : {} {}".format(self.classes, self.attributes, self.methods,
+                                        "{}{}".format(("-t" if self.global_testing else ""),
+                                                      (" -e{}".format(self.global_exporting) if self.global_exporting else "")))
 
     @classmethod
     def from_inline(cls, inline: str):
@@ -86,5 +88,4 @@ if __name__ == "__main__":
         "classA : attr1, attr2, attr3, attr4 : method1, method2 -t -e{us,ts,er}")
     print(new_line.__repr__())
 
-    # future test case- if a field (attr or method) is not provided,
-    # the classes attr or method field should be left as None.
+# actually not sure how useful this class is since we wont need do any operation on inline except translate it into class_dict
