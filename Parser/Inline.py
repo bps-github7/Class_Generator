@@ -65,12 +65,21 @@ inline from (validated) user input.
     def __repr__(self):
         return "{} : {} : {} {}".format(self.classes, self.attributes, self.methods,
                                         "{}{}".format(("-t" if self.global_testing else ""),
-                                                      (" -e{}".format(self.global_exporting) if self.global_exporting else "")))
+                                                      (" -e{}".format(self.global_exporting)
+                                                       if self.global_exporting else "")))
 
     @classmethod
     def from_inline(cls, inline: str):
-        def testing(x): return True if x.count("-t") else False
-        def exporting(x): return inline.split("-e")[1] if x.count("-e") else 0
+        """Alternative constructor for building an Inline object
+        out of a string that uses the Inline spec mini-language.
+
+        Args:
+            inline (str): [description]
+        """
+        def testing(arg): 
+            return True if arg.count("-t") else False
+        def exporting(arg): 
+            return inline.split("-e")[1] if arg.count("-e") else 0
         new_line = inline.split(":")
         modified_methods = new_line[2].split("-t")[0]
         return Inline(classes=new_line[0],

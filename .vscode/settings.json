@@ -14,6 +14,6 @@
     "python.linting.enabled": true,
     "python.linting.pylintPath": "C:\\Users\\Ben\\AppData\\Roaming\\Python\\Python39\\Scripts\\pylint.exe",
     "python.linting.pylintArgs" : [
-        "--disable=C0111"
+        "--disable=F0401"
     ]
 }
