@@ -17,22 +17,24 @@ package1, package2 > package3 : p1, p2 / p3, p4 > p5, p6 : options / options > o
 and parsed into a class_dict, repurposed for this.
 add this to documentation.
 '''
-from Parser.Class_Dict import Class_Dict
+#from Parser.Class_Dict import Class_Dict
 import os
 
+def packaging():
+    print("skonedalone")
 
-class Packaging_Inline:
-    def __init__(self, packages, files, options):
-        self.packages = [(x.strip()).lower() for x in packages.split(',')]
-        self.files = [(x.strip()).lower() for x in files.split(',')]
-        self.options = [(x.strip()).lower() for x in options.split(',')]
-
-    def __repr__(self):
-        # return '<{} : {} : {} >'
-        return
-
-    def __str__(self):
-        return self.__repr__()
-
-    def to_classdict(self):
-        return Class_Dict
+#class Packaging_Inline:
+#    def __init__(self, packages, files, options):
+#        self.packages = [(x.strip()).lower() for x in packages.split(',')]
+#        self.files = [(x.strip()).lower() for x in files.split(',')]
+#        self.options = [(x.strip()).lower() for x in options.split(',')]
+#
+#    def __repr__(self):
+#        # return '<{} : {} : {} >'
+#        return
+#
+#    def __str__(self):
+#        return self.__repr__()
+#
+#    def to_classdict(self):
+#        return Class_Dict

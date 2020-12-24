@@ -7,7 +7,7 @@ Date: 12/21/2020
 Module level docstring: implementation of Class Dict Class
 '''
 
-from Inline import Inline
+from inline import Inline
 
 
 class ClassDict():
@@ -46,7 +46,7 @@ class ClassDict():
     #     methods=(dict[class_name][1]), parents=(dict[class_name][2].strip("parent =")))
 
 
-item = Inline.from_inline("american : attr1, attr2 : methodman")
+item = Inline.string_to_inline("american : attr1, attr2 : methodman")
 # print(str(item).split(":")[0])
 
 print(ClassDict.to_classdict(item))

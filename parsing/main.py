@@ -5,8 +5,8 @@
 
 import sys
 import keyword
-from Inline import Inline
-from ClassDict import Class_Dict
+from inline import Inline
+from class_dict import ClassDict
 
 
 def is_identifier(ident: str) -> bool:

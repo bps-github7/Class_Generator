@@ -4,8 +4,6 @@ Program: inline class for ClassGen program
 Date: 10/28/2020
 Module level docstring: implements the Inline class
 '''
-
-
 class Inline:
     '''
 Class Level Docstring: this is a class that repersents inline class
@@ -69,7 +67,7 @@ inline from (validated) user input.
                                                        if self.global_exporting else "")))
 
     @classmethod
-    def from_inline(cls, inline: str):
+    def string_to_inline(cls, inline: str):
         """Alternative constructor for building an Inline object
         out of a string that uses the Inline spec mini-language.
 
