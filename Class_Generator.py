@@ -10,7 +10,7 @@ Automatically generates class files after being provided the relevant informatio
 
 """
 import argparse
-from something import main
+from classgenerator import main
 # from Options import *
 # from Regular_Class import *
 # from Special_Class import *

@@ -4,6 +4,8 @@ Program: inline class for ClassGen program
 Date: 10/28/2020
 Module level docstring: implements the Inline class
 '''
+
+
 class Inline:
     '''
 Class Level Docstring: this is a class that repersents inline class
@@ -50,7 +52,8 @@ inline from (validated) user input.
     # wouldnt it make more sense to
     def __init__(self, classes=None, attributes=None, methods=None, global_testing=False, global_exporting=None):
         def cleanse(items: str):
-            def clean(x): return x.strip()
+            def clean(x):
+                return x.strip()
             items = map(clean, items.split(","))
             return ",".join(items)
         self.classes = cleanse(classes.strip())
@@ -58,6 +61,29 @@ inline from (validated) user input.
         self.methods = cleanse(methods.strip())
         self.global_testing = global_testing
         self.global_exporting = global_exporting
+
+    def has_inheritance(self):
+        """checks self.classes to see if it has > token in it.
+            having this token indicates inline spec has inheritance.
+
+        Returns:
+            Boolean : based off whether inline has inheritance
+        """
+        if self.classes.count(">"):
+            return True
+        return False
+
+    def has_packaging(self):
+        """checks self.classes to see if it has < token in it.
+            having this token indicates inline spec has packaging.
+            note: rudimentary check- more parsing required than this.
+
+        Returns:
+            Boolean : based off whether inline has packaging
+        """
+        if self.classes.count("<"):
+            return True
+        return False
 
     # no need for str method here. repr will just read the inline back to users
     def __repr__(self):
@@ -74,9 +100,10 @@ inline from (validated) user input.
         Args:
             inline (str): [description]
         """
-        def testing(arg): 
+        def testing(arg):
             return True if arg.count("-t") else False
-        def exporting(arg): 
+
+        def exporting(arg):
             return inline.split("-e")[1] if arg.count("-e") else 0
         new_line = inline.split(":")
         modified_methods = new_line[2].split("-t")[0]
