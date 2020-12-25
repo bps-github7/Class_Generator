@@ -10,17 +10,37 @@ parser = argparse.ArgumentParser(
     description="Generate classes automatically using command line options or interactive prompt")
 group = parser.add_mutually_exclusive_group()
 
-# positional arguments- name and inline definition
+# positional (required) arguments- name
 parser.add_argument(
-    "name", help="Provide the name for the project you are creating.")
-parser.add_argument(
-    "--inline", help="provide class specification as an inline spec argument", required=False)
-parser.add_argument(
-    "--path", help="Provide a valid system path which project directory can be created in\nDefaults to the folder scipt is executed in", dest="path", required=False)
+    "name", help="Provide the name for the project\
+                        you are creating.")
 
-# optional switches: -abc, -sa, -sm, -sb,
+# positional-y (non-required) arguments: --inline, --path, --file
+parser.add_argument("--inline",
+                    help="provide class specification as an inline\
+                    spec argument", required=False)
+parser.add_argument("--path",
+                    help="Provide a valid system path which project directory\n\
+                    can be created in\nDefaults to the folder scipt is executed in",
+                    dest="path", required=False)
+parser.add_argument("--file",
+                    help="Provide a file as input, for supplying classes\n\
+                    to generate via inline specification.",
+                    dest="file", required=False)
+
+
+# optional switches: -i -abc, -sa, -sm, -sb,
+parser.add_argument("-i", "--interactive-mode",
+                    help="Use this short option to generate classes in\n\
+                    interactive mode. CLI app will guide you through\n\
+                    the process of creating classes.",
+                    action="store_true", required=False)
+
+
 parser.add_argument("-abc", "--abstract_base_class",
-                    help="Use this short option to generate class as abscract base class (can also prepend ABC to classname in inline spec).", action="store_true", required=False)
+                    help="Use this short option to generate class as abscract base class \n\
+                    (can also prepend ABC to classname in inline spec).",
+                    action="store_true", required=False)
 
 
 # this should be a mutually exclusive group- can be -sa, -sm or -sb
@@ -57,24 +77,27 @@ def main() -> int:
     if args.inline:
         item = Inline.string_to_inline(args.inline)
         if item.has_inheritance():
-            # packaging can be nested like this because doesnt make a lot of sense to have a packaging spec
+            # packaging can be nested like this because
+            # doesnt make a lot of sense to have a packaging spec
             # without inheritance, otherwise just use name + path.
             if item.has_packaging():
+                specs = Inline(item)
+                print("building a classdict with a inline with packaging")
                 #specs = packaging.main()
-                pass
             else:
+                print("building an class dict with inline with inheritance")
                 #specs = inheritancebuilder.main()
-                pass
         else:
             #specs = inline.main()
-            pass
+            print("building a classdict with standard inline")
     elif args.file:
+        print("reading classes from a file...")
         # specs = file.main()
-        pass
     else:
+        print("using interactive mode")
         # specs = interactive.main()
-        pass
-    #generate the class based on the specs
+    # generate the class based on the specs
+    return 1
 
 # def test() -> int:
 #     """

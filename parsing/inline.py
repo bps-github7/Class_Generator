@@ -49,18 +49,36 @@ inline from (validated) user input.
 
     version = 2.1
 
-    # wouldnt it make more sense to
-    def __init__(self, classes=None, attributes=None, methods=None, global_testing=False, global_exporting=None):
-        def cleanse(items: str):
-            def clean(x):
-                return x.strip()
-            items = map(clean, items.split(","))
-            return ",".join(items)
-        self.classes = cleanse(classes.strip())
-        self.attributes = cleanse(attributes.strip())
-        self.methods = cleanse(methods.strip())
-        self.global_testing = global_testing
-        self.global_exporting = global_exporting
+    # def __init__(self, classes=None, attributes=None, methods=None, global_testing=False, global_exporting=None):
+    #     def cleanse(items: str):
+    #         def clean(x):
+    #             return x.strip()
+    #         items = map(clean, items.split(","))
+    #         return ",".join(items)
+    #     self.classes = cleanse(classes.strip())
+    #     self.attributes = cleanse(attributes.strip())
+    #     self.methods = cleanse(methods.strip())
+    #     self.global_testing = global_testing
+    #     self.global_exporting = global_exporting
+
+    """
+    Consider how you want to handle packaging inline vs normal inline- 
+    suppose it doesnt have to be done in the constructor but cant think of a better way now.
+    """
+
+    def __init__(self, inline):
+        self.inline = inline
+        if self.has_packaging():
+            self.packages = self.inline.split("@")[1].strip("P:")
+            self.classes = self.inline.split("@")[2].strip("C:")
+            print(f"packages: {self.packages} \nClasses: {self.classes}")
+        else:
+            self.inline = inline.split(":")
+            self.classes = self.inline[0]
+            self.attributes = self.inline[1]
+            self.methods = self.inline[2]
+            print(
+                f"classes: {self.classes}\nAttributes: {self.attributes}\nMethods: {self.methods}")
 
     def has_inheritance(self):
         """checks self.classes to see if it has > token in it.
@@ -81,16 +99,16 @@ inline from (validated) user input.
         Returns:
             Boolean : based off whether inline has packaging
         """
-        if self.classes.count("<"):
+        if self.inline.count("<"):
             return True
         return False
 
     # no need for str method here. repr will just read the inline back to users
-    def __repr__(self):
-        return "{} : {} : {} {}".format(self.classes, self.attributes, self.methods,
-                                        "{}{}".format(("-t" if self.global_testing else ""),
-                                                      (" -e{}".format(self.global_exporting)
-                                                       if self.global_exporting else "")))
+    # def __repr__(self):
+    #     return "{} : {} : {} {}".format(self.classes, self.attributes, self.methods,
+    #                                     "{}{}".format(("-t" if self.global_testing else ""),
+    #                                                   (" -e{}".format(self.global_exporting)
+    #                                                    if self.global_exporting else "")))
 
     @classmethod
     def string_to_inline(cls, inline: str):
@@ -107,11 +125,12 @@ inline from (validated) user input.
             return inline.split("-e")[1] if arg.count("-e") else 0
         new_line = inline.split(":")
         modified_methods = new_line[2].split("-t")[0]
-        return Inline(classes=new_line[0],
-                      attributes=new_line[1],
-                      methods=modified_methods,
-                      global_testing=testing(inline),
-                      global_exporting=exporting(inline))
+        return Inline("some : ugle : bagels")
+        # return Inline(classes=new_line[0],
+        #   attributes=new_line[1],
+        #   methods=modified_methods,
+        #   global_testing=testing(inline),
+        #   global_exporting=exporting(inline))
 
     # if global testing/ global exporting set to false, will need to parse
     # for these later, when translating into a class dict from here
