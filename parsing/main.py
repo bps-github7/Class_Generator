@@ -5,8 +5,9 @@
 
 import sys
 import keyword
-from inline import Inline
-from class_dict import ClassDict
+from .inline import Inline
+# from .class_dict import ClassDict
+from utils.options import args
 
 
 def is_identifier(ident: str) -> bool:
@@ -24,19 +25,19 @@ def is_identifier(ident: str) -> bool:
     return True
 
 
-def parse_inline(inline: Inline):
+# def parse_inline(inline: Inline):
 
-    # here we have tests for the full line- when in the format " class name : attr, attr : method, method  "
-    # or " classname : attr, attr" "class name : : method method"
+#     # here we have tests for the full line- when in the format " class name : attr, attr : method, method  "
+#     # or " classname : attr, attr" "class name : : method method"
 
-    if nesting_check(inline):
-        inline = validate_nested(inline)
+#     if nesting_check(inline):
+#         inline = validate_nested(inline)
 
-    if inheritance_check(inline):
-        inline = validate_inheritance(inline)
+#     if inheritance_check(inline):
+#         inline = validate_inheritance(inline)
 
-    inline = inline.split(":")
-    return {validate(inline[0]): (validate(inline[1], item_type="attribute"), validate(inline[2], item_type="method"))}
+#     inline = inline.split(":")
+#     return {validate(inline[0]): (validate(inline[1], item_type="attribute"), validate(inline[2], item_type="method"))}
 
     # what if methods is not provided?
     # classes, attributes, methods = validate(inline[0], item_type="class"), validate(inline[1], item_type="attribute"), validate(inline[2], item_type="method")
@@ -99,4 +100,40 @@ def case_check(item, item_type="class"):
 
 
 def main():
-    return parse_inline("skone, fuckme, shitspread : shit, bisk, chalp : asspie, dessert")
+    """Using args passed in from the cmd line
+    further delegates the tasks of the program
+
+    args : None
+
+    returns None at this time.
+    """
+    project_name = args.name
+    project_path = args.path
+    print(f"proposed project path: {project_path}/{project_name}")
+    # make dir / file with this ^^^ and change to that directory.
+    if args.inline:
+        item = Inline(args.inline)
+        if item.has_inheritance():
+            if item.has_packaging():
+                print("building a classdict with a inline with packaging")
+                #specs = packaging.main()
+            else:
+                print("building an class dict with inline with inheritance")
+                #specs = inheritancebuilder.main()
+        else:
+            #specs = inline.main()
+            print("building a classdict with standard inline")
+    elif args.file:
+        print("reading classes from a file...")
+        # specs = file.main()
+    else:
+        print("using interactive mode")
+        # specs = interactive.main()
+    # for testing purpose\
+    print("\n\n")
+    print("parsed inlines' str method:\n-------------------------")
+    print(item.__str__())
+    print("\n\n")
+    print("parsed inlines repr method:\n-------------------------")
+    print(item.__repr__())
+    print("\n\n")

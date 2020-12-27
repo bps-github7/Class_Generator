@@ -65,20 +65,49 @@ inline from (validated) user input.
     Consider how you want to handle packaging inline vs normal inline- 
     suppose it doesnt have to be done in the constructor but cant think of a better way now.
     """
+    @staticmethod
+    def testing(arg):
+        """returns true if arg contains -t flag 
+        args (Inline.method : str): method section of inline"""
+        return True if arg.count("-t") else False
+
+    @staticmethod
+    def exporting(arg):
+        """returns the keyword dict argument of -e flag if present
+        args (Inline.method : str): method section of inline
+        """
+        return arg.split("-e")[1] if arg.count("-e") else 0
+
+    @staticmethod
+    def cleanse(items: str):
+        """Cleanses a list of stirngs of whitespace and junk text
+        """
+        def clean(item):
+            """ applies strip function on a per token basis.
+            """
+            return item.strip()
+        items = map(clean, items.split(","))
+        return ",".join(items)
 
     def __init__(self, inline):
-        self.inline = inline
-        if self.has_packaging():
-            self.packages = self.inline.split("@")[1].strip("P:")
-            self.classes = self.inline.split("@")[2].strip("C:")
-            print(f"packages: {self.packages} \nClasses: {self.classes}")
-        else:
-            self.inline = inline.split(":")
-            self.classes = self.inline[0]
-            self.attributes = self.inline[1]
-            self.methods = self.inline[2]
-            print(
-                f"classes: {self.classes}\nAttributes: {self.attributes}\nMethods: {self.methods}")
+        self.inline = inline.split(":")
+        self.classes = Inline.cleanse(self.inline[0].strip())
+        self.attributes = Inline.cleanse(self.inline[1].strip())
+        self.methods = Inline.cleanse(self.inline[2].strip())
+        if self.has_options():
+            self.global_exporting = Inline.exporting(self.methods)
+            if self.global_exporting:
+                # we want the first half= [1] is the keyword arg dict.
+                self.methods = self.methods.split("-e")[0]
+            self.global_testing = Inline.testing(self.methods)
+            # cleanup - get rid of switches on methods once their existence is confirmed.
+            if self.global_testing:
+                self.methods = self.methods.split(" -t")[0]
+
+    def has_options(self):
+        """[summary]
+        """
+        return True if ("-e" or "-t") in self.methods else False
 
     def has_inheritance(self):
         """checks self.classes to see if it has > token in it.
@@ -103,42 +132,35 @@ inline from (validated) user input.
             return True
         return False
 
-    # no need for str method here. repr will just read the inline back to users
-    # def __repr__(self):
-    #     return "{} : {} : {} {}".format(self.classes, self.attributes, self.methods,
-    #                                     "{}{}".format(("-t" if self.global_testing else ""),
-    #                                                   (" -e{}".format(self.global_exporting)
-    #                                                    if self.global_exporting else "")))
+    def __repr__(self):
+        """returns the machine representation of inline spec.
 
-    @classmethod
-    def string_to_inline(cls, inline: str):
-        """Alternative constructor for building an Inline object
-        out of a string that uses the Inline spec mini-language.
-
-        Args:
-            inline (str): [description]
+        Returns:
+            str : inline as initialy passed in
         """
-        def testing(arg):
-            return True if arg.count("-t") else False
-
-        def exporting(arg):
-            return inline.split("-e")[1] if arg.count("-e") else 0
-        new_line = inline.split(":")
-        modified_methods = new_line[2].split("-t")[0]
-        return Inline("some : ugle : bagels")
-        # return Inline(classes=new_line[0],
-        #   attributes=new_line[1],
-        #   methods=modified_methods,
-        #   global_testing=testing(inline),
-        #   global_exporting=exporting(inline))
+        return ":".join(self.inline)
+        # return "{} : {} : {} {}".format(self.classes, self.attributes, self.methods,
+        #                                 "{}{}".format(("-t" if self.global_testing else ""),
+        #                                               (" -e{}".format(self.global_exporting)
+        #                                                if self.global_exporting else "")) if self.has_options else
+        #                                 ("", ""))
 
     # if global testing/ global exporting set to false, will need to parse
     # for these later, when translating into a class dict from here
 
+    def __str__(self):
+        return "class(es): {}\n\
+attributes: {}\n\
+methods: {}\n\
+testing: {}\n\
+exporting: {}".format(self.classes, self.attributes,
+                      self.methods, self.global_testing, self.global_exporting)
 
-# if __name__ == "__main__":
-#     new_line = Inline.from_inline(
-#         "classA : attr1, attr2, attr3, attr4 : method1, method2 -t -e{us,ts,er}")
-#     print(new_line.__repr__())
 
-# actually not sure how useful this class is since we wont need do any operation on inline except translate it into class_dict
+def main() -> int:
+    print("main function from Inline module")
+    return 1
+
+
+if __name__ == "__main__":
+    main()
