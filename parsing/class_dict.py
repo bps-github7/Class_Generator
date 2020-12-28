@@ -10,34 +10,36 @@ this might actually be the useless class. but maybe worthwhile figuring out how 
 '''
 
 
-class ClassDict():
+class ClassDict(dict):
     '''Class Level Docstring: Class_Dict is a dictionary that contains the specifications of a class
     it is the internal repersentation of the Inline class.'''
 
-    def __init__(self, classes=None, attributes=None, methods=None, parents='object', testing=False, exporting=False):
+    def __init__(self, classes, details=None):
+
         self.classes = classes.title()
-        self.attributes = [(x.strip()).lower() for x in attributes.split(",")]
-        self.methods = [(x.strip()).lower() for x in methods.split(",")]
-        self.parents = parents
-        self.testing = testing
-        self.exporting = exporting
+        self.details = details
+        # self.attributes = [(x.strip()).lower() for x in attributes.split(",")]
+        # self.methods = [(x.strip()).lower() for x in methods.split(",")]
+        # self.parents = parents
+        # self.testing = testing
+        # self.exporting = exporting
 
-    def __repr__(self):
-        return str({self.classes:
-                    (self.attributes, self.methods, f"parents: {self.parents}, testing: {self.testing}, exporting: {self.exporting}")})
+    # def __repr__(self):
+    #     return str({self.classes:
+    #                 (self.attributes, self.methods, f"parents: {self.parents}, testing: {self.testing}, exporting: {self.exporting}")})
 
-    def __str__(self):
-        return str(self.__repr__())
+    # def __str__(self):
+    #     return str(self.__repr__())
 
-    @classmethod
-    def to_classdict(cls, inline):
-        """Converts an Inline specification into a ClassDict object.
+    # @classmethod
+    # def to_classdict(cls, inline):
+    #     """Converts an Inline specification into a ClassDict object.
 
-        Args:
-            inline (str): The Inline you want to convert.
-            Treat as string to avoid circular import
+    #     Args:
+    #         inline (str): The Inline you want to convert.
+    #         Treat as string to avoid circular import
 
-        Returns:
-            ClassDict: ClassDict matching specification of the Inline argument.
-        """
-        return ClassDict(*(str(inline).split(":")))
+    #     Returns:
+    #         ClassDict: ClassDict matching specification of the Inline argument.
+    #     """
+    #     return ClassDict(*(str(inline).split(":")))

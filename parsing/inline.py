@@ -5,6 +5,7 @@ Date: 10/28/2020
 Module level docstring: implements the Inline class
 '''
 from .class_dict import ClassDict
+from .details import Details
 
 
 class Inline:
@@ -128,11 +129,32 @@ def main(inline: Inline) -> int:
             # It is nesecary to use class dict.__repr__ instead of tuple.
             # maybe u could make a tuple class (attr, methods, parent, testing, exporting) with custom str for formatting
             class_container.update(
-                {cls: (attr, method, f"{object}\t{inline.global_testing}\t{inline.global_exporting}")})
-        print("item no:\tclass name:\tAttributes:\tmethods:\tparent:\ttesting:\texporting:")
-        print("----------------------------------------------------------------------------" + ("----" * 6))
-        for num, item in enumerate(class_container):
-            print(f"{num}\t\t{item}\t\t" + class_container[item].__str__())
+                {cls: Details(attr, method, options=[inline.global_testing, inline.global_exporting])})
+        while True:
+            print(
+                "item no:\tclass name:\tAttributes:\t\tmethods:\t\tparent:\t\t\tpackage:   testing, exporting:")
+            print(
+                "----------------------------------------------------------------------------" + ("----" * 15))
+            for num, item in enumerate(class_container):
+                print(f"{num+1}\t\t{item}\t\t" +
+                      class_container[item].__str__())
+            print("everything looking up to spec?")
+            response = input("type corresponding 'item no' to edit a class spec,\n\
+otherwise type 'continue' to proceed with generation\n")
+            valid_responses = [m+1 for m, n in enumerate(class_container)]
+            if 'continue' in response:
+                return class_container
+            elif int(response) in valid_responses:
+                # update the specfic class- getting class name (key), given item no wont be so easy,
+                print(f"updating item no {response}")
+                break
+            else:
+                print(f"{response} not recognized as a choice")
+                continue
+    else:
+        return NotImplemented
+        # get_feedback({inline.classes, Details(inline.attributes, inline.methods, options=[
+        #              self.global_testing, self.global_testing])})
 
 
 if __name__ == "__main__":
