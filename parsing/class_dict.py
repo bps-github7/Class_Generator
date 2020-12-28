@@ -5,24 +5,26 @@ Software: Class Generator
 Date: 12/21/2020
 
 Module level docstring: implementation of Class Dict Class
-'''
 
-from inline import Inline
+this might actually be the useless class. but maybe worthwhile figuring out how to make it iterable
+'''
 
 
 class ClassDict():
     '''Class Level Docstring: Class_Dict is a dictionary that contains the specifications of a class
     it is the internal repersentation of the Inline class.'''
 
-    def __init__(self, classes=None, attributes=None, methods=None, parents='object'):
+    def __init__(self, classes=None, attributes=None, methods=None, parents='object', testing=False, exporting=False):
         self.classes = classes.title()
         self.attributes = [(x.strip()).lower() for x in attributes.split(",")]
         self.methods = [(x.strip()).lower() for x in methods.split(",")]
         self.parents = parents
+        self.testing = testing
+        self.exporting = exporting
 
     def __repr__(self):
         return str({self.classes:
-                    (self.attributes, self.methods, "parents = {}".format(self.parents))})
+                    (self.attributes, self.methods, f"parents: {self.parents}, testing: {self.testing}, exporting: {self.exporting}")})
 
     def __str__(self):
         return str(self.__repr__())
@@ -32,24 +34,10 @@ class ClassDict():
         """Converts an Inline specification into a ClassDict object.
 
         Args:
-            inline (str | Inline): The Inline you want to convert
+            inline (str): The Inline you want to convert.
+            Treat as string to avoid circular import
 
         Returns:
             ClassDict: ClassDict matching specification of the Inline argument.
         """
         return ClassDict(*(str(inline).split(":")))
-
-    # @classmethod
-    # def from_dict(cls, dict):
-    #     class_name = list(dict.keys())[0]
-    #     return ClassDict(classes=class_name, attributes=(dict[class_name][0]),
-    #     methods=(dict[class_name][1]), parents=(dict[class_name][2].strip("parent =")))
-
-
-item = Inline.string_to_inline("american : attr1, attr2 : methodman")
-# print(str(item).split(":")[0])
-
-print(ClassDict.to_classdict(item))
-# print(ClassDict.to_classdict("package1 : file1, file2 : options"))
-# print(Class_Dict.from_dict(
-#     {"classA": (['attr1', 'attr2'], ['skonedalone'], "parent = shitcandle")}))

@@ -1,13 +1,31 @@
-# Programmer: Ben Sehnert
-# Date: 10/20/2020
-# Program: Parser for class gen, reads in class names and
-# specs, validates them and places them in appropriate container.
+"""
+Programmer: Ben Sehnert
+Program/software: Python class generator
+Date: 10/20/2020
 
+Parser for class gen, reads in class names and
+specs, validates them and places them in appropriate container.
+
+Raises:
+    TypeError: [description]
+
+Returns:
+    [type]: [description]
+"""
 import sys
 import keyword
 from .inline import Inline
+from .inline import main as inline_main
 # from .class_dict import ClassDict
 from utils.options import args
+
+
+# This part of the prg will have to print out a table of the classes to generate
+# and bring the user attention to problems with the proposed generations.
+# then they can select a row in the table to modify their proposed classes.
+# only when they approve/ it is fully validated can they submit it for generating.
+
+version = 1.2
 
 
 def is_identifier(ident: str) -> bool:
@@ -121,19 +139,18 @@ def main():
                 print("building an class dict with inline with inheritance")
                 #specs = inheritancebuilder.main()
         else:
-            #specs = inline.main()
-            print("building a classdict with standard inline")
+            inline_main(item)
     elif args.file:
         print("reading classes from a file...")
         # specs = file.main()
     else:
         print("using interactive mode")
         # specs = interactive.main()
-    # for testing purpose\
-    print("\n\n")
-    print("parsed inlines' str method:\n-------------------------")
-    print(item.__str__())
-    print("\n\n")
-    print("parsed inlines repr method:\n-------------------------")
-    print(item.__repr__())
-    print("\n\n")
+    # # for testing purpose\
+    # print("\n\n")
+    # print("parsed inlines' str method:\n-------------------------")
+    # print(item.__str__())
+    # print("\n\n")
+    # print("parsed inlines repr method:\n-------------------------")
+    # print(item.__repr__())
+    # print("\n\n")
