@@ -124,7 +124,7 @@ def parse_inline(inline) -> list:
     Returns:
         list: [description]
     """
-    class_list = []
+    class_dict = {}
     # if there are multiple classes in a single inline,
     # distinguish them into a multi nested, multi element dictionary
     if inline.classes.count(","):
@@ -135,16 +135,15 @@ def parse_inline(inline) -> list:
                 inline.methods.split("/")):
             classes.append(x), attributes.append(y), methods.append(z)
         for x, y, z in zip(classes, attributes, methods):
-            class_list.append(
-                {x: Details(y, z, options=[inline.global_testing, inline.global_exporting])})
+            class_dict.update(ClassDict(x, Details(y, z), options=[
+                              inline.global_testing, inline.global_exporting]))
     else:
-        # fall through case is a single class inline spec
-        class_list.append({inline.classes: Details(inline.attributes, inline.methods, options=[
-            inline.global_testing, inline.global_exporting])})
-    return class_list
+        class_dict.update(ClassDict(inline.classes, Details(
+            inline.attributes, inline.methods, options=[inline.global_testing, inline.global_exporting])))
+    return class_dict
 
 
-def display_classes(class_list):
+def display_classes(class_dict):
     """[summary]
 
     Args:
@@ -154,10 +153,8 @@ def display_classes(class_list):
 methods:\t\tparent:\t\t\tpackage:   testing, exporting:")
     print(
         "----------------------------------------------------------------------------" + ("----" * 15))
-    for num, item in enumerate(class_list):
-        class_name = list(item.keys())[0]
-        class_details = list(item.values())[0]
-        print(f"{num + 1}\t\t{class_name}\t\t{class_details}")
+    for num, item in enumerate(class_dict):
+        print(f"{num + 1}\t\t{item.classes}\t\t{item.details}")
     return 1
 
 
@@ -168,30 +165,30 @@ def quick_exit():
         return True
 
 
-def get_feedback(class_list):
+def get_feedback(class_dict):
     """[summary]
     """
     while True:
-        display_classes(class_list)
+        display_classes(class_dict)
         print("everything look up to spec?")
         response = input("type c to continue with generation, r to reprint the table, or an\
 entries corresponding 'item no' to edit or delete:\n")
         if response.lower() == 'c':
-            return class_list
+            return class_dict
         elif response.lower() == 'r':
-            display_classes(class_list)
-        elif int(response) in [m+1 for m, n in enumerate(class_list)]:
+            display_classes(class_dict)
+        elif int(response) in [m+1 for m, n in enumerate(class_dict)]:
             cls = int(response)-1
             loop = True
             while loop:
                 response = input(
                     "type e / edit to edit entry, d / delete to delete.\nclose this prompt with c\close")
                 if response.lower() in ('e', 'edit'):
-                    edit_entry(class_list, cls)
+                    edit_entry(class_dict, cls)
                     if quick_exit():
                         loop = False
                 elif response.lower() in ('d', 'delete', 'del'):
-                    delete_entry(class_list, cls)
+                    delete_entry(class_dict, cls)
                     if quick_exit():
                         loop = False
                 elif response.lower() in ('c', 'close'):
@@ -205,7 +202,7 @@ entries corresponding 'item no' to edit or delete:\n")
                 "invalid response- valid choices are c/continue, r/reprint table or a n0umber in the 'item no' col of the table")
 
 
-def delete_entry(class_list, index):
+def delete_entry(class_dict, index):
     """[summary]
 
     Args:
@@ -214,11 +211,11 @@ def delete_entry(class_list, index):
     """
     # get the dict key as a string
     if input("are you sure you want to delete this spec?").lower() in ("yes", "y"):
-        class_list.pop(index)
+        class_dict.pop(index)
     return 1
 
 
-def edit_entry(class_list, index):
+def edit_entry(class_dict, index):
     """[summary]
 
     Args:
@@ -237,7 +234,7 @@ def edit_entry(class_list, index):
         if response in [1, 2, 3, 4, 5, 6]:
             # new = input("enter the new values for this detail:\n")
             # this would be so much less of a pain if claassdict was an iterable object.,,,
-            # class_list[index].
+            # class_dict[index].
             if response == 1:
                 print(
                     "cannot update the class name at this time, as it must be immutable")
