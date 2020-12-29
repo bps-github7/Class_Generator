@@ -12,10 +12,16 @@ Raises:
 Returns:
     [type]: [description]
 """
+import parsing
+import generator
+import utils
+
+
 import sys
 import keyword
 from .inline import Inline
 from .inline import main as inline_main
+
 # from .class_dict import ClassDict
 from utils.options import args
 

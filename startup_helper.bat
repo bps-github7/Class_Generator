@@ -1,0 +1,1 @@
+python -m main.py "project name" --path "C://some//shit" --inline "classA, classB : attr1, attr2 / attr3, attr4 : methodA / methodB -e{vsc}"

@@ -8,8 +8,12 @@ Module level docstring: implementation of Class Dict Class
 
 this might actually be the useless class. but maybe worthwhile figuring out how to make it iterable
 '''
+from classgenerator.parsing.details import Details
+import sys
+sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python")
 
-from details import Details
+
+# __package__ = "parsing"
 
 
 class ClassDict(dict):
@@ -25,6 +29,16 @@ class ClassDict(dict):
                                 for x in self.details.methods.split(",")]
         self.dict = {classes: details}
         super(ClassDict, self).__init__(self.dict)
+
+    @property
+    def classes(Self):
+        return self.classes
+
+    @classes.setter
+    def classes(self, cls):
+        #
+        self.classes = cls
+        self.dict = {self.classes: self.details}
 
     def __repr__(self):
         return repr(self.dict)
@@ -69,5 +83,9 @@ if __name__ == "__main__":
                                            "methodA, methodB", options=[False, '{cc}']))
 
     # print(b.update(c))
+    b.classes = "bicuit_boy"
 
     main(b, c)
+
+    # print('__file__={0:<35} | __name__={1:<20} | __package__={2:<20}'.format(
+    #     __file__, __name__, str(__package__)))

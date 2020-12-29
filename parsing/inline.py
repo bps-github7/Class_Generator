@@ -135,11 +135,12 @@ def parse_inline(inline) -> list:
                 inline.methods.split("/")):
             classes.append(x), attributes.append(y), methods.append(z)
         for x, y, z in zip(classes, attributes, methods):
-            class_dict.update(ClassDict(x, Details(y, z), options=[
-                              inline.global_testing, inline.global_exporting]))
+            class_dict.update(ClassDict(x, Details(y, z, options=[
+                              inline.global_testing, inline.global_exporting])))
     else:
         class_dict.update(ClassDict(inline.classes, Details(
-            inline.attributes, inline.methods, options=[inline.global_testing, inline.global_exporting])))
+            inline.attributes, inline.methods,
+            options=[inline.global_testing, inline.global_exporting])))
     return class_dict
 
 
@@ -154,7 +155,7 @@ methods:\t\tparent:\t\t\tpackage:   testing, exporting:")
     print(
         "----------------------------------------------------------------------------" + ("----" * 15))
     for num, item in enumerate(class_dict):
-        print(f"{num + 1}\t\t{item.classes}\t\t{item.details}")
+        print(f"{num + 1}\t\t{item}\t\t{class_dict[item]}")
     return 1
 
 
@@ -173,16 +174,19 @@ def get_feedback(class_dict):
         print("everything look up to spec?")
         response = input("type c to continue with generation, r to reprint the table, or an\
 entries corresponding 'item no' to edit or delete:\n")
+        valid_responses, keys = [
+            m+1 for m, n in enumerate(class_dict)], [items for items in class_dict]
         if response.lower() == 'c':
             return class_dict
         elif response.lower() == 'r':
             display_classes(class_dict)
-        elif int(response) in [m+1 for m, n in enumerate(class_dict)]:
-            cls = int(response)-1
+        elif int(response) in valid_responses:
+            cls = keys[int(response)-1]
             loop = True
             while loop:
                 response = input(
-                    "type e / edit to edit entry, d / delete to delete.\nclose this prompt with c\close")
+                    "type e / edit to edit entry, d / delete to delete.\n\
+close this prompt with c / close")
                 if response.lower() in ('e', 'edit'):
                     edit_entry(class_dict, cls)
                     if quick_exit():
@@ -202,7 +206,7 @@ entries corresponding 'item no' to edit or delete:\n")
                 "invalid response- valid choices are c/continue, r/reprint table or a n0umber in the 'item no' col of the table")
 
 
-def delete_entry(class_dict, index):
+def delete_entry(class_dict, key):
     """[summary]
 
     Args:
@@ -211,11 +215,11 @@ def delete_entry(class_dict, index):
     """
     # get the dict key as a string
     if input("are you sure you want to delete this spec?").lower() in ("yes", "y"):
-        class_dict.pop(index)
+        del class_dict[key]
     return 1
 
 
-def edit_entry(class_dict, index):
+def edit_entry(class_dict, key):
     """[summary]
 
     Args:
@@ -234,7 +238,7 @@ def edit_entry(class_dict, index):
         if response in [1, 2, 3, 4, 5, 6]:
             # new = input("enter the new values for this detail:\n")
             # this would be so much less of a pain if claassdict was an iterable object.,,,
-            # class_dict[index].
+            # class_dict[key].
             if response == 1:
                 print(
                     "cannot update the class name at this time, as it must be immutable")
