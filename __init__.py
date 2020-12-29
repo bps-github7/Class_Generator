@@ -5,12 +5,11 @@ Date: 12/24/2020
 Purpose: initialize environment for program run time, ensures that
 the needed sub modules are appeneded to the syspath.
 """
-import sys
-sys.path.insert(0, 'C:\\Users\\Ben\\VsCode\\python\\classgenerator\\parsing')
+# import sys
+# sys.path.insert(0, 'C:\\Users\\Ben\\VsCode\\python\\classgenerator\\parsing')
 
 
+# from parsing import inline
 
-from parsing import inline
-
-m = inline.string_to_inline("class : attr1, attr2 : method")
-print(m.attributes)
+# m = inline.string_to_inline("class : attr1, attr2 : method")
+# print(m.attributes)

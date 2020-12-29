@@ -3,10 +3,55 @@
 # Software: Python class Generator
 # Date: 1/21/2020
 
-from Regular_Class import make_class
-from Special_Class import make_abc
+from .Regular_Class import make_class
+from .Special_Class import make_abc
 
 """Module defines miscellaneous functions used for the class generator"""
+
+
+def get_confirmation(opt_code, line):
+    """Asks user if they are satisfied with their choice"""
+    opts = {1: "line no.{} has no colons- meaning your class has no attributes or methods,\
+        \n or this line was incorrectly defined".format(line),
+            2: "No attributes provided for specs on line no. {}".format(line),
+            3: "No methods provided for specs on line no. {}".format(line)}
+    print(opts[opt_code])
+    while True:
+        ans = input("Do you wish to proceed with generating this line? (y/n)")
+        if ans in ("y", "yes"):
+            return True
+        elif ans in ("n", "no"):
+            return False
+
+
+def from_file(f, results=[]):
+    """
+builds a container out of text file
+containing class dict specifications inline format.
+    """
+    # need to account for lack of .txt in POSIX systems
+    with open("{}.txt".format(f), "r") as file:
+        for num, line in enumerate(file):
+            if line.startswith("#") or line.startswith("//"):
+                # enables the user to 'comment out' lines with both JS and python style of commenting
+                continue
+            copy = line.strip("\n")
+            line = line.split(":")
+            if line[0] in ("", " ", "\t", "\t\t", None):
+                print("Cannot produce a class/classes without name(s).\n\
+Please review/revise the following class specification:\n {}on line no.{}\n".format(copy, num))
+            elif line[1] in ("", " ", "\t", "\t\t", None):
+                if get_confirmation(2, num):
+                    results.append(copy)
+            elif line[2] in ("", " ", "\t", "\t\t", " \n", " \t\n", "\t\t\n" "\n", None):
+                if get_confirmation(3, num):
+                    results.append(copy)
+            else:
+                """ 
+                should call Inline.to_dict
+                 """
+                results.append(copy)
+        return results
 
 
 def class_generator(name, attributes, methods=None, parent='object', children=None):
