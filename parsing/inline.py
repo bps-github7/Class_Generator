@@ -104,15 +104,15 @@ exporting: {}".format(self.classes, self.attributes,
         return arg.split("-e")[1] if arg.count("-e") else False
 
     @staticmethod
-    def cleanse(items: str):
-        """Cleanses a list of stirngs of whitespace and junk text
+    def cleanse(items: any):
+        """format properties by strip and lowercase of each elements.
+        side-effect: coerces ',' delimited string to formatted list.
         """
-        def clean(item):
-            """ applies strip function on a per token basis.
-            """
-            return item.strip()
-        items = map(clean, items.split(","))
-        return ",".join(items)
+        if isinstance(items, list):
+            return list(map(
+                lambda item: item.strip().lower(), items))
+        return list(map(
+            lambda item: item.strip().lower(), items.split(",")))
 
 
 def parse_inline(inline) -> list:
