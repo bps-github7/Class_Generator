@@ -8,10 +8,10 @@ Module level docstring: implementation of Class Dict Class
 
 this might actually be the useless class. but maybe worthwhile figuring out how to make it iterable
 '''
-from classgenerator.parsing.details import Details
+"%##"
 import sys
-sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python")
-
+sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator\\parsing")
+from details import Details
 
 # __package__ = "parsing"
 
@@ -30,15 +30,14 @@ class ClassDict(dict):
         self.dict = {classes: details}
         super(ClassDict, self).__init__(self.dict)
 
-    @property
-    def classes(Self):
-        return self.classes
+    # @property
+    # def classes(self):
+    #     return self.classes
 
-    @classes.setter
-    def classes(self, cls):
-        #
-        self.classes = cls
-        self.dict = {self.classes: self.details}
+    # @classes.setter
+    # def classes(self, cls):
+    #     print("class attribute cannot be changed.")
+    #     return 1
 
     def __repr__(self):
         return repr(self.dict)
@@ -73,7 +72,8 @@ def main(cls1: ClassDict, cls2: ClassDict):
     new = {}
     new.update(cls1)
     new.update(cls2)
-    print(new)
+    shit_1 = new["moth"]
+    shit_1.attributes = "paste"
 
 
 if __name__ == "__main__":
@@ -83,7 +83,7 @@ if __name__ == "__main__":
                                            "methodA, methodB", options=[False, '{cc}']))
 
     # print(b.update(c))
-    b.classes = "bicuit_boy"
+    # b.classes = "bicuit_boy"
 
     main(b, c)
 

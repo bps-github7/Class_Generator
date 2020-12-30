@@ -145,5 +145,6 @@ dmypy.json
 cython_debug/
 #
 /__pycache__
+__init__.cpython-39.pyc
 *.cpython-39.pyc
 *.cpython-35.pyc

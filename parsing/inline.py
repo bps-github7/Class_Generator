@@ -188,7 +188,7 @@ entries corresponding 'item no' to edit or delete:\n")
                     "type e / edit to edit entry, d / delete to delete.\n\
 close this prompt with c / close")
                 if response.lower() in ('e', 'edit'):
-                    edit_entry(class_dict, cls)
+                    class_dict = edit_entry(class_dict, cls)
                     if quick_exit():
                         loop = False
                 elif response.lower() in ('d', 'delete', 'del'):
@@ -244,8 +244,16 @@ def edit_entry(class_dict, key):
                     "cannot update the class name at this time, as it must be immutable")
                 return 0
             else:
-                print("featire not implemented at this time.")
-                return 1
+                new_values = input(f"enter new values for {opts_dict[response]}\n\
+delimit multiple items with , token:\n")
+                field = opts_dict[response]
+                #this not working,
+                class_dict[key][field] = new_values
+                print(class_dict)
+                return class_dict
+        else:
+            print(f"sorry- {response} is not a valid choice. Try again.")
+                
 
 
 def main(inline: Inline) -> int:
