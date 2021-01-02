@@ -112,15 +112,19 @@ def case_check(item, item_type="class"):
             return item.strip()
         else:
             answer = input(
-                "your class name {} is not capitalized. Would you like this corrected? (y/n)".format(item))
-            return (item.title() if (answer.lower() in ('yes', 'y', 'yea', 'yeah', 'yup')) else item).strip()
+                "your class name {} is not capitalized.\
+Would you like this corrected? (y/n)".format(item))
+            return (item.title() if (answer.lower() in ('yes',
+            'y', 'yea', 'yeah', 'yup')) else item).strip()
     elif item_type in ("attribute", "method"):
         if item.islower():
             return item.strip()
         else:
             answer = input(
-                "your attribute or method {} is not lowercase. Would you like this corrected? (y/n)".format(item))
-            return (item.lower() if (answer.lower() in ('yes', 'y', 'yea', 'yeah', 'yup')) else item).strip()
+                "your attribute or method {} is not lowercase.\
+Would you like this corrected? (y/n)".format(item))
+            return (item.lower() if (answer.lower() in ('yes',
+            'y', 'yea', 'yeah', 'yup')) else item).strip()
 
 
 def main():

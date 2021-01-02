@@ -49,6 +49,9 @@ strip white space from fields, which is noise in the classGen mini language.
             # cleanup - get rid of switches on methods once their existence is confirmed.
             if self.global_testing:
                 self.methods = self.methods.split(" -t")[0]
+        else:
+            self.global_testing = False
+            self.global_exporting = None
 
     def has_options(self):
         """[summary]
@@ -134,13 +137,17 @@ def parse_inline(inline) -> list:
                 inline.attributes.split("/"),
                 inline.methods.split("/")):
             classes.append(x), attributes.append(y), methods.append(z)
+        # setting parent and package to defaults in this and else block below
+        # until we sophisticate the packaging and inheritance functionality a bit more.
         for x, y, z in zip(classes, attributes, methods):
-            class_dict.update(ClassDict(x, Details(y, z, options=[
-                              inline.global_testing, inline.global_exporting])))
+            class_dict.update(ClassDict(x, y, z,
+                            'root', object,
+                            inline.global_testing, inline.global_exporting))
     else:
-        class_dict.update(ClassDict(inline.classes, Details(
+        class_dict.update(ClassDict(inline.classes,
             inline.attributes, inline.methods,
-            options=[inline.global_testing, inline.global_exporting])))
+            'root', object,
+            inline.global_testing, inline.global_exporting))
     return class_dict
 
 
@@ -188,7 +195,9 @@ entries corresponding 'item no' to edit or delete:\n")
                     "type e / edit to edit entry, d / delete to delete.\n\
 close this prompt with c / close")
                 if response.lower() in ('e', 'edit'):
-                    class_dict = edit_entry(class_dict, cls)
+                    pass
+                    # class in question edit_main
+                    # class_dict = edit_entry(class_dict, cls)
                     if quick_exit():
                         loop = False
                 elif response.lower() in ('d', 'delete', 'del'):
@@ -217,44 +226,6 @@ def delete_entry(class_dict, key):
     if input("are you sure you want to delete this spec?").lower() in ("yes", "y"):
         del class_dict[key]
     return 1
-
-
-def edit_entry(class_dict, key):
-    """[summary]
-
-    Args:
-        classdict ([type]): [description]
-        opt ([type]): [description]
-    """
-    while True:
-        opts_dict = {1: "classes", 2: "attributes", 3: "methods",
-                     4: "parent", 5: "package", 6: "testing/exporting"}
-        print("enter the corresponding number for the detail you want to edit:\n\n")
-        print("item no:\toption:")
-        print("-----------------------------")
-        for x, y in zip(opts_dict, list(opts_dict.values())):
-            print(f"{x}\t\t{y}")
-        response = int(input())
-        if response in [1, 2, 3, 4, 5, 6]:
-            # new = input("enter the new values for this detail:\n")
-            # this would be so much less of a pain if claassdict was an iterable object.,,,
-            # class_dict[key].
-            if response == 1:
-                print(
-                    "cannot update the class name at this time, as it must be immutable")
-                return 0
-            else:
-                new_values = input(f"enter new values for {opts_dict[response]}\n\
-delimit multiple items with , token:\n")
-                field = opts_dict[response]
-                #this not working,
-                class_dict[key][field] = new_values
-                print(class_dict)
-                return class_dict
-        else:
-            print(f"sorry- {response} is not a valid choice. Try again.")
-                
-
 
 def main(inline: Inline) -> int:
     classes = parse_inline(inline)
