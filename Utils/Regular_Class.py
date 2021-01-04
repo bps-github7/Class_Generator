@@ -117,8 +117,7 @@ Returns None. methods should be
 a comma delimited string.
     """
     NM, CM, SM = [], [], []
-
-    for m in methods.split(","):
+    for m in methods:
         if m.startswith("SM"):
             SM += [m[2:]]
         elif m.startswith("CM"):
@@ -184,8 +183,8 @@ outputs the appropriate class syntax for what is specified.
         \n\tprint('Running class file. Nothing to do here')")
 
 
-# these should be able to take class_dict as an argument!
-make_class("employer", ["employeeID", "name", "salary"],
-           "SMstaticmethod1,SMstaticmethod2,CMclassmethod1,CMclassmethod2,normalmethod1", parent="Person")
-make_class("person", ["name", "age", "weight",
-                      "height"], "mystical_beansprout")
+# # these should be able to take class_dict as an argument!
+# make_class("employer", ["employeeID", "name", "salary"],
+#            ["SMstaticmethod1","SMstaticmethod2","CMclassmethod1","CMclassmethod2","normalmethod1"], parent="Person")
+# make_class("person", ["name", "age", "weight",
+#                       "height"], ["mystical_beansprout"])

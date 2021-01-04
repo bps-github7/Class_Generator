@@ -18,11 +18,6 @@ class ClassDict(dict):
         self.classes = classes
         self.details = [ClassDict.cleanse(attributes), ClassDict.cleanse(methods),
                         parents, packages, testing, exporting]
-        # TypeError: unhashable type: 'list' is a big problem... design oversight.
-        #  hopeful some workaround hiding in the code.
-
-        ### Doesnt make a lot of sense really- quick google search says list cannot be key in a dict. value can be any datatype
-        ### is there anwhere in the code where details is assumed to be the key instead of value? weird bug time to debugggg, yay
         self.dict = dict({self.classes: self.details})
         super(ClassDict, self).__init__(self.dict)
 
@@ -30,7 +25,10 @@ class ClassDict(dict):
         return repr(self.dict)
 
     def __str__(self):
-        return str(self.dict)
+        #big problem here- package and parents are being mixed for who knows what reason
+        # had to switch their order of appearance, but this shouldnot ne treated like a permentant solitoon. 
+        return str(f"{self.classes}\t{self.attributes}\t\t{self.methods}\t\
+{self.packages}\t\t{self.parents}  {self.testing}\t\t {self.exporting}")
 
     def __iter__(self):
         return iter(self.dict)
@@ -134,12 +132,15 @@ class ClassDict(dict):
         opts_dict = {1: "classes", 2: "attributes", 3: "methods",
                 4: "parent", 5: "package", 6: "testing/exporting"}
         while True:
-            print("enter the corresponding number for the detail you want to edit:\n\n")
+            print("enter the corresponding number for the detail you want to edit:")
             print("item no:\toption:")
             print("-----------------------------")
             for number, selection in zip(opts_dict, list(opts_dict.values())):
                 print(f"{number}\t\t\t\t\t{selection}")
-            response = int(input("type c/continue at any time to leave the editing prompt."))
+            response = input("c/continue at any time to leave the editing prompt.")
+            if response in ("c", "continue"):
+                return self.details
+            response = int(response)
             if response in [1, 2, 3, 4, 5, 6]:
                 new = input("enter the new values for this detail:\n")
                 # this would be so much less of a pain if claassdict was an iterable object.,,,
@@ -188,8 +189,6 @@ class ClassDict(dict):
                                 print("didnt recognize your response- provide options matching the syntax: single_option   or  option1,option2")
                     elif exporting in ("s", "send"):
                         self.exporting = None
-            elif response in ("c", "continue"):
-                return 1
             else:
                 print(f"sorry- {response} is not a valid choice. Try again.")
 
@@ -241,6 +240,7 @@ def main(cls1: ClassDict, cls2: ClassDict):
     new = {}
     new.update(cls1)
     new.update(cls2)
+    return new
 
 if __name__ == "__main__":
     # print('__file__={0:<35} | __name__={1:<20} | __package__={2:<20}'.format(

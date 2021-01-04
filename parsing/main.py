@@ -149,7 +149,7 @@ def main():
                 print("building an class dict with inline with inheritance")
                 #specs = inheritancebuilder.main()
         else:
-            inline_main(item)
+            return inline_main(item)
     elif args.file:
         print("reading classes from a file...")
         # specs = file.main()

@@ -3,8 +3,10 @@
 # Software: Python class Generator
 # Date: 1/21/2020
 
-from .Regular_Class import make_class
-from .Special_Class import make_abc
+import sys
+sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
+from utils.regular_class import make_class
+from utils.special_class import make_abc
 
 """Module defines miscellaneous functions used for the class generator"""
 
@@ -54,22 +56,22 @@ Please review/revise the following class specification:\n {}on line no.{}\n".for
         return results
 
 
-def class_generator(name, attributes, methods=None, parent='object', children=None):
+def class_generator(name, attributes, methods=None, parent='object'):
     '''
 Decides what function to run to build the specified class list.
 NOTE: assumes that the current working dir is the project folder and it is writable.
 for inheritance, invoked inside a loop to create correct parents, children etc
     '''
-    # test for inheritance
-    if name.count(">") > 0:
-        inheritance(name, attributes, parent)
-    elif name.startswith("ABC"):
-        name = name[3:]
-        make_abc(name, attributes)
-        # parent also needs to include any parents from up the inheritance hierarchy
-    else:
-        make_class(name, attributes, parent=parent)
-
+    # # test for inheritance
+    # if name.count(">") > 0:
+    #     inheritance(name, attributes, parent)
+    # elif name.startswith("ABC"):
+    #     name = name[3:]
+    #     make_abc(name, attributes)
+    #     # parent also needs to include any parents from up the inheritance hierarchy
+    # else:
+    #     make_class(name, attributes, parent=parent)
+    make_class(name, attributes, methods=methods, parent=parent)
 
 def modified_generator(name, attributes, parent='object', children=None):
     '''

@@ -4,8 +4,10 @@ Program: inline class for ClassGen program
 Date: 10/28/2020
 Module level docstring: implements the Inline class
 '''
-from .class_dict import ClassDict
-from .details import Details
+import sys
+sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
+from parsing.class_dict import ClassDict
+# from .details import Details
 
 
 class Inline:
@@ -37,9 +39,10 @@ strip white space from fields, which is noise in the classGen mini language.
 
     def __init__(self, inline):
         self.inline = inline.split(":")
-        self.classes = Inline.cleanse(self.inline[0].strip())
-        self.attributes = Inline.cleanse(self.inline[1].strip())
-        self.methods = Inline.cleanse(self.inline[2].strip())
+        # self.classes = Inline.cleanse(self.inline[0].strip())
+        self.classes = self.inline[0].strip().title()
+        self.attributes = self.inline[1].strip()
+        self.methods = self.inline[2].strip()
         if self.has_options():
             self.global_exporting = Inline.exporting(self.methods)
             if self.global_exporting:
@@ -130,13 +133,19 @@ def parse_inline(inline) -> list:
     class_dict = {}
     # if there are multiple classes in a single inline,
     # distinguish them into a multi nested, multi element dictionary
+
+    # would be nice to have this done within the class-
+    # but that would require making a second 'builder' class
+    # for handling the cases where there is , in the class  name attribute of inline
     if inline.classes.count(","):
         classes, attributes, methods = [], [], []
         for x, y, z in zip(
                 inline.classes.split(","),
                 inline.attributes.split("/"),
                 inline.methods.split("/")):
-            classes.append(x), attributes.append(y), methods.append(z)
+            classes.append(x)
+            attributes.append(y)
+            methods.append(z)
         # setting parent and package to defaults in this and else block below
         # until we sophisticate the packaging and inheritance functionality a bit more.
         for x, y, z in zip(classes, attributes, methods):
@@ -157,12 +166,12 @@ def display_classes(class_dict):
     Args:
         classdict ([type]): [description]
     """
-    print("item no:\tclass name:\tAttributes:\t\t\
-methods:\t\tparent:\t\t\tpackage:   testing, exporting:")
+    print("item no:   class name:\t\tAttributes:\t\t\t\
+methods:\t\tparent:\t\tpackage:\ttesting:\texporting:")
     print(
-        "----------------------------------------------------------------------------" + ("----" * 15))
+        "----------------------------------------------------------------------------" + ("----" * 26))
     for num, item in enumerate(class_dict):
-        print(f"{num + 1}\t\t{item}\t\t{class_dict[item]}")
+        print(f"{num + 1}\t  {(ClassDict.from_tuple((item, class_dict[item]))).__str__()}")
     return 1
 
 
@@ -179,33 +188,34 @@ def get_feedback(class_dict):
     while True:
         display_classes(class_dict)
         print("everything look up to spec?")
-        response = input("type c to continue with generation, r to reprint the table, or an\
-entries corresponding 'item no' to edit or delete:\n")
+        action = input("c / continue to continue with generation\n\
+r / reprint to reprint the table\n\
+or an entries corresponding 'item no' to edit or delete it:\n")
         valid_responses, keys = [
             m+1 for m, n in enumerate(class_dict)], [items for items in class_dict]
-        if response.lower() == 'c':
+        if action.lower() in ('c', 'continue'):
             return class_dict
-        elif response.lower() == 'r':
-            display_classes(class_dict)
-        elif int(response) in valid_responses:
-            cls = keys[int(response)-1]
+        elif action.lower() in ('r', 'reprint'):
+            continue
+        elif int(action) in valid_responses:
+            class_name = keys[int(action)-1]
+            cls = ClassDict.from_tuple((class_name, class_dict[class_name]))
             loop = True
             while loop:
-                response = input(
-                    "type e / edit to edit entry, d / delete to delete.\n\
-close this prompt with c / close")
-                if response.lower() in ('e', 'edit'):
-                    pass
-                    # class in question edit_main
-                    # class_dict = edit_entry(class_dict, cls)
+                choice = input(
+                    "type e / edit to edit entry\n\
+d / delete to delete.\n\
+close this prompt with c / close:\n")
+                if choice.lower() in ('e', 'edit'):
+                    class_dict[class_name] = cls.edit_main()
                     if quick_exit():
                         loop = False
-                elif response.lower() in ('d', 'delete', 'del'):
-                    delete_entry(class_dict, cls)
+                elif choice.lower() in ('d', 'delete', 'del'):
+                    delete_entry(class_dict, class_name)
                     if quick_exit():
                         loop = False
-                elif response.lower() in ('c', 'close'):
-                    break
+                elif choice.lower() in ('c', 'close'):
+                    return class_dict
                 else:
                     print(
                         "invalid response- valid choices are e/edit, d/delete, c/close")
@@ -213,7 +223,6 @@ close this prompt with c / close")
         else:
             print(
                 "invalid response- valid choices are c/continue, r/reprint table or a n0umber in the 'item no' col of the table")
-
 
 def delete_entry(class_dict, key):
     """[summary]
@@ -229,8 +238,11 @@ def delete_entry(class_dict, key):
 
 def main(inline: Inline) -> int:
     classes = parse_inline(inline)
-    get_feedback(classes)
+    return get_feedback(classes)
 
 
 if __name__ == "__main__":
+    # also not reading -e values now
     main(Inline("classA : attr1, attr2, attr3 : method1 -t -e{ut,cc}"))
+    # test = Inline("classA : attr1, attr2, attr3 : method1 -t -e{ut,cc}")
+    # print(test.global_testing)
