@@ -56,7 +56,7 @@ Please review/revise the following class specification:\n {}on line no.{}\n".for
         return results
 
 
-def class_generator(name, attributes, methods=None, parent='object'):
+def class_generator(cls):
     '''
 Decides what function to run to build the specified class list.
 NOTE: assumes that the current working dir is the project folder and it is writable.
@@ -71,7 +71,10 @@ for inheritance, invoked inside a loop to create correct parents, children etc
     #     # parent also needs to include any parents from up the inheritance hierarchy
     # else:
     #     make_class(name, attributes, parent=parent)
-    make_class(name, attributes, methods=methods, parent=parent)
+    make_class(cls.classes, cls.attributes, methods=cls.methods, parent=cls.parents)
+    # make_class(class.classes, class.attributes, methods=class.methods, parent=class.parents,
+    # packages=class.packages, testing=class.testing, exporting=class.exporting)
+
 
 def modified_generator(name, attributes, parent='object', children=None):
     '''

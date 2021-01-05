@@ -25,10 +25,7 @@ class ClassDict(dict):
         return repr(self.dict)
 
     def __str__(self):
-        #big problem here- package and parents are being mixed for who knows what reason
-        # had to switch their order of appearance, but this shouldnot ne treated like a permentant solitoon. 
-        return str(f"{self.classes}\t{self.attributes}\t\t{self.methods}\t\
-{self.packages}\t\t{self.parents}  {self.testing}\t\t {self.exporting}")
+        return f"\t{self.classes}\t\t\t{self.attributes}\t\t{self.methods}\t  {self.parents}\t   {self.packages}\t\t  {self.testing}\t\t{self.exporting}"
 
     def __iter__(self):
         return iter(self.dict)
@@ -44,14 +41,6 @@ class ClassDict(dict):
 
     def values(self):
         return self.dict.values()
-
-    # Does not work- obviously. but its also very buggy
-    # for unknown reason - iterates 3 times upon invokation
-    
-    # @property
-    # def classes(self):
-    #     return NotImplemented
-    #     # return str(self.dict)
 
     # accessing these is funny so we'll define computed properties for all fields
     @property
@@ -109,25 +98,56 @@ class ClassDict(dict):
 
     @exporting.setter
     def exporting(self, new_values):
-        self.details[5] = ClassDict.cleanse(new_values)
+        # maybe shoudl have a special stiatic method for reading exporting args
+        self.details[5] = new_values
 
     @classmethod
-    def replace_item(self, old_details=None):
-        """[summary]
+    def replace_item(self, old_details):
         """
-        # parse a new line and instantiate a classdict using it,
-        # then replace in table
+        Alt constructor- build new ClassDict to replace an old one.
 
-        # alternatively, if they want to keep all the old details the same.
-        # then just get the name and instantiate a bew class w old details
-        pass
+        allows user to generate a new class dict on the spot.
+        since class name is key in dict, editing that attribute is impossible during runtime.
+        """
 
+        building_path = input("want to use the old details \
+(attributes, methods, parent, etc) of the class (y/n)?\n\
+(Note that choosing n/no means you will have to provide a new inline to build it from scratch)")
+        if building_path in ("y", "yes"):
+            return ClassDict(input("provide a new name for your class:\n"), *old_details)
+        elif building_path in ("n", "no"):
+            # we should use inline.parse here but it
+            # would create a circular import and tight coupling.
+            # we will use interactive mode fns until this is figured out
+            name = input("provide a new name for your class:\n")
+            attributes = input(f"provide attributes for {name},\
+ delimiting with ',', or leave blank for no attributes:\n")
+            methods = input(f"provide methods for {name}, delimiting with ',',\
+ or leave blank for no methods:\n")
+            if answer := input("any parents? (defaults to 'object')"):
+                parents = answer
+            else:
+                parents = 'object'
+            if answer := input(f"is {name} contained within a package? (defaults to 'root')"):
+                packages = answer
+            else:
+                packages = 'root'
+            if answer := input(f"generate {name} with testing? (defaults to False)"):
+                testing = answer
+            else:
+                testing = False
+            if answer := input(f"Should we do anything with {name}\
+ after generation (options- vsc, send)? (defaults to None)"):
+                exporting = answer
+            else:
+                exporting = None
+            return ClassDict(name, attributes, methods, parents, packages, testing, exporting)
 
     def edit_main(self):
         """Facilitates the editing of classdict members.
 
         Returns:
-            [type]: [description]
+            self [ClassDict]: the complete class dict after editing.
         """
         opts_dict = {1: "classes", 2: "attributes", 3: "methods",
                 4: "parent", 5: "package", 6: "testing/exporting"}
@@ -137,29 +157,26 @@ class ClassDict(dict):
             print("-----------------------------")
             for number, selection in zip(opts_dict, list(opts_dict.values())):
                 print(f"{number}\t\t\t\t\t{selection}")
-            response = input("c/continue at any time to leave the editing prompt.")
+            response = input("c/continue at any time to leave the editing prompt.\n")
             if response in ("c", "continue"):
-                return self.details
+                return self
             response = int(response)
             if response in [1, 2, 3, 4, 5, 6]:
-                new = input("enter the new values for this detail:\n")
-                # this would be so much less of a pain if claassdict was an iterable object.,,,
-                # class_dict[key].
+                if response < 6 and response > 1:
+                    new = input("enter the new values for this class field:\n")
                 if response == 1:
                     print(
-                        "cannot update the class name at this time, as it must be immutable")
+                        "cannot update the class name in place, as it must be immutable\n")
                     while True:
-                        restart = input("delete this entry and provide a corrected replacement (y/n)?")
+                        restart = input("delete this entry and provide\
+ a corrected replacement (y/n)?\n")
+                        print("\n\n")
                         if restart in ("y", "yes"):
-                            # how do i get return from this to change table?
-                            # rebuild it with the new values...
-                            if ClassDict.replace_item():
-                                break
+                            return ClassDict.replace_item(self.details)
                         elif restart in ("n", "no"):
-                            return 0
+                            break
                         else:
                             print("sorry, didnt understand that response")
-
                 elif response == 2:
                     self.attributes = ClassDict.cleanse(new)
                 elif response == 3:
@@ -175,42 +192,32 @@ class ClassDict(dict):
                 elif response == 5:
                     self.packages = str(new)
                 elif response == 6:
-                    testing = input("testing is set to {self.testing}, flip the switch (y/n)?")
+                    testing = input("testing is set to {self.testing}, flip the switch (y/n)?\n")
                     if testing in ("y", "yes"):
                         self.testing = not self.testing
-                    exporting = input("exporting has been provided the following options:  {self.exporting}, modify them (y/n)? switch the flag (set exporting to false) with (s/switch)")
+                    exporting = input(f"exporting has been provided the following options:  {self.exporting},\n\
+modify them (y/n)? switch the flag (set exporting to false) with (s/switch):\n")
                     if exporting in ("y", "yes"):
                         while True:
-                            new_exporting = input("type the options you want to be applied to this class for exporting (options- vsc (source code management), send- (ssh or email)")
+                            new_exporting = input("type the options you\
+ want to be applied to this class for exporting\n\
+(options- vsc (source code management), send- (ssh or email):\n")
                             if new_exporting in ("vsc","send", "vsc,send", "vsc, send", "send,vsc", "send, vsc"):
                                 self.exporting = new_exporting
                                 break
                             else:
-                                print("didnt recognize your response- provide options matching the syntax: single_option   or  option1,option2")
+                                print("didnt recognize your response- provide options\
+ matching the syntax: single_option   or  option1,option2")
                     elif exporting in ("s", "send"):
                         self.exporting = None
             else:
                 print(f"sorry- {response} is not a valid choice. Try again.")
-
-
-                        
-
-
 
     # these are 'best practices' modifications, so we will make them
     # involuntary by default and add a .rc setting to turn it off.
 
     # only other modification is non-optional - validation:
     # handle this in input retrival stage of program
-
-    @classmethod
-    def from_tuple(cls, item):
-        '''Alt constructor for building a class dict out of tuple
-        helps with isinstance testing when getting a 
-        '''
-        return ClassDict(item[0], item[1][0], item[1][1], item[1][2], item[1][3], item[1][4])
-
-
     @staticmethod
     def cleanse(items: any):
         """format properties by strip and lowercase of each elements.
@@ -221,6 +228,15 @@ class ClassDict(dict):
                 lambda item: item.strip().lower(), items))
         return list(map(
             lambda item: item.strip().lower(), items.split(",")))
+
+    # @classmethod
+    # def from_tuple(cls, item):
+    #     '''Alt constructor for building a class dict out of tuple
+    #     helps with isinstance testing when getting a 
+    #     '''
+    #     return ClassDict(item[0], attributes=item[1][0], methods=item[1][1], parents=item[1][2], packages=item[1][3], testing=item[1][4], exporting=item[1][5])
+
+
 
 def main(cls1: ClassDict, cls2: ClassDict):
     """test all fns the class should handle.
