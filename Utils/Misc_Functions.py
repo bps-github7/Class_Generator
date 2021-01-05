@@ -71,7 +71,8 @@ for inheritance, invoked inside a loop to create correct parents, children etc
     #     # parent also needs to include any parents from up the inheritance hierarchy
     # else:
     #     make_class(name, attributes, parent=parent)
-    make_class(cls.classes, cls.attributes, methods=cls.methods, parent=cls.parents)
+    make_class(cls.classes, cls.attributes,
+    methods=cls.methods, parent=cls.parents, packages="testing")
     # make_class(class.classes, class.attributes, methods=class.methods, parent=class.parents,
     # packages=class.packages, testing=class.testing, exporting=class.exporting)
 

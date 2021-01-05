@@ -152,7 +152,7 @@ Please revise your class definition so that there are no duplicates in method na
 
 
 # why is attributes passed in as a list but methods a string?
-def make_class(name, attributes, methods, parent=object, protected=False):
+def make_class(name, attributes, methods, parent=object, package='root', protected=False):
     """
 main subroutine for class generator
 creates a file with the provided class name
@@ -160,7 +160,11 @@ outputs the appropriate class syntax for what is specified.
     """
     # coerce adherence to PEP8 by making class identifier titlecase
     name = name.title()
-    with open("{}.py".format(name), "a+") as file:
+    if package not in ('root', None):
+        full_name = f"{package}/{name}.py"
+    else:
+        full_name = f"{name}.py"    
+    with open(full_name, "a+") as file:
         if parent != object:
             make_imports(file, [parent])
         else:
