@@ -4,9 +4,12 @@
 # Date: 1/21/2020
 
 import sys
+import os
+import errno
+import tempfile
+
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
-from utils.regular_class import make_class
-from utils.special_class import make_abc
+
 
 """Module defines miscellaneous functions used for the class generator"""
 
@@ -24,6 +27,81 @@ def get_confirmation(opt_code, line):
             return True
         elif ans in ("n", "no"):
             return False
+
+def isWritable(path):
+    try:
+        testfile = tempfile.TemporaryFile(dir=path)
+        testfile.close()
+    except OSError as e:
+        if e.errno == errno.EACCES:  # 13
+            return False
+        e.filename = path
+        raise
+    return True
+
+
+def make_new_folder(path, project_name):
+    os.chdir(path)
+    new = os.path.join(path, project_name)
+    if not os.path.exists(new):
+        os.mkdir(new)
+        os.chdir(new)
+        return 1
+    else:
+        ### why not just change dir to this existing one?
+        print("Error: a folder already exists with this name.")
+        return 0
+
+# Seems like there is a  logic/ exception error somewhere- keep getting this error message in cmdline mode
+
+def test_paths(paths):
+    """like the test_path fn but works on an array of potential paths
+
+    Args:
+        paths ([list]): list of potential paths for validating
+    """
+    valid, invalid = [], []
+
+    for item in paths:
+        if os.path.exists(item) and os.path.isdir(item) and isWritable(item):
+            valid += item
+        else:
+            invalid += item
+    if invalid:
+        print("the following are not valid packages for use in this program:")
+        for i in invalid:
+            print(i)
+        # response = input("Learn more (y/n) ?")
+        # if response in ("y", "yes"):
+        #     path_error_message(path)
+    return valid if len(valid) > 0 else 0
+
+def test_path(path, first=True):
+    """checks if a path is valid for use in generating class files"""
+    if path == 'root':
+        return 1
+    if isinstance(path, list) and len(path) > 0:
+        return test_paths(path)
+    if os.path.exists(path) and os.path.isdir(path) and isWritable(path):
+        return path
+    else:
+        if first:
+            # avoids redundant printing of error messages
+            print("error with the path for a package or default path you provided.")
+            response = input("learn more (y/n)?")
+            if response in ("y", "yes"):
+                path_error_message(path)
+        return 0
+
+
+def path_error_message(path):
+    print("Error: there is an issue with the path provided")
+    print("Please check the following:")
+    issues = ["1. Is the default path: {} a valid, fully qualified path?".format(path),
+                "2. Does the default path lead to a valid directory in the file system? (ie. not a file, filesystem, shortcut. etc...)",
+                "3. Is the default path provided a writable directory? (ie. does the current user have the nescesary privalleges to write in this directory?)"]
+    for issue in issues:
+        print(issue)
 
 
 def from_file(f, results=[]):
@@ -56,37 +134,6 @@ Please review/revise the following class specification:\n {}on line no.{}\n".for
         return results
 
 
-def class_generator(cls):
-    '''
-Decides what function to run to build the specified class list.
-NOTE: assumes that the current working dir is the project folder and it is writable.
-for inheritance, invoked inside a loop to create correct parents, children etc
-    '''
-    # # test for inheritance
-    # if name.count(">") > 0:
-    #     inheritance(name, attributes, parent)
-    # elif name.startswith("ABC"):
-    #     name = name[3:]
-    #     make_abc(name, attributes)
-    #     # parent also needs to include any parents from up the inheritance hierarchy
-    # else:
-    #     make_class(name, attributes, parent=parent)
-    make_class(cls.classes, cls.attributes,
-    methods=cls.methods, parent=cls.parents, packages="testing")
-    # make_class(class.classes, class.attributes, methods=class.methods, parent=class.parents,
-    # packages=class.packages, testing=class.testing, exporting=class.exporting)
-
-
-def modified_generator(name, attributes, parent='object', children=None):
-    '''
-Works like the above generator but without possibilities for inheritance.
-    '''
-    if name.startswith("ABC"):
-        name = name[3:]
-        make_abc(name, attributes)
-        # parent also needs to include any parents from up the inheritance hierarchy
-    else:
-        make_class(name, attributes, parent=parent)
 
 
 def list_to_str(a, delimiter=","):
@@ -112,52 +159,52 @@ Takes a string and returns  a list
     return list(map(custom_strip, a.split(delimiter)))
 
 
-def inheritance(name, attributes, methods=None, parent='object', runs=0):
-    """
-<Abstract: >
-    Handles inheritance. Breaks up passed in string argument, that tells us
-    the names and attribute lists for a class.
-<Dev notes: >
-    last updated Thursday 2/20/2020 9:27pm EST
-    everything is working as hoped/expected.
-    would be wise to modularize and test drive develop this some more.
-    im sure there are unexpected issues lurking.
-   """
-    # methods = list_to_str(methods)
-    family = name.split(">")
-    family_attributes = attributes.split(">")
-    #family_methods = methods.split(">")
-    if len(family) != len(family_attributes):
-        print("Error: mismatch in number of classes and attributes\n\
-        Make sure that occurences of /'>/' are consistent on \n\
-        both sides of : in -c option's dictionary")
-        return 0
-    # we now have a family of class names and class attributes,
-    # belonging to the first family in the list
-    parents = family[0]
-    parent_attr = family_attributes[0]
-    # we will enumerate the current members, delimited by a
-    # comma, or backslash for attribute listings
-    inheriter(parents, parent_attr, parent=parent.strip(), runs=runs)
-    del family[0]
-    del family_attributes[0]
-    name = " > ".join(family)
-    attr = " > ".join(family_attributes)
-    # calling it with runs = 1 so that function knows it's been called before.
-    if len(family) > 0:
-        inheritance(name, attr, parent=parents.strip(), runs=1)
-    else:
-        # finished succesfully!
-        return 0
+# def inheritance(name, attributes, methods=None, parent='object', runs=0):
+#     """
+# <Abstract: >
+#     Handles inheritance. Breaks up passed in string argument, that tells us
+#     the names and attribute lists for a class.
+# <Dev notes: >
+#     last updated Thursday 2/20/2020 9:27pm EST
+#     everything is working as hoped/expected.
+#     would be wise to modularize and test drive develop this some more.
+#     im sure there are unexpected issues lurking.
+#    """
+#     # methods = list_to_str(methods)
+#     family = name.split(">")
+#     family_attributes = attributes.split(">")
+#     #family_methods = methods.split(">")
+#     if len(family) != len(family_attributes):
+#         print("Error: mismatch in number of classes and attributes\n\
+#         Make sure that occurences of /'>/' are consistent on \n\
+#         both sides of : in -c option's dictionary")
+#         return 0
+#     # we now have a family of class names and class attributes,
+#     # belonging to the first family in the list
+#     parents = family[0]
+#     parent_attr = family_attributes[0]
+#     # we will enumerate the current members, delimited by a
+#     # comma, or backslash for attribute listings
+#     inheriter(parents, parent_attr, parent=parent.strip(), runs=runs)
+#     del family[0]
+#     del family_attributes[0]
+#     name = " > ".join(family)
+#     attr = " > ".join(family_attributes)
+#     # calling it with runs = 1 so that function knows it's been called before.
+#     if len(family) > 0:
+#         inheritance(name, attr, parent=parents.strip(), runs=1)
+#     else:
+#         # finished succesfully!
+#         return 0
 
 
-def inheriter(parents, parent_attr, parent='object', runs=0):
-    for x, y in zip(parents.split(","), parent_attr.split("/")):
-        if runs == 0:
-            modified_generator(x.strip(), str_to_list(y))
-        # case where the inheritance function has already been invoked once.
-        else:
-            modified_generator(x.strip(), str_to_list(y), parent=parent)
+# def inheriter(parents, parent_attr, parent='object', runs=0):
+#     for x, y in zip(parents.split(","), parent_attr.split("/")):
+#         if runs == 0:
+#             modified_generator(x.strip(), str_to_list(y))
+#         # case where the inheritance function has already been invoked once.
+#         else:
+#             modified_generator(x.strip(), str_to_list(y), parent=parent)
 
 # additional command line options.
 

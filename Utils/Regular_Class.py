@@ -4,6 +4,7 @@
 
 """Defines the functions used for writing regular class files."""
 
+from utils.misc_functions import test_path
 
 def make_imports(file, parents, path_to_parents="./"):
     '''
@@ -56,7 +57,7 @@ given the file object and attribute list
 
 def make_str(file, name, attributes):
     '''
-Writes class __str__ method to a file,
+Writes class __str__ method to a file,1
 given the file object and attribute list
     '''
     file.write("\tdef __str__(self):\n\t\treturn \"{}(".format(name))
@@ -151,8 +152,10 @@ Please revise your class definition so that there are no duplicates in method na
     return None
 
 
+# def validate_paths
+
 # why is attributes passed in as a list but methods a string?
-def make_class(name, attributes, methods, parent=object, package='root', protected=False):
+def make_class(name, attributes, methods, parents=object, packages='root', protected=False):
     """
 main subroutine for class generator
 creates a file with the provided class name
@@ -160,11 +163,12 @@ outputs the appropriate class syntax for what is specified.
     """
     # coerce adherence to PEP8 by making class identifier titlecase
     name = name.title()
-    if package not in ('root', None):
-        full_name = f"{package}/{name}.py"
-    else:
-        full_name = f"{name}.py"    
-    with open(full_name, "a+") as file:
+    if isinstance(test_path(packages), list):
+        for item in test_path(packages):
+            make_class(name, attributes, methods, parents=object, packages=item)
+    # what to do if one item in return of test_path is root?
+    # note that path variabke used below is still undefined.
+    with open(path, "a+") as file:
         if parent != object:
             make_imports(file, [parent])
         else:
