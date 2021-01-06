@@ -6,7 +6,6 @@ should I design a better way to do this
 
 '''
 
-from Misc_Functions import list_to_str
 import argparse
 import sys
 import os
@@ -120,12 +119,12 @@ Key- move forward : [c,d,continue,done], help : [h,help], leave prompt : [q,e,qu
             if get_confirmation(classes, member="class"):
                 return classes
             classes = input()
-        elif cls in ("h","help"):
-            print(help)
-            classes = input()
+        # elif cls in ("h","help"):
+            # print(help)
+            # classes = input()
         #assuming user didnt enter a recognized keyword, appends the response to classes
         #need to parse cls to check compliance with class naming rules/conventions.
-        classes.append(cls)
+        # classes.append(cls)
     
 def build_class_specs(cls):
     """

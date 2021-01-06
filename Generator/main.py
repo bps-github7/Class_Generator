@@ -9,6 +9,7 @@ facilitates generation of classes, given a single classdict
 
 from utils.regular_class import make_class
 from utils.special_class import make_abc
+from utils.misc_functions import test_path
 
 def class_generator(cls):
     '''
@@ -25,10 +26,29 @@ for inheritance, invoked inside a loop to create correct parents, children etc
     #     # parent also needs to include any parents from up the inheritance hierarchy
     # else:
     #     make_class(name, attributes, parent=parent)
-    make_class(cls.classes, cls.attributes,
-    methods=cls.methods, parent=cls.parents, packages="testing")
-    # make_class(class.classes, class.attributes, methods=class.methods, parent=class.parents,
-    # packages=class.packages, testing=class.testing, exporting=class.exporting)
+    
+    # makes the clss an abc if name is prepended with ABC
+    if cls.name.startswith("ABC"):
+        cls.name = cls.name[3:]
+        make_abc(cls.name, cls.attributes)
+
+    # test_path validates packages/ does the package exist, is it writable etc? 
+    # returns 1 for root, the path to a validated package, or a list of paths to validated packages
+    ##### so we need to test all these cases to write classes appropriately.
+    path = test_path(cls.packages)
+    if path == 1:
+        # when user doesnt specify a package, use 'root' || './' (cwd where script was invoked)
+        make_class(cls.classes, cls.attributes,
+        methods=cls.methods, parent=cls.parents)
+    elif isinstance(path, list):
+        # makes class in multiple packages if the specs call for that.
+        for items in path:
+            make_class(cls.classes, cls.attributes,
+            cls.methods, parent=cls.parents, packages=items)
+    # being specific prevents class from being generated when package/path was invalid
+    elif path != 0:
+        make_class(cls.classes, cls.attributes,
+        methods=cls.methods, parent=cls.parents, packages=path)
 
 
 def modified_generator(name, attributes, parent='object', children=None):

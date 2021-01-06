@@ -151,11 +151,8 @@ Please revise your class definition so that there are no duplicates in method na
             \n\n".format(items))
     return None
 
-
-# def validate_paths
-
 # why is attributes passed in as a list but methods a string?
-def make_class(name, attributes, methods, parents=object, packages='root', protected=False):
+def make_class(name, attributes, methods, parents=object, protected=False):
     """
 main subroutine for class generator
 creates a file with the provided class name
@@ -163,14 +160,9 @@ outputs the appropriate class syntax for what is specified.
     """
     # coerce adherence to PEP8 by making class identifier titlecase
     name = name.title()
-    if isinstance(test_path(packages), list):
-        for item in test_path(packages):
-            make_class(name, attributes, methods, parents=object, packages=item)
-    # what to do if one item in return of test_path is root?
-    # note that path variabke used below is still undefined.
-    with open(path, "a+") as file:
-        if parent != object:
-            make_imports(file, [parent])
+    with open(f"{name}.py", "a+") as file:
+        if parents != object:
+            make_imports(file, [parents])
         else:
             # prevent writing object as internal type representation.
             parent = "object"

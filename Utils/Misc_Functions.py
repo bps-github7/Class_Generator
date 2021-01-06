@@ -61,7 +61,6 @@ def test_paths(paths):
         paths ([list]): list of potential paths for validating
     """
     valid, invalid = [], []
-
     for item in paths:
         if os.path.exists(item) and os.path.isdir(item) and isWritable(item):
             valid += item
@@ -77,7 +76,11 @@ def test_paths(paths):
     return valid if len(valid) > 0 else 0
 
 def test_path(path, first=True):
-    """checks if a path is valid for use in generating class files"""
+    """checks if a path is valid for use in generating class files
+    
+    returns 1 for root, 0 for invalid root, validated path or list of validated paths
+    depeding on if path argument is string or list.
+    """
     if path == 'root':
         return 1
     if isinstance(path, list) and len(path) > 0:

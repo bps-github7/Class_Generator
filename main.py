@@ -1,8 +1,8 @@
 """main function for class generator, called at begining of program runtime.
 """
-from parsing.class_dict import ClassDict
+# from parsing.class_dict import ClassDict
 from parsing.main import main as parse
-from utils.misc_functions import class_generator
+from generator.main import class_generator
 
 def main() -> int:
     """
@@ -14,7 +14,7 @@ def main() -> int:
         0 = failure
     """
     parsed_inline = parse()
-    for index, items in enumerate(parsed_inline):
+    for items in parsed_inline:
         class_generator(items)
     # class_generator(parsed_inline)
     # generate the class based on the specs
