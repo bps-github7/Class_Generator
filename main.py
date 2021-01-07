@@ -1,6 +1,8 @@
 """main function for class generator, called at begining of program runtime.
 """
-# from parsing.class_dict import ClassDict
+# # from parsing.class_dict import ClassDict
+# import sys
+# sys.path.insert(0,"C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 from parsing.main import main as parse
 from generator.main import class_generator
 

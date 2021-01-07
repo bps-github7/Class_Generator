@@ -28,9 +28,9 @@ for inheritance, invoked inside a loop to create correct parents, children etc
     #     make_class(name, attributes, parent=parent)
     
     # makes the clss an abc if name is prepended with ABC
-    if cls.name.startswith("ABC"):
-        cls.name = cls.name[3:]
-        make_abc(cls.name, cls.attributes)
+    if cls.classes.startswith("ABC"):
+        cls.classes = cls.classes[3:]
+        make_abc(cls.classes, cls.attributes)
 
     # test_path validates packages/ does the package exist, is it writable etc? 
     # returns 1 for root, the path to a validated package, or a list of paths to validated packages
@@ -39,25 +39,25 @@ for inheritance, invoked inside a loop to create correct parents, children etc
     if path == 1:
         # when user doesnt specify a package, use 'root' || './' (cwd where script was invoked)
         make_class(cls.classes, cls.attributes,
-        methods=cls.methods, parent=cls.parents)
+        methods=cls.methods, parents=cls.parents)
     elif isinstance(path, list):
         # makes class in multiple packages if the specs call for that.
         for items in path:
             make_class(cls.classes, cls.attributes,
-            cls.methods, parent=cls.parents, packages=items)
+            cls.methods, parents=cls.parents, packages=items)
     # being specific prevents class from being generated when package/path was invalid
     elif path != 0:
         make_class(cls.classes, cls.attributes,
-        methods=cls.methods, parent=cls.parents, packages=path)
+        methods=cls.methods, parents=cls.parents, packages=path)
 
 
-def modified_generator(name, attributes, parent='object', children=None):
-    '''
-Works like the above generator but without possibilities for inheritance.
-    '''
-    if name.startswith("ABC"):
-        name = name[3:]
-        make_abc(name, attributes)
-        # parent also needs to include any parents from up the inheritance hierarchy
-    else:
-        make_class(name, attributes, parent=parent)
+# def modified_generator(name, attributes, parents='object', children=None):
+#     '''
+# Works like the above generator but without possibilities for inheritance.
+#     '''
+#     if name.startswith("ABC"):
+#         name = name[3:]
+#         make_abc(name, attributes)
+#         # parent also needs to include any parents from up the inheritance hierarchy
+#     else:
+#         make_class(name, attributes, parents=parents)
