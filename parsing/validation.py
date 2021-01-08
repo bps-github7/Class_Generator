@@ -267,7 +267,7 @@ if __name__ == "__main__":
 
     # complete and correct inline
     item = basic_validate("Biscuit : gravy, sausage : method1, method2")
-    print(item.me)
+    print(item.global_exporting)
 
     # does it case correct all incorrect claSSES, attributes and methods?
     # basic_validate("biscuit : Gravy, SAusage : MAthod1, meTHOod2")

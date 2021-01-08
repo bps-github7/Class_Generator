@@ -54,26 +54,12 @@ strip white space from fields, which is noise in the classGen mini language.
             self.methods = None
         else:
             self.methods = self.inline[2].strip()
-        ### need to debug past this point. opt flags are not being recognized.
-        if self.has_options():
-            self.global_exporting = Inline.exporting(self.methods)
-            if self.global_exporting:
-                # we want the first half= [1] is the keyword arg dict.
-                self.methods = self.methods.split("-e")[0]
-            self.global_testing = Inline.testing(self.methods)
-            # cleanup - get rid of switches on methods once their existence is confirmed.
-            if self.global_testing:
-                self.methods = self.methods.split("-t")[0]
+        if inline[3] is None:
+            self.options = None
         else:
-            self.global_testing = False
-            self.global_exporting = None
-
-
-
-    def has_options(self):
-        """[summary]
-        """
-        return True if ("-e" or "-t") in self.methods else False
+            # for backwards compatibility.
+            if len(inline) > 3:
+                self.options = self.inline[3].strip()
 
     def has_inheritance(self):
         """checks self.classes to see if it has > token in it.
@@ -101,14 +87,13 @@ strip white space from fields, which is noise in the classGen mini language.
 
     def __str__(self, single_line=True):
         if single_line:
-            return "{}\t{}\t{}\t{}\t{}".format(self.classes, self.attributes, self.methods, self.global_testing, self.global_exporting)
+            return "{}\t{}\t{}\t{}".format(self.classes, self.attributes, self.methods, self.options)
         else:
             return "class(es): {}\n\
 attributes: {}\n\
 methods: {}\n\
-testing: {}\n\
-exporting: {}".format(self.classes, self.attributes,
-                      self.methods, self.global_testing, self.global_exporting)
+options: {}".format(self.classes, self.attributes,
+                      self.methods, self.options)
 
     @classmethod
     def from_individual_arguments(cls, *args):
@@ -125,20 +110,7 @@ exporting: {}".format(self.classes, self.attributes,
                 continue
             if isinstance(value, list):
                 items[i] = ",".join(value)
-        return Inline(f"{items[0]}:{items[1]}:{items[2]}")
-
-    @staticmethod
-    def testing(arg):
-        """returns true if arg contains -t flag
-        args (Inline.method : str): method section of inline"""
-        return True if arg.count("-t") else False
-
-    @staticmethod
-    def exporting(arg):
-        """returns the keyword dict argument of -e flag if present
-        args (Inline.method : str): method section of inline
-        """
-        return arg.split("-e")[1] if arg.count("-e") else False
+        return Inline(f"{items[0]}:{items[1]}:{items[2]}:{items[3]}")
 
     @staticmethod
     def cleanse(items: any):
@@ -151,51 +123,55 @@ exporting: {}".format(self.classes, self.attributes,
         return list(map(
             lambda item: item.strip().lower(), items.split(",")))
 
-def multiple_inline_handler(inline : Inline):
-    """[summary]
+# def multiple_inline_handler(inline : Inline):
+#     """[summary]
 
-    Args:
-        inline ([type]): [description]
-    """
-    specifications = []
-    classes, attributes, methods = [], [], []
-    for single_class, its_attributes, its_methods in zip(
-            inline.classes.split(","),
-            inline.attributes.split("/"),
-            inline.methods.split("/")):
-        classes.append(single_class)
-        attributes.append(its_attributes)
-        methods.append(its_methods)
-    # setting parent and package to defaults in this and else block below
-    # until we sophisticate the packaging and inheritance functionality a bit more.
-    specifications = [ClassDict(class_title, attribute_group, method_group, object, 'root')\
-    for class_title, attribute_group, method_group in zip(classes, attributes, methods)]
-    return specifications
+#     Args:
+#         inline ([type]): [description]
+#     """
+#     specifications = []
+#     classes, attributes, methods, options = [], [], [], []
+#     ### need to validate the inline before using this
+#     ### to confirm number of / and , match up correctly.
+#     for single_class, its_attributes, its_methods, its_options in zip(
+#             inline.classes.split(","),
+#             inline.attributes.split("/"),
+#             inline.methods.split("/"),
+#             inline.options.split("/")):
+#         classes.append(single_class)
+#         attributes.append(its_attributes)
+#         methods.append(its_methods)
+#         options.append(its_options)
+#     # setting parent and package to defaults in this and else block below
+#     # until we sophisticate the packaging and inheritance functionality a bit more.
+#     specifications = [ClassDict(class_title, attribute_group, method_group, object, 'root', options_group)\
+#     for class_title, attribute_group, method_group, options_group in zip(classes, attributes, methods, options)]
+#     return specifications
 
-def parse_inline(inline):
-    """[summary]
+# def parse_inline(inline):
+#     """[summary]
 
-    Args:
-        inline ([type]): [description]
+#     Args:
+#         inline ([type]): [description]
 
-    Returns:
-        list: A list of all the inlines parsed out of the current inline spec.
-    """
+#     Returns:
+#         list: A list of all the inlines parsed out of the current inline spec.
+#     """
 
 
-    if inline.classes.count(","):
-        parsed_classes = multiple_inline_handler(inline)
-    else:
-        # casting to a list for safety reasons.
-        parsed_classes = [ClassDict(inline.classes,
-            inline.attributes, inline.methods,
-            object, 'root',
-            inline.global_testing, inline.global_exporting)]
-    return parsed_classes
+#     if inline.classes.count(","):
+#         parsed_classes = multiple_inline_handler(inline)
+#     else:
+#         # casting to a list for safety reasons.
+#         parsed_classes = [ClassDict(inline.classes,
+#             inline.attributes, inline.methods,
+#             object, 'root',
+#             inline.options)]
+#     return parsed_classes
 
-def main(inline: Inline) -> int:
-    classes = parse_inline(inline)
-    return get_feedback(classes)
+# def main(inline: Inline) -> int:
+#     classes = parse_inline(inline)
+#     return get_feedback(classes)
 
 if __name__ == "__main__":
     # also not reading -e values now
@@ -203,8 +179,12 @@ if __name__ == "__main__":
 
     # instead of rewriting the constructor, wrote this
     # classmethod/alt constructor for this use case
-    main(Inline.from_individual_arguments("Biscuit", ['gravy', 'sausage'], ['method1', 'method2']))
-
+    # main(Inline.from_individual_arguments("Biscuit", ['gravy', 'sausage'], ['method1', 'method2'], '-t -e{ut}'))
+    
+    items = Inline.from_individual_arguments("Biscuit",
+    ['gravy', 'sausage'], ['method1', 'method2'], '-t -e{ut}')
+    print(items)
+    
     # a = Inline("classA : attr1, attr2, attr3 : method1 -t -e{ut,cc}")
     # b = Inline("biscuit : attrA, attrB, attrC : methodA, methodB -t")
     # items = [a, b]
