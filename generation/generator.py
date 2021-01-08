@@ -26,7 +26,7 @@ for inheritance, invoked inside a loop to create correct parents, children etc
     #     # parent also needs to include any parents from up the inheritance hierarchy
     # else:
     #     make_class(name, attributes, parent=parent)
-    
+
     # makes the clss an abc if name is prepended with ABC
     if cls.classes.startswith("ABC"):
         cls.classes = cls.classes[3:]

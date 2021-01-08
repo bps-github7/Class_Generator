@@ -32,7 +32,6 @@ class InheritanceBuilder:
             classes.append(InheritanceBuilder.member_splitter(cls))
             attributes.append(InheritanceBuilder.member_splitter(attr, token="/"))
             methods.append(InheritanceBuilder.member_splitter(method, token="/"))
-        print(f"classes:  {classes}\nattributes: {attributes}\nmethods: {methods}")
         new = []
         #might have some kinks to work out with this one here vvv...
         parent = 'object'
@@ -67,13 +66,27 @@ class InheritanceBuilder:
                 return container
 
 
+def main(inline : Inline):
+    """parses an inheritance tree according to classgenerator mini language
+    typically returns a list of ClassDict objects. The only instance where it
+    would not would be if a non-inheritance 
+    containing inline was passed in by mistake.
+
+    Args:
+        inline (Inline): an inline specification containing inheritance tree.
+
+    Returns:
+        list<ClassDict> | ClassDict: multiple classes parsed out of inheritance Inline.
+    """
+    return InheritanceBuilder(inline).classes
+
 # item = Inline("classA > classB : attr1, attr2, attr3 > mastadon, bucket, shallot: method1 > method2 -t -e{ut,cc}")
-mulit_item = Inline("folderA, folderB > folderC : A1, A2 / B1, B2 > C1, C2 : Amethod / Bmethod > Cmethod")
+# multi_item = Inline("Person1, Person2 > Employee > Dish_washer, Short_Order_Cook, Sous_Chef : P1A, P1B / P2A, P2B > E1, E2, E3 > D1, D2 / S1, S2 / SC1, SC2 : P1method / P2method > SMmethod > CMmethod / SMmethod / method")
 
 # InheritanceBuilder(item)
-processed = InheritanceBuilder(mulit_item)
-
-print(processed.classes)
+# processed = InheritanceBuilder(mulit_item)
+# print(processed.classes)
+# print(main(multi_item))
 
 # print(InheritanceBuilder.member_splitter(['Classa, Classb', 'Classc']))
 # print(InheritanceBuilder.member_splitter(['A1, A2 / B1, B2', 'C1, C2'], token="/"))

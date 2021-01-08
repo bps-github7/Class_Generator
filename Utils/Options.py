@@ -15,6 +15,7 @@ parser = argparse.ArgumentParser(
     description="Generate classes automatically using command line options or interactive prompt")
 group = parser.add_mutually_exclusive_group()
 
+
 # positional (required) arguments- name
 parser.add_argument(
     "name", help="Provide the name for the project\
@@ -33,8 +34,15 @@ parser.add_argument("--file",
                     to generate via inline specification.",
                     dest="file", required=False)
 
+# future- L for language selection- choices = python(default), Java, C++, C#, Php, JAvascript typescript
 
-# optional switches: -i -abc, -sa, -sm, -sb,
+
+# optional switches: -v, -i -abc, -sa, -sm, -sb,
+parser.add_argument("-v", "--verbose",
+                    help="program will provide output to \n\
+                    detail all operations taken during runtime",
+                    action="store_true", required=False)
+
 parser.add_argument("-i", "--interactive-mode",
                     help="Use this short option to generate classes in\n\
                     interactive mode. CLI app will guide you through\n\

@@ -22,7 +22,7 @@ def make_init(file, name, attributes, protected=False):
     """
 Completes the init statement by writing attributes to the file
     """
-    file.write("\tdef __init__(self, ")
+    file.write("    def __init__(self, ")
     for i in attributes:
         if i == attributes[len(attributes)-1]:
             file.write("{}".format(i))
@@ -33,11 +33,11 @@ Completes the init statement by writing attributes to the file
     # sort of a bandaid solution- should be able to make individual attributes private...
     if protected:
         for i in attributes:
-            file.write("\t\tself.__{} = {}\n".format(i, i))
+            file.write("        self.__{} = {}\n".format(i, i))
         file.write("\n")
     else:
         for i in attributes:
-            file.write("\t\tself.{} = {}\n".format(i, i))
+            file.write("        self.{} = {}\n".format(i, i))
         file.write("\n")
 
 
@@ -46,7 +46,7 @@ def make_repr(file, attributes):
 writes class repr method to a file,
 given the file object and attribute list
     '''
-    file.write("\tdef __repr__(self):\n\t\treturn {")
+    file.write("    def __repr__(self):\n        return {")
     for i in attributes:
         if i == attributes[len(attributes)-1]:
             file.write("\"{}\" : self.{}".format(i, i))
@@ -60,7 +60,7 @@ def make_str(file, name, attributes):
 Writes class __str__ method to a file,1
 given the file object and attribute list
     '''
-    file.write("\tdef __str__(self):\n\t\treturn \"{}(".format(name))
+    file.write("    def __str__(self):\n        return \"{}(".format(name))
     for i in attributes:
         if i == attributes[len(attributes)-1]:
             file.write("{} = ".format(i))
@@ -83,8 +83,8 @@ def make_getter(file, a):
 Writes the getter for one attribute in pip 3.8 syntax,
 given the file object and attribute a.
     '''
-    file.write("\t@property\n\tdef {}(self):\n\
-    \treturn self._{}\n\n".format(a, a))
+    file.write("    @property\n    def {}(self):\n\
+        return self._{}\n\n".format(a, a))
 
 
 def make_setter(file, a):
@@ -94,11 +94,11 @@ given the file object and attribute a
     '''
     # name mangling attr setter according to descriptor protocol
     if a.startswith("__"):
-        file.write("\t@{}.setter\n\tdef {}(self, {}):\n\
-        \tself._{} = {}\n\n".format(a, a, a, a, a))
+        file.write("    @{}.setter\n    def {}(self, {}):\n\
+            self._{} = {}\n\n".format(a, a, a, a, a))
         return
-    file.write("\t@{}.setter\n\tdef {}(self, {}):\n\
-    \tself._{} = {}\n\n".format(a, a, a, a, a))
+    file.write("    @{}.setter\n    def {}(self, {}):\n\
+        self._{} = {}\n\n".format(a, a, a, a, a))
 
 
 def duplicate_check(provided):
@@ -135,19 +135,19 @@ Please revise your class definition so that there are no duplicates in method na
     # write the specific method
     for items in NM:
         # default case makes instance method
-        file.write("\tdef {}(self):\
-            \n\t\t\"\"\"\n\tmethod docstring:\
-        \n\t\t\"\"\"\n\t\treturn NotImplemented\
+        file.write("    def {}(self):\
+            \n        \"\"\"\n    method docstring:\
+        \n        \"\"\"\n        return NotImplemented\
             \n\n".format(items))
     for items in SM:
-        file.write("\t@staticmethod\n\tdef {}():\
-            \n\t\t\"\"\"\n\tmethod docstring:\n\
-\t\"\"\"\n\t\treturn NotImplemented\
+        file.write("    @staticmethod\n    def {}():\
+            \n        \"\"\"\n    method docstring:\n\
+    \"\"\"\n        return NotImplemented\
             \n\n".format(items))
     for items in CM:
-        file.write("\t@classmethod\n\tdef {}(cls):\
-            \n\t\t\"\"\"\n\tmethod docstring:\n\t\
-    \"\"\"\n\t\treturn NotImplemented\
+        file.write("    @classmethod\n    def {}(cls):\
+            \n        \"\"\"\n    method docstring:\n    \
+    \"\"\"\n        return NotImplemented\
             \n\n".format(items))
     return None
 
@@ -166,7 +166,7 @@ outputs the appropriate class syntax for what is specified.
         else:
             # prevent writing object as internal type representation.
             parent = "object"
-        file.write("class {}({}):\n".format(name, parent))
+        file.write("class {}({}):\n".format(name, parents))
         make_init(file, name, attributes, protected=protected)
         make_repr(file, attributes)
         make_str(file, name, attributes)
@@ -180,7 +180,7 @@ outputs the appropriate class syntax for what is specified.
             # what to do if value is passed up here? suppose its sufficient to assume user will use command successful second time round.
             make_methods(file, methods)
         file.write("if __name__ == '__main__':\
-        \n\tprint('Running class file. Nothing to do here')")
+        \n    print('Running class file. Nothing to do here')\n")
 
 
 # # these should be able to take class_dict as an argument!
