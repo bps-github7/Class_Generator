@@ -40,9 +40,21 @@ strip white space from fields, which is noise in the classGen mini language.
 
     def __init__(self, inline):
         self.inline = inline.split(":")
-        self.classes = self.inline[0].strip().title()
-        self.attributes = self.inline[1].strip()
-        self.methods = self.inline[2].strip()
+        # Inline cannot be parsed if no class identifier is provided.
+        if inline[0] is None:
+            return None
+        else:
+            self.classes = self.inline[0].strip().title()
+        # handles if attribute or methods are None
+        if inline[1] is None:
+            self.attributes = None
+        else:
+            self.attributes = self.inline[1].strip()
+        if inline[2] is None:
+            self.methods = None
+        else:
+            self.methods = self.inline[2].strip()
+        ### need to debug past this point. opt flags are not being recognized.
         if self.has_options():
             self.global_exporting = Inline.exporting(self.methods)
             if self.global_exporting:
@@ -51,7 +63,7 @@ strip white space from fields, which is noise in the classGen mini language.
             self.global_testing = Inline.testing(self.methods)
             # cleanup - get rid of switches on methods once their existence is confirmed.
             if self.global_testing:
-                self.methods = self.methods.split(" -t")[0]
+                self.methods = self.methods.split("-t")[0]
         else:
             self.global_testing = False
             self.global_exporting = None
@@ -97,6 +109,23 @@ methods: {}\n\
 testing: {}\n\
 exporting: {}".format(self.classes, self.attributes,
                       self.methods, self.global_testing, self.global_exporting)
+
+    @classmethod
+    def from_individual_arguments(cls, *args):
+        """ turns the 3 components of Inline (class, attributes and methods)
+        into an inline object. if any of the items are lists, turn them into
+        comma delimited strings that Inline constructor expects. 
+
+        Returns:
+            [type]: [description]
+        """
+        items = [*args]
+        for i, value in enumerate(items):
+            if value is None:
+                continue
+            if isinstance(value, list):
+                items[i] = ",".join(value)
+        return Inline(f"{items[0]}:{items[1]}:{items[2]}")
 
     @staticmethod
     def testing(arg):
@@ -170,7 +199,11 @@ def main(inline: Inline) -> int:
 
 if __name__ == "__main__":
     # also not reading -e values now
-    main(Inline("classA : attr1, attr2, attr3 : method1 -t -e{ut,cc}"))
+    # main(Inline("classA : attr1, attr2, attr3 : method1 -t -e{ut,cc}"))
+
+    # instead of rewriting the constructor, wrote this
+    # classmethod/alt constructor for this use case
+    main(Inline.from_individual_arguments("Biscuit", ['gravy', 'sausage'], ['method1', 'method2']))
 
     # a = Inline("classA : attr1, attr2, attr3 : method1 -t -e{ut,cc}")
     # b = Inline("biscuit : attrA, attrB, attrC : methodA, methodB -t")

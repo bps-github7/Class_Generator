@@ -30,14 +30,14 @@ def ask_case(item, item_type="class"):
         if item.istitle():
             return item.strip()
         else:
-            if case_prompt(item, item_type=item_type):
+            if case_prompt(item):
                 return item.title().strip()
             return item.strip()
     else:
         if item.islower():
             return item.strip()
         else:
-            if case_prompt(item, item_type=item_type):
+            if case_prompt(item, item_type="field"):
                 return item.lower().strip()
             return item.strip()
 
@@ -57,10 +57,10 @@ def case_prompt(item, item_type="class"):
     while True:
         if item_type == "class":
             response = input(f"your class name {item} is not capitalized.\n\
-        This violates PEP8 guidelines- should this be corrected (y/n)?\n")
+This violates PEP8 guidelines- should this be corrected (y/n)?\n")
         else:
             response = input(f"your attribute or method name {item} is not lowercase.\n\
-        This violates PEP8 guidelines- should this be corrected (y/n)\n")
+This violates PEP8 guidelines- should this be corrected (y/n)\n")
         if response in ("y", "yes"):
             return 1
         return 0
@@ -136,9 +136,9 @@ def basic_validate_members(items, item_type="class"):
     """
     container = []
     for item in items:
+        item = item.strip()
         if is_identifier(item):
             container.append(case_check(item, item_type=item_type))
-    print(container)
     return container
 
 
@@ -150,17 +150,16 @@ def basic_validate(inline : str):
     if inline[0].strip():
         classes = basic_validate_members((inline[0].strip()).split(","))
         if len(inline) > 1:
-            pass
             if inline[1].strip():
                 attributes = basic_validate_members((inline[1].strip()).split(","), item_type="field")
+                # Most desirable condition- classes, attributes, methods have all been provided.
                 if len(inline) > 2 and inline[2].strip():
                     methods = basic_validate_members((inline[2].strip()).split(","), item_type="field")
-                    # return Inline(classes, attributes, methods)
+                    return Inline.from_individual_arguments(classes, attributes, methods)
                 else:
                     if missing_field(type="method"):
-                        print("missing methods")
-                        # print(f"{clas} : {}")
-                        # inline(classes, attributes, None)
+                        # if verbose: print "missing method"
+                        return Inline.from_individual_arguments(classes, attributes, None)
             else:
                 # redundant but prevents methods from being
                 #  undefined in if below in same else block.
@@ -168,16 +167,17 @@ def basic_validate(inline : str):
                     methods = basic_validate_members(inline[2].strip(), item_type="field")
                 else:
                     if missing_field(type="none"):
-                        print("missing both attr and methods")
-                        # return Inline(classes, None, None)
+                        # if verbose:
+                        # print("missing both attr and methods")
+                        return Inline.from_individual_arguments(classes, None, None)
                 if missing_field(type="attribute"):
                     print("missing attributes")
-                    # return Inline(classes, None, methods)
+                    return Inline.from_individual_arguments(classes, None, methods)
         else:
             # make an Inline w/ niether fields if user accepts that.
             if missing_field(type="none"):
                 print("missing both attributes and methods.")
-                # return Inline(classes, None, None)
+                return Inline.from_individual_arguments(classes, None, None)
             else:
                 return 0
     else:
@@ -213,7 +213,6 @@ def missing_field(type="class"):
         else:
             return 0
 
-        
 def continue_prompt(field_type="attribute"):
     if field_type == "none":
         message = "the inline provided has neither attributes or methods"
@@ -244,8 +243,31 @@ def validate(inline: str):
     return NotImplemented
 
 if __name__ == "__main__":
-    # Going to be doing this kind of parsing before the inline is cast
-    # as an inline object. this avoids having to integrate this validation
-    # within the class body and the code bloat it will cause.
-    
-    basic_validate("class_A : attr1, attr2 : method")
+    ### unit testing
+
+    # are these values case corrected and indeed identifiers?
+    # print(basic_validate_members(['  attr1', ' attr2 '], item_type="field"))
+
+    # print(ask_case("Shite", item_type="field"))
+    # print(case_check("Shite", item_type="field"))
+
+
+
+    # tests to see if fails when no class is provided
+    # basic_validate(": attr1, attr2 : method")
+
+    # what happens when no attributes are provided?
+    # basic_validate("biscuit : : method")
+
+    # what happens when no methods are provided?
+    # basic_validate("biscuit : gravy, sausage : ")
+
+    # when niether fields are provided?
+    # basic_validate("Biscuit : :")
+
+    # complete and correct inline
+    item = basic_validate("Biscuit : gravy, sausage : method1, method2")
+    print(item.me)
+
+    # does it case correct all incorrect claSSES, attributes and methods?
+    # basic_validate("biscuit : Gravy, SAusage : MAthod1, meTHOod2")
