@@ -52,7 +52,28 @@ class ClassDict(dict):
     def __repr__(self):
         return repr(self.dict)
 
-    def __str__(self):
+    def str_testing(self):
+        if isinstance(self.testing, bool):
+            return " -t"
+        elif isinstance(self.testing, str):
+            return f" -t{self.testing}"
+        else:
+            return ''
+
+    def str_exporting(self):
+        if isinstance(self.exporting, bool):
+            return " -e"
+        elif isinstance(self.exporting, str):
+            return f" -e{self.exporting}"
+        else:
+            return ''
+
+    def str_switches(self):
+        return f"{self.str_testing()}{self.str_exporting()}"
+
+    def __str__(self, switches=False):
+        if switches:
+            return f"\t{self.classes}\t\t\t{self.attributes}\t\t{self.methods}\t  {self.parents}\t   {self.packages}\t\t  {self.testing}\t\t{self.str_switches()}"
         return f"\t{self.classes}\t\t\t{self.attributes}\t\t{self.methods}\t  {self.parents}\t   {self.packages}\t\t  {self.testing}\t\t{self.exporting}"
 
     def __iter__(self):
@@ -69,6 +90,9 @@ class ClassDict(dict):
 
     def values(self):
         return self.dict.values()
+
+
+
 
     # accessing these is funny so we'll define computed properties for all fields
     @property
@@ -94,6 +118,18 @@ class ClassDict(dict):
     @property
     def exporting(self):
         return self.details[5]
+
+    # exposing the private interface because python
+    # is giving me a confusing error about not being able
+    # to set attributes if i write this as a property.
+    def get_details(self):
+        if self.options is None:
+            return [self.attributes, self.methods,
+                        self.parents, self.packages]
+        else:
+            return [self.attributes, self.methods,
+                    self.parents, self.packages, self.str_switches()]
+
 
     @attributes.setter
     def attributes(self, new_values):

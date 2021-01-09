@@ -68,7 +68,7 @@ c to close this prompt:\n")
                 "invalid response- valid choices are e/edit, d/delete, c/close")
             continue
         #non standard operating procedure to exit this way, so it returns 0 status code.
-        return classes
+    return classes
 
 def replace_item(old_details):
     """
@@ -82,6 +82,7 @@ def replace_item(old_details):
 (attributes, methods, parent, etc) of the class (y/n)?\n\
 (Note that choosing n/no means you will have to provide a new inline to build it from scratch)")
     if building_path in ("y", "yes"):
+        # need to use validation fn to enforce case correctness here! and below in attr and methods
         return ClassDict(input("provide a new name for your class:\n"), *old_details)
     elif building_path in ("n", "no"):
         # we should use inline.parse here but it
@@ -144,12 +145,8 @@ def edit_main(cls):
         response = int(response)
         if response in [1, 2, 3, 4, 5, 6]:
             return edit_prompt(response, cls)
-            
-            #PROMPT fn call
-
 
 def edit_prompt(action_number, cls):
-    
     if action_number < 6 and action_number > 1:
         new = input("enter the new values for this class field:\n")
     if action_number == 1:
@@ -160,7 +157,7 @@ def edit_prompt(action_number, cls):
 a corrected replacement (y/n)?\n")
             print("\n\n")
             if restart in ("y", "yes"):
-                return ClassDict.replace_item(cls.details)
+                return replace_item(cls.get_details())
             elif restart in ("n", "no"):
                 break
             else:
@@ -197,7 +194,11 @@ want to be applied to this class for exporting\n\
                     print("didnt recognize your response- provide options\
 matching the syntax: single_option   or  option1,option2")
         elif exporting in ("s", "send"):
-            cls.exporting = None        
+            cls.exporting = None
+    ######  such a messy function.
+    # no type of validation or second chances for providing input- 
+    # tsk tsk tsk...
+    return cls
 
 def delete_entry(classes, index):
     """[summary]
