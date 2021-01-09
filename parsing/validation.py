@@ -12,6 +12,9 @@ import sys
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 import keyword
 from parsing.inline import Inline
+from parsing.class_dict import ClassDict
+from parsing.class_dict import ClassDict
+from utils.editing_menu import get_feedback
 
 def ask_case(item, item_type="class"):
     """
@@ -124,6 +127,26 @@ def is_identifier(ident: str) -> bool:
 
     return True
 
+def validate_options(items):
+    """[summary]
+
+    Args:
+        items ([type]): [description]
+    """
+    items = items.split("-")
+    for item in items:
+        if item.startswith("e") or item.startswith("t") or item.startswith("{"):
+            continue
+        # ignore white space
+        elif item in (""," "):
+            del item 
+        else:
+            print(f"invalid option detected: {item}")
+            print(f"please only use accepted switches: -t, -e")
+            print("or their attached argument list -t{ut,cc,sa} -e{send,vsc,zip,tgz}")
+            return 0
+    return "-".join(items)
+
 def basic_validate_members(items, item_type="class"):
     """does basic validation for a standard inlines' members
         1. ensure each item is identifier
@@ -134,6 +157,8 @@ def basic_validate_members(items, item_type="class"):
 
     returns:  
     """
+    if item_type == "options":
+        return validate_options(items)
     container = []
     for item in items:
         item = item.strip()
@@ -142,7 +167,7 @@ def basic_validate_members(items, item_type="class"):
     return container
 
 
-def basic_validate(inline : str):
+def basic_validate(inline : str, verbose=False):
     """
     """
     inline = inline.split(":")
@@ -155,29 +180,44 @@ def basic_validate(inline : str):
                 # Most desirable condition- classes, attributes, methods have all been provided.
                 if len(inline) > 2 and inline[2].strip():
                     methods = basic_validate_members((inline[2].strip()).split(","), item_type="field")
-                    return Inline.from_individual_arguments(classes, attributes, methods)
+                    if len(inline) > 3 and inline[3].strip():
+                        options = basic_validate_members((inline[3].strip()), item_type="options") 
+                    else:
+                        return Inline.from_individual_arguments(classes, attributes, methods, verbose=verbose)
+                    return Inline.from_individual_arguments(classes, attributes, methods, options, verbose=verbose)
                 else:
                     if missing_field(type="method"):
-                        # if verbose: print "missing method"
-                        return Inline.from_individual_arguments(classes, attributes, None)
+                        if len(inline) > 3 and inline[3].strip():
+                            options = basic_validate_members((inline[3].strip()), item_type="options") 
+                        else:
+                            return Inline.from_individual_arguments(classes, attributes, None, verbose=verbose)
+                        return Inline.from_individual_arguments(classes, attributes, None, options, verbose=verbose)
             else:
                 # redundant but prevents methods from being
                 #  undefined in if below in same else block.
                 if len(inline) > 2 and inline[2].strip():
-                    methods = basic_validate_members(inline[2].strip(), item_type="field")
+                    methods = basic_validate_members(inline[2].strip().split(","), item_type="field")
                 else:
                     if missing_field(type="none"):
-                        # if verbose:
-                        # print("missing both attr and methods")
-                        return Inline.from_individual_arguments(classes, None, None)
+                        if len(inline) > 3 and inline[3].strip():
+                            options = basic_validate_members((inline[3].strip()), item_type="options") 
+                        else:
+                            return Inline.from_individual_arguments(classes, None, None, verbose=verbose)
+                        return Inline.from_individual_arguments(classes, None, None, options, verbose=verbose)
                 if missing_field(type="attribute"):
-                    print("missing attributes")
-                    return Inline.from_individual_arguments(classes, None, methods)
+                    if len(inline) > 3 and inline[3].strip():
+                        options = basic_validate_members((inline[3].strip()), item_type="options") 
+                    else:
+                        return Inline.from_individual_arguments(classes, None, methods, verbose=verbose)
+                    return Inline.from_individual_arguments(classes, None, methods, options, verbose=verbose)
         else:
             # make an Inline w/ niether fields if user accepts that.
             if missing_field(type="none"):
-                print("missing both attributes and methods.")
-                return Inline.from_individual_arguments(classes, None, None)
+                if len(inline) > 3 and inline[3].strip():
+                    options = basic_validate_members((inline[3].strip()), item_type="options") 
+                else:
+                    return Inline.from_individual_arguments(classes, None, None, verbose=verbose)
+                return Inline.from_individual_arguments(classes, None, None, options, verbose=verbose)
             else:
                 return 0
     else:
@@ -220,7 +260,7 @@ def continue_prompt(field_type="attribute"):
         message = f"the inline provided has no {field_type}s."
     while True:
         print(message)
-        response = input("proceed with generation (y/n)?")
+        response = input("proceed with generation (y/n)?\n")
         if response in ("y", "yes"):
             return 1
         elif response in ("n", "no"):
@@ -228,22 +268,126 @@ def continue_prompt(field_type="attribute"):
         else:
             print("sorry, didnt understand your response. valid: y or n")
 
-def multiple_validate(items, item_type="class"):
-    """
-    """
-    return NotImplemented
+def multiple_inline_handler(inline : Inline):
+    """[summary]
 
-def inheritance_validate(items, item_type="class"):
+    Args:
+        inline ([type]): [description]
+    """
+    specifications = []
+    classes, attributes, methods, options = [], [], [], []
+    ### need to validate the inline before using this
+    ### to confirm number of / and , match up correctly.
+    for single_class, its_attributes, its_methods, its_options in zip(
+            inline.classes.split(","),
+            inline.attributes.split("/"),
+            inline.methods.split("/"),
+            inline.options.split("/")):
+        classes.append(single_class)
+        attributes.append(its_attributes)
+        methods.append(its_methods)
+        options.append(its_options)
+    # setting parent and package to defaults in this and else block below
+    # until we sophisticate the packaging and inheritance functionality a bit more.
+
+    ### should call basic_Validate here instead of classdict- do that later..
+    specifications = [ClassDict(class_title, attribute_group,
+    method_group, object, 'root', options_group)\
+    for class_title, attribute_group, method_group, options_group\
+    in zip(classes, attributes, methods, options)]
+    return specifications
+
+def validate_mulitple(inline: str):
+    """
+    """
+    # inline = inline.split(":")
+    return multiple_inline_handler(Inline.from_individual_arguments(*inline.split(":")))
+
+def validate_inheritance(inline: str):
     """[summary]
     """
     return NotImplemented
 
 
-def validate(inline: str):
-    return NotImplemented
+def validate(inline: str, verbose=False):
+    """
+
+    Args:
+        inline (str): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    if verbose:
+        print("inline succesfuly parsed")
+    if inline.count(">"):
+        # if item.has_packaging():
+            # if args.verbose:
+                # print("building a classdict with a inline with packaging")
+            #return packaging.main()
+        # else:
+            # if args.verbose:
+                # print("building an class dict with inline with inheritance")
+        return validate_inheritance(inline)
+    else:
+        return basic_validate(inline)
+
+def validate_file(filename : str):
+    """[summary]
+
+    Args:
+        filename (str): [description]
+    """
+
+def parse_inline(inline):
+    """[summary]
+
+    Args:
+        inline ([type]): [description]
+
+    Returns:
+        list: A list of all the inlines parsed out of the current inline spec.
+    """
+
+    ### its important that we test the followin before validating
+    ### because some of the tokens for our syntax would fail basic validation.
+    if inline.classes.count(","):
+        if inline.classes.count(">"):
+            if inline.classes.count("<"):
+                print("packaging inline containing inheritance and multiple classes.")
+            else:
+                print("non packaging inline with inheritance and multiple classes.")
+                # inheritance fn handles multiple classes by default- what about a singleton
+        else:
+            print("non inheritance inline w multiple classes")
+    else:
+        print("single class ready for validation")
+        parsed_classes = multiple_inline_handler(inline)
+    return parsed_classes
+    # note the finished program will expect a classdict from here- or will require modification otherwise.    
+    ### note that the above conditionals handle mutually exclusive conditions 
+    ### meaning we have all the possible sets of condtions, but not every possible
+    ### combination (aye aye ayye) see basic_validate for example of how we handled
+    ### this in the basic inline.
+    # else:
+    #     # casting to a list for safety reasons.
+    #     parsed_classes = [ClassDict(inline.classes,
+    #         inline.attributes, inline.methods,
+    #         object, 'root',
+    #         inline.options)]
+    # return parsed_classes
+
+def main(inline: Inline) -> int:
+    classes = parse_inline(inline)
+    return get_feedback(classes)
+
 
 if __name__ == "__main__":
     ### unit testing
+
+    # testing multiple_validate:
+    testing = validate_mulitple("classA, classB : attr1, attr2 / attr3, attr4 : methodA / methodB : -e{vsc} / -t{ut,cc}")
+    print(testing)
 
     # are these values case corrected and indeed identifiers?
     # print(basic_validate_members(['  attr1', ' attr2 '], item_type="field"))
@@ -257,7 +401,8 @@ if __name__ == "__main__":
     # basic_validate(": attr1, attr2 : method")
 
     # what happens when no attributes are provided?
-    # basic_validate("biscuit : : method")
+    # item = basic_validate("biscuit : : method1, leaftrap")
+    # print(item)
 
     # what happens when no methods are provided?
     # basic_validate("biscuit : gravy, sausage : ")
@@ -266,8 +411,18 @@ if __name__ == "__main__":
     # basic_validate("Biscuit : :")
 
     # complete and correct inline
-    item = basic_validate("Biscuit : gravy, sausage : method1, method2")
-    print(item.global_exporting)
+    # item = basic_validate("Biscuit : gravy, sausage : method1, method2 : -t -e{ut,cc}")
+    # print(item)
+
+    # #accepts valid options only- returning them in correct format
+    # print(basic_validate_members(" -t -e{ut,cc}", item_type="options"))
+    # print(basic_validate_members("-e -t{ut,cc}", item_type="options"))
+    # print(basic_validate_members(" -t{ut,cc} -e", item_type="options"))
+
+
+    # #denies anything but -t, -e or -t{args}, -e{args} or combination of them
+    # print(basic_validate_members(" -z{ut,cc} -f", item_type="options"))
+
 
     # does it case correct all incorrect claSSES, attributes and methods?
     # basic_validate("biscuit : Gravy, SAusage : MAthod1, meTHOod2")

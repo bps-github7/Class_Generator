@@ -6,10 +6,6 @@ Module level docstring: implements the Inline class
 '''
 import sys
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
-from parsing.class_dict import ClassDict
-from utils.editing_menu import get_feedback
-# from .details import Details
-
 
 class Inline:
     '''
@@ -20,14 +16,38 @@ constructor: creates an instance of the Inline class. performs cleansing to
 strip white space from fields, which is noise in the classGen mini language.
 
     Parameters:
-        -classes = None : repersents the class to be generated's identifier(s)
+        inline [str]: a string containing the following tokens
+        
+            -basic layout: "classes : attributes : methods : options"
+            -some incomplete yet accepted alternative basic layouts:
+                - "classes : : :"
+                - "classes : attributes : methods : "
+                - "classes : attributes : : options "
+                - any combination including or excluding - attributes, methods, options
+                - classes must be included, or the parsing will fail
+                as a nameless class cannot be generated.
+
+            -mutliple class layouts
+                - "class1, class2 : attributes / attributes : methods / methods : options / options"
+                will be parsed into indivdual basic layout:
+                ["class1 : attributes : methods : options",
+                "class2 : attributes : methods : options"]
+
+            -inheritance hierarchy layout:
+            "class1 > class2 : attribute1 > attribute2 : method1 > method2 : options > options" 
+            will be parsed to a similar list as above, where class1 is parent of class2.
+
+
+        -classes : repersents the class to be generated's identifier
         -attributes = None : repersents the class to be generated's attribute(s)
         -methods = None : repersents the class to be generated's method(s)
-        -global_testing = False : should unit tests be generated for all files
-        -global_export = None : What should be done to the project after generation.
-        if the field is not set to None, it will be a set of arguments/directives (what to do next?)
+        -options = None : the options fpr generating the class (-t = testing, -e = exporting)
+        each -t and -e can have optional argument lists appened to the end like so:
+        -t{ut,cc,sa} - for unit testing, code coverage, static analysis
+        -e{send,vsc,tgz,zip} - for sending via email or ssh, vsc - source code management, tgz and zip - compression algorithms
 
-    Return values: None
+
+    Return values: Inline object
 
     Side-effects: creates an Inline object in the scope of the
     invokation/call to the constructor. Memory is consumed while
@@ -38,28 +58,57 @@ strip white space from fields, which is noise in the classGen mini language.
 
     version = 2.1
 
-    def __init__(self, inline):
+    def __init__(self, inline : str, verbose = False):
         self.inline = inline.split(":")
-        # Inline cannot be parsed if no class identifier is provided.
+        self.options = None
+        self.attributes = None
+        self.methods = None
+        #### cant make class with no name
         if inline[0] is None:
+            print("Inline cannot be parsed if no class identifier is provided")
             return None
         else:
             self.classes = self.inline[0].strip().title()
-        # handles if attribute or methods are None
-        if inline[1] is None:
-            self.attributes = None
+            if verbose:
+                print(f"creating inline (human readable representation) for class {self.classes}")
+        # defensive prograamming to avoid IndexError
+        # in cases where no colons are provided or attr was skipped.
+        if len(self.inline) > 1:
+            if len(self.inline) >= 2 and self.inline[1] in ('', ' ', None):
+                pass
+            else:
+                self.attributes = self.inline[1].strip()
         else:
-            self.attributes = self.inline[1].strip()
-        if inline[2] is None:
-            self.methods = None
+            if verbose:
+                print(f"class {self.classes}: attributes not provided.")
+        if len(self.inline) > 2:
+            if len(self.inline) >= 3 and self.inline[2] in ('',' ',None):
+                pass
+            else:
+                self.methods = self.inline[2].strip()
         else:
-            self.methods = self.inline[2].strip()
-        if inline[3] is None:
-            self.options = None
-        else:
-            # for backwards compatibility.
-            if len(inline) > 3:
+            if verbose:
+                print(f"class {self.classes}: methods not provided.")
+        if len(self.inline) > 3:
+            if len(self.inline) == 4:
                 self.options = self.inline[3].strip()
+        else:
+            if verbose:
+                print(f"class {self.classes}: options not provided.")
+
+    # def set_attributes(self):
+    #     try:
+    #         self.inline[2]
+    #     except IndexError:
+    #         return 0
+    #     if len(inline) > 1:
+    #         if len(inline) >= 2 and inline[1] in ('', ' ', None):
+    #             pass
+    #         else:
+    #             self.attributes = self.inline[1].strip()
+    #     else:
+    #         print("attributes not provided")
+
 
     def has_inheritance(self):
         """checks self.classes to see if it has > token in it.
@@ -87,7 +136,7 @@ strip white space from fields, which is noise in the classGen mini language.
 
     def __str__(self, single_line=True):
         if single_line:
-            return "{}\t{}\t{}\t{}".format(self.classes, self.attributes, self.methods, self.options)
+            return "{} : {} : {} : {}".format(self.classes, self.attributes, self.methods, self.options)
         else:
             return "class(es): {}\n\
 attributes: {}\n\
@@ -96,7 +145,7 @@ options: {}".format(self.classes, self.attributes,
                       self.methods, self.options)
 
     @classmethod
-    def from_individual_arguments(cls, *args):
+    def from_individual_arguments(cls, *args, verbose=False):
         """ turns the 3 components of Inline (class, attributes and methods)
         into an inline object. if any of the items are lists, turn them into
         comma delimited strings that Inline constructor expects. 
@@ -110,7 +159,18 @@ options: {}".format(self.classes, self.attributes,
                 continue
             if isinstance(value, list):
                 items[i] = ",".join(value)
-        return Inline(f"{items[0]}:{items[1]}:{items[2]}:{items[3]}")
+        if len(items) == 1:
+            return Inline(items[0], verbose=verbose)
+        elif len(items) == 2:
+            return Inline(f"{items[0]}:{items[1]}", verbose=verbose)
+        elif len(items) == 3:
+            return Inline(f"{items[0]}:{items[1]}:{items[2]}", verbose=verbose)
+        elif len(items) == 4:
+            return Inline(f"{items[0]}:{items[1]}:{items[2]}:{items[3]}", verbose=verbose)
+        else:
+            print("cannot generate inline with more than 4 (: delimited)\
+arguments\nRefer to the README file for instructions on proper inline format")
+            return 0
 
     @staticmethod
     def cleanse(items: any):
@@ -123,64 +183,14 @@ options: {}".format(self.classes, self.attributes,
         return list(map(
             lambda item: item.strip().lower(), items.split(",")))
 
-def multiple_inline_handler(inline : Inline):
-    """[summary]
-
-    Args:
-        inline ([type]): [description]
-    """
-    specifications = []
-    classes, attributes, methods, options = [], [], [], []
-    ### need to validate the inline before using this
-    ### to confirm number of / and , match up correctly.
-    for single_class, its_attributes, its_methods, its_options in zip(
-            inline.classes.split(","),
-            inline.attributes.split("/"),
-            inline.methods.split("/"),
-            inline.options.split("/")):
-        classes.append(single_class)
-        attributes.append(its_attributes)
-        methods.append(its_methods)
-        options.append(its_options)
-    # setting parent and package to defaults in this and else block below
-    # until we sophisticate the packaging and inheritance functionality a bit more.
-    specifications = [ClassDict(class_title, attribute_group, method_group, object, 'root', options_group)\
-    for class_title, attribute_group, method_group, options_group in zip(classes, attributes, methods, options)]
-    return specifications
-
-def parse_inline(inline):
-    """[summary]
-
-    Args:
-        inline ([type]): [description]
-
-    Returns:
-        list: A list of all the inlines parsed out of the current inline spec.
-    """
-
-
-    if inline.classes.count(","):
-        parsed_classes = multiple_inline_handler(inline)
-    else:
-        # casting to a list for safety reasons.
-        parsed_classes = [ClassDict(inline.classes,
-            inline.attributes, inline.methods,
-            object, 'root',
-            inline.options)]
-    return parsed_classes
-
-def main(inline: Inline) -> int:
-    classes = parse_inline(inline)
-    return get_feedback(classes)
-
 if __name__ == "__main__":
     # also not reading -e values now
     # main(Inline("classA : attr1, attr2, attr3 : method1 -t -e{ut,cc}"))
 
     # instead of rewriting the constructor, wrote this
     # classmethod/alt constructor for this use case
-    main(Inline.from_individual_arguments("Biscuit", ['gravy', 'sausage'], ['method1', 'method2'], '-t -e{ut}'))
-    
+    item = Inline.from_individual_arguments("Biscuit", ['gravy', 'sausage'], ['method1', 'method2'], '-t -e{ut}')
+    print(item)
     # items = Inline.from_individual_arguments("Biscuit",
     # ['gravy', 'sausage'], ['method1', 'method2'], '-t -e{ut}')
     # print(items)

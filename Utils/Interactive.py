@@ -10,34 +10,15 @@ import argparse
 import sys
 import os
 
-parser = argparse.ArgumentParser(description="Generate classes automatically using command line options or interactive prompt")
-
-#file mode- the star of the show here
-parser.add_argument("--file", type = str, nargs="?", required=False)
-##note that -- makes an argument non positional- this way it can be non-required.
-
-
-#what are alternative constructors and should they be included in this tool?
-#parser.add_argument("-A", "--Alternative Constructor", help="")
-
-#testing
-parser.add_argument("-t", "--testing", type=str, metavar='', help="Automatically generate unittests, static analysis, code coverage, additional documentation?", required=False)
-
-#exportng
-parser.add_argument("-e", "--exporting", type=str, metavar='', choices=['tgz', 'zip', 'tgz and email', 'tgz and zip', 'tgz and SSH', 'zip and SSH'], help="What should be done with the generated project {tgz, zip, tgz & email req arg: 'name@mail.com', zip and email, tgz and ssh, zip and ssh }", required=False)
-
-
-#interactive mode
-parser.add_argument("-i", "--interactive", help="Run the program in interactive mode!", action= "store_true" , required = False)
-
-
-args = parser.parse_args()
-
 #Global that holds all classes parsed via application use.
 container = {}
 
-def interactive_main():
-    """What a user sees when they fire up the program in -i mode"""
+def interactive_mode():
+    """What a user sees when they fire up the program in -i mode
+    
+    returns a validated list of classdicts parsed from the
+    user input attained during interactive session.
+    """
     print("\nWelcome to Class Generator interactive mode!\n")
     help = "Default mode- Sequentially list your classes in the desired 'inline' format.\n\
 example_class : attr1, attr2, attr3 : method1, method.\n\

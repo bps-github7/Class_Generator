@@ -13,10 +13,11 @@ Returns:
     [type]: [description]
 """
 
-
-from parsing.inline import Inline
-from parsing.inline import main as inline_main
-from parsing.inheritance_builder import main as inheritance_builder
+from parsing.validation import validate, validate_file
+from utils.interactive import interactive_mode
+# from parsing.inline import Inline
+# from parsing.inline import main as inline_main
+# from parsing.inheritance_builder import main as inheritance_builder
 
 
 # from .class_dict import ClassDict
@@ -75,28 +76,15 @@ def main():
     if args.verbose:
         print("determining source of input... (cmd line arg, file or interactive mode)")
     if args.inline:
-        item = Inline(args.inline)
-        if args.verbose:
-            print("inline succesfuly parsed")
-        if item.has_inheritance():
-            if item.has_packaging():
-                if args.verbose:
-                    print("building a classdict with a inline with packaging")
-                #return packaging.main()
-            else:
-                if args.verbose:
-                    print("building an class dict with inline with inheritance")
-                return inheritance_builder(item)
-        else:
-            return inline_main(item)
+        return validate(args.inline)
     elif args.file:
         if args.verbose:
             print("reading classes from a file...")
-        # return file.main()
+        return validate_file(args.file)
     else:
         if args.verbose:
             print("using interactive mode")
-        # specs = interactive.main()
+        return interactive_mode()
 
     # Reaching here means the parsing was unsuccessful
     # and class will not be generated
