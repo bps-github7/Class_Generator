@@ -10,6 +10,9 @@ or confirm the whole lot.
 """
 
 
+from parsing.class_dict import ClassDict
+
+
 def display_classes(classes):
     """[summary]
 
@@ -52,7 +55,7 @@ def editing_menu(classes, index):
 d to delete entry.\n\
 c to close this prompt:\n")
         if choice.lower() in ('e', 'edit'):
-            classes[class_index] = selected_class.edit_main()
+            classes[class_index] = edit_main(selected_class)
             if input("done editing this class?") in ("y","yes"):
                 loop=False
         elif choice.lower() in ('d', 'delete', 'del'):
@@ -66,6 +69,135 @@ c to close this prompt:\n")
             continue
         #non standard operating procedure to exit this way, so it returns 0 status code.
         return classes
+
+def replace_item(old_details):
+    """
+    helps build new ClassDict to replace an old one.
+
+    allows user to generate a new class dict on the spot.
+    since class name is key in dict, editing that attribute is impossible during runtime.
+    """
+
+    building_path = input("want to use the old details \
+(attributes, methods, parent, etc) of the class (y/n)?\n\
+(Note that choosing n/no means you will have to provide a new inline to build it from scratch)")
+    if building_path in ("y", "yes"):
+        return ClassDict(input("provide a new name for your class:\n"), *old_details)
+    elif building_path in ("n", "no"):
+        # we should use inline.parse here but it
+        # would create a circular import and tight coupling.
+        # we will use interactive mode fns until this is figured out
+        name = input("provide a new name for your class:\n")
+        attributes = input(f"provide attributes for {name},\
+delimiting with ',', or leave blank for no attributes:\n")
+        methods = input(f"provide methods for {name}, delimiting with ',',\
+or leave blank for no methods:\n")
+        if answer := input("any parents? (defaults to 'object')"):
+            parents = answer
+        else:
+            parents = 'object'
+        if answer := input(f"is {name} contained within a package? (defaults to 'root')"):
+            packages = answer
+        else:
+            packages = 'root'
+        if answer := input(f"generate {name} with testing? (defaults to False)"):
+            if answer in ("yes", "y"):
+                testing = answer
+            else:
+                testing = ''
+        if answer := input(f"Should we do anything with {name}\
+after generation (options- vsc, send)? (defaults to None)"):
+            if answer in ("yes", "y"):
+                exporting = answer
+            else:
+                exporting = ''
+        options = ''
+        if testing:
+            if isinstance(testing, bool):   
+                options += "-t"
+            else:
+                options += f"-t{testing}"
+        if exporting:
+            if isinstance(exporting, bool):
+                options += " -e"
+            else:
+                options += f" -e{exporting}"
+        return ClassDict(name, attributes, methods, parents, packages, options)
+
+def edit_main(cls):
+    """Facilitates the editing of classdict members.
+
+    Returns:
+        self [ClassDict]: the complete class dict after editing.
+    """
+    opts_dict = {1: "classes", 2: "attributes", 3: "methods",
+            4: "parent", 5: "package", 6: "testing/exporting"}
+    while True:
+        print("enter the corresponding number for the detail you want to edit:")
+        print("item no:\toption:")
+        print("-----------------------------")
+        for number, selection in zip(opts_dict, list(opts_dict.values())):
+            print(f"{number}\t\t\t\t\t{selection}")
+        response = input("c/continue at any time to leave the editing prompt.\n")
+        if response in ("c", "continue"):
+            return cls
+        response = int(response)
+        if response in [1, 2, 3, 4, 5, 6]:
+            return edit_prompt(response, cls)
+            
+            #PROMPT fn call
+
+
+def edit_prompt(action_number, cls):
+    
+    if action_number < 6 and action_number > 1:
+        new = input("enter the new values for this class field:\n")
+    if action_number == 1:
+        print(
+            "cannot update the class name in place, as it must be immutable\n")
+        while True:
+            restart = input("delete this entry and provide\
+a corrected replacement (y/n)?\n")
+            print("\n\n")
+            if restart in ("y", "yes"):
+                return ClassDict.replace_item(cls.details)
+            elif restart in ("n", "no"):
+                break
+            else:
+                print("sorry, didnt understand that action_number")
+    elif action_number == 2:
+        cls.attributes = ClassDict.cleanse(new)
+    elif action_number == 3:
+        cls.methods = ClassDict.cleanse(new)
+    elif action_number == 4:
+        ### should be:
+        # if valid_parent(new):
+        #     cls.parents = new
+        # else:
+        #     print("Invalid new value- parent must be a valid python class identifier")
+        #     return
+        cls.parents = new
+    elif action_number == 5:
+        cls.packages = str(new)
+    elif action_number == 6:
+        testing = input("testing is set to {cls.testing}, flip the switch (y/n)?\n")
+        if testing in ("y", "yes"):
+            cls.testing = not cls.testing
+        exporting = input(f"exporting has been provided the following options:  {cls.exporting},\n\
+modify them (y/n)? switch the flag (set exporting to false) with (s/switch):\n")
+        if exporting in ("y", "yes"):
+            while True:
+                new_exporting = input("type the options you\
+want to be applied to this class for exporting\n\
+(options- vsc (source code management), send- (ssh or email):\n")
+                if new_exporting in ("vsc","send", "vsc,send", "vsc, send", "send,vsc", "send, vsc"):
+                    cls.exporting = new_exporting
+                    break
+                else:
+                    print("didnt recognize your response- provide options\
+matching the syntax: single_option   or  option1,option2")
+        elif exporting in ("s", "send"):
+            cls.exporting = None        
 
 def delete_entry(classes, index):
     """[summary]
@@ -108,4 +240,3 @@ reprint, c, continue, or an existing item no")
             print(
                 "invalid response- valid choices are c/continue,\
 r/reprint table or a number in the 'item no' col of the table")
-
