@@ -10,122 +10,10 @@ import sys
 # import os
 
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
-import keyword
 from parsing.inline import Inline
 from parsing.class_dict import ClassDict
 from parsing.class_dict import ClassDict
-from utils.editing_menu import get_feedback
-
-def ask_case(item, item_type="class"):
-    """
-    In the case that the user has set the preference of case correction:"ask"
-    checks if field has correct case according to pep8, in the case it is not
-    if the user agrees, modifies the identifier with the correct case.
-
-    item [str] - the real time value of the identifier.
-    item_type="class" [str] - can be class or field.
-
-    Returns:
-        item [str]: the same item passed in, stripped of whitespace,
-        and with correct case if requested. 
-    """
-    if item_type == "class":
-        if item.istitle():
-            return item.strip()
-        else:
-            if case_prompt(item):
-                return item.title().strip()
-            return item.strip()
-    else:
-        if item.islower():
-            return item.strip()
-        else:
-            if case_prompt(item, item_type="field"):
-                return item.lower().strip()
-            return item.strip()
-
-def case_prompt(item, item_type="class"):
-    """
-    Prompts user whether or not they want to correct errors
-    in how their identifier is cased.
-
-    item [str] - the real time value of the identifier.
-    item_type="class" [str] - can be class or field.
-
-    returns int:
-    1 - user afirms the the mistake should be corrected.
-    0 - user denies the mistake should be corrected.
-    
-    """
-    while True:
-        if item_type == "class":
-            response = input(f"your class name {item} is not capitalized.\n\
-This violates PEP8 guidelines- should this be corrected (y/n)?\n")
-        else:
-            response = input(f"your attribute or method name {item} is not lowercase.\n\
-This violates PEP8 guidelines- should this be corrected (y/n)\n")
-        if response in ("y", "yes"):
-            return 1
-        return 0
-
-def coerce_case(item, item_type="class"):
-    # class names are cast to title case
-    if item_type == "class":
-        # not sufficient testing- but works for now
-        # really, we want to title case and remove spaces between words.
-        if item.istitle():
-            return item.strip()
-        else:
-            return item.title().strip()
-    # methods are casted to lowercase.
-    else:
-        if item.islower():
-            return item.strip()
-        else:
-            return item.lower().strip()
-
-
-def case_check(item, item_type="class", preferences="ask"):
-    """
-    based on user preferences, set in rc file:
-    either coerce, ask user or do nothing about
-    incorrectly cased identifiers.
-
-    
-    item [str] - the real time value of the identifier.
-    item_type="class" [str] - can be class or field.
-    preference="ask" [str] - what the user prefers
-    regarding correction of case.
-
-    return [str] - the modified value of the identifier,
-    according to what the user requested.
-    """
-    if preferences == "ask":
-        return ask_case(item, item_type=item_type)
-    elif preferences == "none":
-        return item
-    else:
-        return coerce_case(item, item_type=item_type)
-
-def is_identifier(ident: str) -> bool:
-    """Determines if string is valid Python identifier.
-    
-    ident [str] - the real time value of identifier
-
-    returns [bool]- True or False based on whether
-    the ident argument is an identifier.
-    """
-
-    if not isinstance(ident, str):
-        raise TypeError("expected str, but got {!r}".format(type(ident)))
-
-    if not ident.isidentifier():
-        return False
-
-    if keyword.iskeyword(ident):
-        return False
-
-    return True
+from utils.conventions import is_identifier, case_check
 
 def validate_options(items):
     """[summary]
@@ -139,7 +27,7 @@ def validate_options(items):
             continue
         # ignore white space
         elif item in (""," "):
-            del item 
+            del item
         else:
             print(f"invalid option detected: {item}")
             print(f"please only use accepted switches: -t, -e")
@@ -168,7 +56,7 @@ def basic_validate_members(items, item_type="class"):
 
 
 def basic_validate(inline : str, verbose=False):
-    """
+    """ needs revision- only return 0 or 1 based on whether the tests succeeded
     """
     inline = inline.split(":")
     #fall through test - cant generate class if no class names are provided
@@ -268,69 +156,38 @@ def continue_prompt(field_type="attribute"):
         else:
             print("sorry, didnt understand your response. valid: y or n")
 
-def multiple_inline_handler(inline : Inline):
-    """[summary]
-
-    Args:
-        inline ([type]): [description]
-    """
-    specifications = []
-    classes, attributes, methods, options = [], [], [], []
-    ### need to validate the inline before using this
-    ### to confirm number of / and , match up correctly.
-    for single_class, its_attributes, its_methods, its_options in zip(
-            inline.classes.split(","),
-            inline.attributes.split("/"),
-            inline.methods.split("/"),
-            inline.options.split("/")):
-        classes.append(single_class)
-        attributes.append(its_attributes)
-        methods.append(its_methods)
-        options.append(its_options)
-    # setting parent and package to defaults in this and else block below
-    # until we sophisticate the packaging and inheritance functionality a bit more.
-
-    ### should call basic_Validate here instead of classdict- do that later..
-    specifications = [ClassDict(class_title, attribute_group,
-    method_group, object, 'root', options_group)\
-    for class_title, attribute_group, method_group, options_group\
-    in zip(classes, attributes, methods, options)]
-    return specifications
 
 def validate_mulitple(inline: str):
     """
     """
-    # inline = inline.split(":")
-    return multiple_inline_handler(Inline.from_individual_arguments(*inline.split(":")))
+    inline = Inline.from_individual_arguments(*inline.split(":"))
+    if inline.classes.count(",") < inline.attributes.count("/"):
+        print("Error: too many attributes.\n\
+make sure the number of ',' in classes is equal to num of '/' in attributes.")
+        return 0
+    if inline.classes.count(",") > inline.attributes.count("/"):
+        print("Error: not enough attributes.\n\
+make sure the number of ',' in classes is equal to num of '/' in attributes.")
+        return 0
+    if inline.classes.count(",") < inline.methods.count("/"):
+        print("Error: too many methods.\n\
+make sure the number of ',' in classes is equal to num of '/' in methods.")
+        return 0
+    if inline.classes.count(",") > inline.methods.count("/"):
+        print("Error: not enough methods.\n\
+make sure the number of ',' in classes is equal to num of '/' in methods.")
+        return 0
+    if inline.classes.count(",") < inline.options.count("/"):
+        print("Too many options.\n\
+make sure the number of ',' in classes is equal to num of '/' in options.")
+        return 0
+    ### What else could go wrong with multiple class inline spec?
+    return 1
 
 def validate_inheritance(inline: str):
     """[summary]
     """
     return NotImplemented
-
-
-def validate(inline: str, verbose=False):
-    """
-
-    Args:
-        inline (str): [description]
-
-    Returns:
-        [type]: [description]
-    """
-    if verbose:
-        print("inline succesfuly parsed")
-    if inline.count(">"):
-        # if item.has_packaging():
-            # if args.verbose:
-                # print("building a classdict with a inline with packaging")
-            #return packaging.main()
-        # else:
-            # if args.verbose:
-                # print("building an class dict with inline with inheritance")
-        return validate_inheritance(inline)
-    else:
-        return basic_validate(inline)
 
 def validate_file(filename : str):
     """[summary]
@@ -339,55 +196,63 @@ def validate_file(filename : str):
         filename (str): [description]
     """
 
-def parse_inline(inline):
+def validate_packaging(inline : str):
     """[summary]
 
     Args:
-        inline ([type]): [description]
+        inine (str): a packaging inline of the format <p:( package : files )
+        or <p:{package1 : files, package2 : files, ... packageN : files}
+    """
+    # have to be careful when parsing- not to confuse
+    #  inheritance w/ packaging because of closing >
+    if not inline.startswith('<p:(') and not inline.endswith('>'):
+        print("Error- invalid format of packaging inline")
+        return 0
+    else:
+        #expose content of syntax/ expression
+        # by removing '<p:(' and ')>'
+        contents = inline[3:-1]
+        print(contents)
+        print(contents[1:-1])
+        if contents.startswith("(") and contents.endswith(")"):
+            return validate_single_packaging_inline(contents[1:-1])
+        else:
+            # can just take the first version of contents & treat it as dict.
+            return validate_multiple_packaging_inline(contents)
 
-    Returns:
-        list: A list of all the inlines parsed out of the current inline spec.
+def validate_multiple_packaging_inline(inline):
     """
 
-    ### its important that we test the followin before validating
-    ### because some of the tokens for our syntax would fail basic validation.
-    if inline.classes.count(","):
-        if inline.classes.count(">"):
-            if inline.classes.count("<"):
-                print("packaging inline containing inheritance and multiple classes.")
-            else:
-                print("non packaging inline with inheritance and multiple classes.")
-                # inheritance fn handles multiple classes by default- what about a singleton
-        else:
-            print("non inheritance inline w multiple classes")
-    else:
-        print("single class ready for validation")
-        parsed_classes = multiple_inline_handler(inline)
-    return parsed_classes
-    # note the finished program will expect a classdict from here- or will require modification otherwise.    
-    ### note that the above conditionals handle mutually exclusive conditions 
-    ### meaning we have all the possible sets of condtions, but not every possible
-    ### combination (aye aye ayye) see basic_validate for example of how we handled
-    ### this in the basic inline.
-    # else:
-    #     # casting to a list for safety reasons.
-    #     parsed_classes = [ClassDict(inline.classes,
-    #         inline.attributes, inline.methods,
-    #         object, 'root',
-    #         inline.options)]
-    # return parsed_classes
+    Args:
+        inline ([type]): [description]
+    """
 
-def main(inline: Inline) -> int:
-    classes = parse_inline(inline)
-    return get_feedback(classes)
+def validate_single_packaging_inline(inline):
+    inline = inline.split(":")
+    if len(inline) == 2:
+        if is_identifier(inline[0]):
+            if corrected := case_check(inline[0],item_type="package"):
+                print(corrected)
+        else:
+            print(f"Error- title you provided for package {inline[0]}\
+is invalid. see pep8.")
+            return 0
+        if is_identifier(inline[1]):
+            if corrected := case_check(inline[1], item_type="module"):
+                print(corrected)
+        else:
+            print(f"Error- module name you provided for\
+module/file {inline[1]} is invalid. see pep8")
+    else:
+        return validate_multiple_packaging_inline({inline[x] : inline[x+1] for x in range(0, len(inline), 2)})
 
 
 if __name__ == "__main__":
     ### unit testing
 
     # testing multiple_validate:
-    testing = validate_mulitple("classA, classB : attr1, attr2 / attr3, attr4 : methodA / methodB : -e{vsc} / -t{ut,cc}")
-    print(testing)
+    # testing = validate_mulitple("classA, classB : attr1, attr2 / attr3, attr4 : methodA / methodB : -e{vsc} / -e -t{ut,cc}")
+    # print(testing)
 
     # are these values case corrected and indeed identifiers?
     # print(basic_validate_members(['  attr1', ' attr2 '], item_type="field"))
@@ -426,3 +291,5 @@ if __name__ == "__main__":
 
     # does it case correct all incorrect claSSES, attributes and methods?
     # basic_validate("biscuit : Gravy, SAusage : MAthod1, meTHOod2")
+
+    validate_packaging("<p:(skone : nard)>")

@@ -23,6 +23,9 @@ import os
 def packaging():
     print("skonedalone")
 
+def main():
+    print("nard")
+
 #class Packaging_Inline:
 #    def __init__(self, packages, files, options):
 #        self.packages = [(x.strip()).lower() for x in packages.split(',')]

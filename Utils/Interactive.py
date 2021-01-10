@@ -174,10 +174,6 @@ def abort_state():
             sys.exit(1)
         else:
             return True
-    
-
-
-
 
 #Dev notes: 3/29/2020 @ 5:24pm EST
 # Made a huge update to this interactive prompt/
@@ -195,4 +191,4 @@ def abort_state():
 # interactive_main()
 # print(get_confirmation(["bisk","chalp","skone","POADES"]))
 # print(get_data("Shaat"))
-interactive_main()
+# interactive_mode()
