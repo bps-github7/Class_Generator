@@ -150,6 +150,9 @@ options: {}".format(self.classes, self.attributes,
         into an inline object. if any of the items are lists, turn them into
         comma delimited strings that Inline constructor expects. 
 
+        NOTE: that this fn is not robust enough to handle a multiple
+        class inline such as 'classA, classB : attr1, attr2 / attrA, attrB'
+
         Returns:
             [type]: [description]
         """

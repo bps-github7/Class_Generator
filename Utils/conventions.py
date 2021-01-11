@@ -140,7 +140,6 @@ def case_check(item, item_type="class", preferences="ask"):
     either coerce, ask user or do nothing about
     incorrectly cased identifiers.
 
-    
     item [str] - the real time value of the identifier.
     item_type="class" [str] - can be class or field.
     preference="ask" [str] - what the user prefers
@@ -158,7 +157,7 @@ def case_check(item, item_type="class", preferences="ask"):
 
 def is_identifier(ident: str) -> bool:
     """Determines if string is valid Python identifier.
-    
+
     ident [str] - the real time value of identifier
 
     returns [bool]- True or False based on whether
@@ -175,4 +174,3 @@ def is_identifier(ident: str) -> bool:
         return False
 
     return True
-

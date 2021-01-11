@@ -15,11 +15,23 @@ from parsing.class_dict import ClassDict
 from parsing.class_dict import ClassDict
 from utils.conventions import is_identifier, case_check
 
-def validate_options(items):
-    """[summary]
+def validate_options(items : str):
+    """validates options by rejecting all
+    that do not match the followning:
+        -t 
+        -e
+        -t{value(s,)}
+        -e{value(s,)}
+        -2 part combination of any of the above.
 
     Args:
-        items ([type]): [description]
+        items [str]: option string needing validation.
+
+    Returns:
+        items [str]: validated option string
+                    with no leading/trailing white space.
+
+        failure code [int] : returns 0 if validation tests fail.
     """
     items = items.split("-")
     for item in items:
@@ -43,10 +55,13 @@ def basic_validate_members(items, item_type="class"):
     items [list | str] : class name or attributes/methods to validate.
     item_type="class" [str] : which type of identifier to validate- class or field.
 
-    returns:  
+    returns:
+
     """
     if item_type == "options":
         return validate_options(items)
+    elif item_type in ("attribute","method"):
+        item_type = "field"
     container = []
     for item in items:
         item = item.strip()
@@ -57,63 +72,93 @@ def basic_validate_members(items, item_type="class"):
 
 def basic_validate(inline : str, verbose=False):
     """ needs revision- only return 0 or 1 based on whether the tests succeeded
+
+    unlike typical validation functions in the module, revises inline
+    correcting for incorrect case.
+
+    returns:
+    1. inline [Inline] - generates an inline w/ one to all arguments included.
+
     """
     inline = inline.split(":")
+    # need to loop over here and strip whitespace from each element
+    # the conditional below not specific enough to work correctly.
+
     #fall through test - cant generate class if no class names are provided
     if inline[0].strip():
         classes = basic_validate_members((inline[0].strip()).split(","))
+        # need to figure out which arguments are provided
         if len(inline) > 1:
-            if inline[1].strip():
-                attributes = basic_validate_members((inline[1].strip()).split(","), item_type="field")
-                # Most desirable condition- classes, attributes, methods have all been provided.
-                if len(inline) > 2 and inline[2].strip():
-                    methods = basic_validate_members((inline[2].strip()).split(","), item_type="field")
-                    if len(inline) > 3 and inline[3].strip():
-                        options = basic_validate_members((inline[3].strip()), item_type="options") 
-                    else:
-                        return Inline.from_individual_arguments(classes, attributes, methods, verbose=verbose)
-                    return Inline.from_individual_arguments(classes, attributes, methods, options, verbose=verbose)
-                else:
-                    if missing_field(type="method"):
-                        if len(inline) > 3 and inline[3].strip():
-                            options = basic_validate_members((inline[3].strip()), item_type="options") 
-                        else:
-                            return Inline.from_individual_arguments(classes, attributes, None, verbose=verbose)
-                        return Inline.from_individual_arguments(classes, attributes, None, options, verbose=verbose)
+            # class + attributes
+            if inline[1].strip() and len(inline) == 2:
+                attributes = basic_validate_members(
+                    (inline[1].strip()).split(","), item_type="attribute")
+                if missing_field("methods or options"):
+                    return Inline.from_individual_arguments(classes,
+                    attributes, None, None)
+            # class + methods
+            elif inline[2].strip():
+                methods = basic_validate_members(
+                    (inline[2].strip()).split(","), item_type="method")
+                if missing_field("attributes or options"):
+                    return Inline.from_individual_arguments(classes,
+                    None, methods, None)
+            # class + options
+            elif inline[3].strip():
+                options = basic_validate_members(
+                    (inline[3].strip()), item_type="options")
+                if missing_field("attributes or methods"):
+                    return Inline.from_individual_arguments(classes, None,
+                    None, options)
+
+            # class + attributes + methods
+            elif inline[1].strip() and inline[2].strip():
+                attributes = basic_validate_members(
+                    (inline[1].strip()).split(","), item_type="attribute")
+                methods = basic_validate_members(
+                    (inline[2].strip()).split(","), item_type="method")
+                if missing_field("options"):
+                    return Inline.from_individual_arguments(classes,
+                    attributes, methods, None)
+            # class + attributes + options
+            elif inline[1].strip() and inline[3].strip():
+                attributes = basic_validate_members(
+                    (inline[1].strip()).split(","), item_type="attribute")
+                options = basic_validate_members(
+                    (inline[3].strip()), item_type="options")
+                if missing_field("methods"):
+                    return Inline.from_individual_arguments(classes,
+                    attributes, None, options)
+            # class + methods + options
+            elif inline[2].strip() and inline[3].strip():
+                methods = basic_validate_members(
+                    (inline[2].strip()).split(","), item_type="method")
+                options = basic_validate_members(
+                    (inline[3].strip()), item_type="options")
+                if missing_field("attributes"):
+                    return Inline.from_individual_arguments(classes,
+                    None, methods, options)
+
+            # class + attributes + methods + options
             else:
-                # redundant but prevents methods from being
-                #  undefined in if below in same else block.
-                if len(inline) > 2 and inline[2].strip():
-                    methods = basic_validate_members(inline[2].strip().split(","), item_type="field")
-                else:
-                    if missing_field(type="none"):
-                        if len(inline) > 3 and inline[3].strip():
-                            options = basic_validate_members((inline[3].strip()), item_type="options") 
-                        else:
-                            return Inline.from_individual_arguments(classes, None, None, verbose=verbose)
-                        return Inline.from_individual_arguments(classes, None, None, options, verbose=verbose)
-                if missing_field(type="attribute"):
-                    if len(inline) > 3 and inline[3].strip():
-                        options = basic_validate_members((inline[3].strip()), item_type="options") 
-                    else:
-                        return Inline.from_individual_arguments(classes, None, methods, verbose=verbose)
-                    return Inline.from_individual_arguments(classes, None, methods, options, verbose=verbose)
+                print("the else block executed in basic_validate-\
+all inline args provided")
+                attributes = basic_validate_members(
+                    (inline[1].strip()).split(","), item_type="field")
+                methods = basic_validate_members(
+                    (inline[2].strip()).split(","), item_type="field")
+                options = basic_validate_members(
+                    (inline[3].strip()), item_type="options")
+                return Inline.from_individual_arguments(classes, attributes,
+                methods, options)
         else:
-            # make an Inline w/ niether fields if user accepts that.
-            if missing_field(type="none"):
-                if len(inline) > 3 and inline[3].strip():
-                    options = basic_validate_members((inline[3].strip()), item_type="options") 
-                else:
-                    return Inline.from_individual_arguments(classes, None, None, verbose=verbose)
-                return Inline.from_individual_arguments(classes, None, None, options, verbose=verbose)
-            else:
-                return 0
+            pass
     else:
         return missing_field()
 
 def missing_field(type="class"):
     """
-    prints appropriate message based on one of 3 missing fields.
+    prints appropriate message based on one of 4 missing fields.
 
     field [str] - the real time value of inline field.
     type="class" [str] - what type of field dealt w/ determines error message.
@@ -125,27 +170,39 @@ def missing_field(type="class"):
     if type == "class":
         print("Error: cannot make class with no class name.")
         return 0
-    elif type == "attribute":
-        if continue_prompt():
-            return 1
-        else:
-            return 0
-    elif type == "method":
-        if continue_prompt(field_type="method"):
-            return 1
-        else:
-            return 0
-    elif type == "none":
-        if continue_prompt(field_type="none"):
+    else:
+        if continue_prompt(field_type = type):
             return 1
         else:
             return 0
 
-def continue_prompt(field_type="attribute"):
+def continue_prompt(field_type="attributes"):
+    """Asks users if they want to continue with generation,
+    if a certain field or combination of fields is missing.
+
+    Args:
+        field_type (str, optional): [description]. Defaults to "attributes".
+        NOTE: a field type other than None
+        results in the execution of else block,
+        therefore, type the literal value of the missing fields
+        delimited by or, as a string.
+        like so:
+            # if methods and options are missing
+            field_type = "methods or options"
+
+            # this will properly output:
+            "the inline provided has no methods or options"
+
+    Returns:
+        success code [int]:
+        1 indicates the user confirmed the prompt - create the inline
+        0 indicates the user denied the prompt - do not create it.
+    """
     if field_type == "none":
-        message = "the inline provided has neither attributes or methods"
+        message = "the inline provided has no attributes, methods\
+ or options"
     else:
-        message = f"the inline provided has no {field_type}s."
+        message = f"the inline provided has no {field_type}."
     while True:
         print(message)
         response = input("proceed with generation (y/n)?\n")
@@ -250,7 +307,7 @@ def validate_single_packaging_inline(inline):
     if len(inline) == 2:
         if (package := validate_package_name(inline[0])) and (module := validate_module_name(inline[1])):
             # does the above test fail if either return 0? ensure this!
-            return {"package" : package, "module" : module}
+            return {package : module}
         else:
             return 0
     else:
@@ -262,8 +319,8 @@ def validate_package_name(title):
             return corrected
         else:
             return title
-    print(f"Error- invalid package title- {title}: package title must\n\
-must conform to python identifier naming rules - no numbers, whitespace\
+    print(f"Error: invalid package called '{title}'\nPackage name\
+must conform to python identifier naming rules:\nno numbers, whitespace\
 or special chars except for underscores.")
     return 0
 
@@ -273,8 +330,8 @@ def validate_module_name(title):
             return corrected
         else:
             return title
-    print(f"Error- invalid module title- {title}: module title must\n\
-must conform to python identifier naming rules - no numbers, whitespace\
+    print(f"Error: invalid module called '{title}'\nModule name must\
+ conform to python identifier naming rules:\nno numbers, whitespace\
 or special chars except for underscores.")
     return 0
 
@@ -308,8 +365,8 @@ if __name__ == "__main__":
     # basic_validate("Biscuit : :")
 
     # complete and correct inline
-    # item = basic_validate("Biscuit : gravy, sausage : method1, method2 : -t -e{ut,cc}")
-    # print(item)
+    item = basic_validate("Biscuit : gravy, sausage : method1, method2 : -t -e{ut,cc}")
+    print(item)
 
     # #accepts valid options only- returning them in correct format
     # print(basic_validate_members(" -t -e{ut,cc}", item_type="options"))
@@ -329,9 +386,9 @@ if __name__ == "__main__":
     #     print(f"validated package: {valid}")
     
     # # what about a multiple package spec?
-    if validate_packaging("<p:(skone : !nard, moofy : mofty, shitpike : w90easel, monkey : orangutang)>"):
-        print("we did it\n"*2)
-    else:
-        # seems the test works. consider further nuances.
-        print(validate_packaging("<p:(skone : !nard, moofy : mofty, shitpike : w90easel, monkey : orangutang)>"))
+    # if validate_packaging("<p:(skone : !nard, moofy : mofty, shitpike : w90easel, monkey : orangutang)>"):
+    #     print("we did it\n"*2)
+    # else:
+    #     # seems the test works. consider further nuances.
+    #     print(validate_packaging("<p:(skone : nard, moofy : mofty, shitpike : w90easel, monkey : orangutang)>"))
     # validate_multiple_packaging_inline({'skone' : 'nard', 'moofy' : 'mofty', 'shitpike' : 'weasel', 'monkey' : 'orangutang'})
