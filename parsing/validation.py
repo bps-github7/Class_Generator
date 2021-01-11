@@ -212,13 +212,17 @@ def validate_packaging(inline : str):
         #expose content of syntax/ expression
         # by removing '<p:(' and ')>'
         contents = inline[3:-1]
-        print(contents)
-        print(contents[1:-1])
-        if contents.startswith("(") and contents.endswith(")"):
-            return validate_single_packaging_inline(contents[1:-1])
-        else:
+        # print(contents)
+        # print(contents[1:-1])
+        if contents.count(","):
             # can just take the first version of contents & treat it as dict.
-            return validate_multiple_packaging_inline(contents)
+            inline = {}
+            for items in contents[1:-1].split(","):
+                inline.update({str(items.split(":")[0].strip()) : str(items.split(":")[1].strip())})
+            return validate_multiple_packaging_inline(inline)
+        else:
+            return validate_single_packaging_inline(contents[1:-1])
+
 
 def validate_multiple_packaging_inline(inline):
     """
@@ -226,25 +230,53 @@ def validate_multiple_packaging_inline(inline):
     Args:
         inline ([type]): [description]
     """
+    validated = {}
+    for item in inline:
+        if (valid := validate_single_packaging_inline(f"{item}:{inline[item]}")):
+            if isinstance(valid, dict):
+                validated.update(valid)
+            else:
+                return 0
+        else:
+            return 0
+    return validated
 
 def validate_single_packaging_inline(inline):
     inline = inline.split(":")
+    # strip leading and trailing whitespace
+    # that could make it fail is_identifier test.
+    inline = list(map(lambda x: x.strip(), inline))
+    # check that it is indeed a single package inline
     if len(inline) == 2:
-        if is_identifier(inline[0]):
-            if corrected := case_check(inline[0],item_type="package"):
-                print(corrected)
+        if (package := validate_package_name(inline[0])) and (module := validate_module_name(inline[1])):
+            # does the above test fail if either return 0? ensure this!
+            return {"package" : package, "module" : module}
         else:
-            print(f"Error- title you provided for package {inline[0]}\
-is invalid. see pep8.")
             return 0
-        if is_identifier(inline[1]):
-            if corrected := case_check(inline[1], item_type="module"):
-                print(corrected)
-        else:
-            print(f"Error- module name you provided for\
-module/file {inline[1]} is invalid. see pep8")
     else:
         return validate_multiple_packaging_inline({inline[x] : inline[x+1] for x in range(0, len(inline), 2)})
+
+def validate_package_name(title):
+    if is_identifier(title):
+        if corrected := case_check(title,item_type="package"):
+            return corrected
+        else:
+            return title
+    print(f"Error- invalid package title- {title}: package title must\n\
+must conform to python identifier naming rules - no numbers, whitespace\
+or special chars except for underscores.")
+    return 0
+
+def validate_module_name(title):
+    if is_identifier(title):
+        if corrected := case_check(title, item_type="module"):
+            return corrected
+        else:
+            return title
+    print(f"Error- invalid module title- {title}: module title must\n\
+must conform to python identifier naming rules - no numbers, whitespace\
+or special chars except for underscores.")
+    return 0
 
 
 if __name__ == "__main__":
@@ -292,4 +324,14 @@ if __name__ == "__main__":
     # does it case correct all incorrect claSSES, attributes and methods?
     # basic_validate("biscuit : Gravy, SAusage : MAthod1, meTHOod2")
 
-    validate_packaging("<p:(skone : nard)>")
+    # does validate_packaging work for a single package spec
+    # if valid := validate_packaging("<p:(skone : n%ard)>"):
+    #     print(f"validated package: {valid}")
+    
+    # # what about a multiple package spec?
+    if validate_packaging("<p:(skone : !nard, moofy : mofty, shitpike : w90easel, monkey : orangutang)>"):
+        print("we did it\n"*2)
+    else:
+        # seems the test works. consider further nuances.
+        print(validate_packaging("<p:(skone : !nard, moofy : mofty, shitpike : w90easel, monkey : orangutang)>"))
+    # validate_multiple_packaging_inline({'skone' : 'nard', 'moofy' : 'mofty', 'shitpike' : 'weasel', 'monkey' : 'orangutang'})
