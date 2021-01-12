@@ -146,7 +146,8 @@ options: {}".format(self.classes, self.attributes,
 
     @classmethod
     def from_individual_arguments(cls, *args, verbose=False):
-        """ turns the 3 components of Inline (class, attributes and methods)
+        """ turns the 4 components (or less) of Inline 
+                (class, attributes, methods and options)
         into an inline object. if any of the items are lists, turn them into
         comma delimited strings that Inline constructor expects. 
 

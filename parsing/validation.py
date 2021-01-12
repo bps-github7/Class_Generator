@@ -58,7 +58,10 @@ def basic_validate_members(items, item_type="class"):
     returns:
 
     """
-    if item_type == "options":
+    if item_type == "class":
+        if is_identifier(items):
+            return(case_check(items))
+    elif item_type == "options":
         return validate_options(items)
     elif item_type in ("attribute","method"):
         item_type = "field"
@@ -86,73 +89,140 @@ def basic_validate(inline : str, verbose=False):
 
     #fall through test - cant generate class if no class names are provided
     if inline[0].strip():
-        classes = basic_validate_members((inline[0].strip()).split(","))
+        classes = basic_validate_members(inline[0].strip())
         # need to figure out which arguments are provided
         if len(inline) > 1:
-            # class + attributes
-            if inline[1].strip() and len(inline) == 2:
-                attributes = basic_validate_members(
+            if len(inline) == 2:
+                # only attributes were provided and there was a single
+                # semicolon in the inline ie 'class : attributes'
+                if inline[1].strip():
+                    attributes = basic_validate_members(
+                        (inline[1].strip()).split(","), item_type="attribute")
+                    return Inline.from_individual_arguments(classes,
+                        attributes, None, None)
+                else:
+                    if missing_field("attributes"):
+                        return Inline.from_individual_arguments(classes)
+            # possiblities: ###################
+            #     class : attr : method
+            #     class :      : method
+            #     class : attr :
+            #     class :      :       <- this is else block       
+            # since user didnt provide a third colon-
+            # cant reference inline[3] or act as if
+            # they wanted to generate options but forgot to include them.
+            ###################################
+            elif len(inline) == 3:
+                # class + attributes + methods
+                if inline[1].strip() and inline[2].strip():
+                    attributes = basic_validate_members(
+                        (inline[1].strip()).split(","), item_type="attribute")
+                    methods = basic_validate_members(
+                        (inline[2].strip()).split(","), item_type="method")
+                    return Inline.from_individual_arguments(classes,
+                    attributes, methods)
+                # class and attribute provided but no methods
+                elif inline[1].strip() and not inline[2].strip():
+                    attributes = basic_validate_members(
                     (inline[1].strip()).split(","), item_type="attribute")
-                if missing_field("methods or options"):
+                    if missing_field("methods"):
+                        return Inline.from_individual_arguments(classes,
+                        attributes)
+                # class + methods
+                elif inline[2].strip() and not inline[1].strip():
+                    methods = basic_validate_members(
+                        (inline[2].strip()).split(","), item_type="method")
+                    if missing_field("attributes"):
+                        return Inline.from_individual_arguments(classes,
+                        None, methods)
+                else:
+                    if missing_field("attributes or methods"):
+                        return Inline.from_individual_arguments(classes, None,
+                        None)
+            elif len(inline) == 4:
+            ############### possiblities:
+            # class : attributes : methods : options
+            # class : attributes : methods : 
+            # class : attributes :         : options
+            # class : attributes :         :          
+            # class :            : methods : options      
+            # class :            : methods : 
+            # class :            :         :         <- this is the else case.
+            # class :            :         : options
+            ########################################    
+                # class + attributes + methods + options
+                if inline[1].strip and inline[2].strip and inline[3].strip():
+                    attributes = basic_validate_members(
+                        (inline[1].strip()).split(","), item_type="field")
+                    methods = basic_validate_members(
+                        (inline[2].strip()).split(","), item_type="field")
+                    options = basic_validate_members(
+                        (inline[3].strip()), item_type="options")
                     return Inline.from_individual_arguments(classes,
-                    attributes, None, None)
-            # class + methods
-            elif inline[2].strip():
-                methods = basic_validate_members(
-                    (inline[2].strip()).split(","), item_type="method")
-                if missing_field("attributes or options"):
-                    return Inline.from_individual_arguments(classes,
-                    None, methods, None)
-            # class + options
-            elif inline[3].strip():
-                options = basic_validate_members(
-                    (inline[3].strip()), item_type="options")
-                if missing_field("attributes or methods"):
-                    return Inline.from_individual_arguments(classes, None,
-                    None, options)
+                    attributes, methods, options)
+                # class + attributes + methods but no options
+                elif inline[1].strip() and inline[2].strip() and not\
+                inline[2].strip():
+                    attributes = basic_validate_members(
+                        (inline[1].strip()).split(","), item_type="field")
+                    methods = basic_validate_members(
+                        (inline[2].strip()).split(","), item_type="field")
+                    if missing_field("options"):
+                        return Inline.from_individual_arguments(classes,
+                        attributes, methods)
+                # class + attributes + options but no methods
+                elif inline[1].strip() and inline[3].strip() and\
+                not inline[2].strip():
+                    attributes = basic_validate_members(
+                        (inline[1].strip()).split(","), item_type="attribute")
+                    options = basic_validate_members(
+                        (inline[3].strip()), item_type="options")
+                    if missing_field("methods"):
+                        return Inline.from_individual_arguments(classes,
+                        attributes, None, options)
+                # class + attributes but no methods or options
+                elif inline[1].strip() and not inline[2].strip()\
+                and not inline[3].strip():
+                    attributes = basic_validate_members(
+                        (inline[1].strip()).split(","), item_type="attribute")
+                    if missing_field("methods or options"):
+                        return Inline.from_individual_arguments(classes, attributes)
+                # class + methods + options but no attributes
+                elif inline[2].strip() and inline[3].strip and not\
+                inline[1].strip():
+                    # # # problem area- this triggers unexpectedly
+                    methods = basic_validate_members(
+                        (inline[2].strip()).split(","), item_type="field")
+                    options = basic_validate_members(
+                        (inline[3].strip()), item_type="options")
+                    if missing_field("attributes"):
+                        return Inline.from_individual_arguments(classes, None,
+                        methods, options)
+                # class + methods, no attributes or options
+                elif inline[2].strip() and not \
+                inline[1].strip or inline[3].strip():
+                    methods = basic_validate_members(
+                        (inline[2].strip()).split(","), item_type="field")
+                    if missing_field("attributes or options"):
+                        return Inline.from_individual_arguments(classes, None,
+                        methods, None)
+                # class + options no attributes or methods
+                elif inline[3].strip() and not \
+                inline[1].strip() and not inline[2].strip():
+                    options = basic_validate_members(
+                        (inline[3].strip()), item_type="options")
+                    if missing_field("attributes or methods"):
+                        return Inline.from_individual_arguments(classes, None,
+                        None, options)
+                else:
+                    if missing_field("attributes, methods or options"):
+                        return Inline.from_individual_arguments(classes, None,
+                        None, None)
 
-            # class + attributes + methods
-            elif inline[1].strip() and inline[2].strip():
-                attributes = basic_validate_members(
-                    (inline[1].strip()).split(","), item_type="attribute")
-                methods = basic_validate_members(
-                    (inline[2].strip()).split(","), item_type="method")
-                if missing_field("options"):
-                    return Inline.from_individual_arguments(classes,
-                    attributes, methods, None)
-            # class + attributes + options
-            elif inline[1].strip() and inline[3].strip():
-                attributes = basic_validate_members(
-                    (inline[1].strip()).split(","), item_type="attribute")
-                options = basic_validate_members(
-                    (inline[3].strip()), item_type="options")
-                if missing_field("methods"):
-                    return Inline.from_individual_arguments(classes,
-                    attributes, None, options)
-            # class + methods + options
-            elif inline[2].strip() and inline[3].strip():
-                methods = basic_validate_members(
-                    (inline[2].strip()).split(","), item_type="method")
-                options = basic_validate_members(
-                    (inline[3].strip()), item_type="options")
-                if missing_field("attributes"):
-                    return Inline.from_individual_arguments(classes,
-                    None, methods, options)
-
-            # class + attributes + methods + options
-            else:
-                print("the else block executed in basic_validate-\
-all inline args provided")
-                attributes = basic_validate_members(
-                    (inline[1].strip()).split(","), item_type="field")
-                methods = basic_validate_members(
-                    (inline[2].strip()).split(","), item_type="field")
-                options = basic_validate_members(
-                    (inline[3].strip()), item_type="options")
-                return Inline.from_individual_arguments(classes, attributes,
-                methods, options)
         else:
-            pass
+            print("hello")
+            if missing_field("attributes, methods or options"):
+                return Inline.from_individual_arguments(classes, None, None, None)
     else:
         return missing_field()
 
@@ -354,19 +424,19 @@ if __name__ == "__main__":
     # tests to see if fails when no class is provided
     # basic_validate(": attr1, attr2 : method")
 
-    # what happens when no attributes are provided?
-    # item = basic_validate("biscuit : : method1, leaftrap")
-    # print(item)
+    # print(basic_validate_members("biscuit"))
+
 
     # what happens when no methods are provided?
     # basic_validate("biscuit : gravy, sausage : ")
 
-    # when niether fields are provided?
-    # basic_validate("Biscuit : :")
+    
 
     # complete and correct inline
-    item = basic_validate("Biscuit : gravy, sausage : method1, method2 : -t -e{ut,cc}")
-    print(item)
+    # item = basic_validate("Biscuit : gravy, sausage : method1, method2 : -t -e{ut,cc}")
+    # print(item)
+
+    # missing_field("attributes or methods")
 
     # #accepts valid options only- returning them in correct format
     # print(basic_validate_members(" -t -e{ut,cc}", item_type="options"))
@@ -392,3 +462,50 @@ if __name__ == "__main__":
     #     # seems the test works. consider further nuances.
     #     print(validate_packaging("<p:(skone : nard, moofy : mofty, shitpike : w90easel, monkey : orangutang)>"))
     # validate_multiple_packaging_inline({'skone' : 'nard', 'moofy' : 'mofty', 'shitpike' : 'weasel', 'monkey' : 'orangutang'})
+
+    #     class : attr
+    # print(basic_validate(" classA : frog, basket "))
+
+    #     class :     
+    # print(basic_validate("classA : "))
+    
+    #     class : attr : method
+    # print(basic_validate(" classA : army, navy, puddin : method1 "))
+    
+    #     class :      : method
+    # print(basic_validate(" classA : : method1 "))
+    
+    #     class : attr :
+    # print(basic_validate("ClassBisk: candle, sitting, monkey : "))
+    
+    #     class :      :       <- this is else block       
+    # print(basic_validate("classA : : "))
+
+    # class : attributes : methods : options
+    # print(basic_validate(" classA: attr1, attr2 : method : -e -t{ut,sa} "))
+
+    # class : attributes : methods : 
+    # print(basic_validate(" classA: attr1, attr2 : method: "))
+
+    # class : attributes :         : options
+    # print(basic_validate("ClassA : attr1, attr2:  : -e"))
+    # ^^^^ doesnt confirm for lack of methods
+
+    # class : attributes :         :          
+    # print(basic_validate("ClassA : attr1,attr2 : : "))
+
+    # class :            : methods : options      
+    # print(basic_validate("ClassA : : method1 : -e "))
+    ### ^ also no confirmation here
+
+
+    # class :            : methods : 
+    # print(basic_validate(" ClassA:  : metho1 :"))
+    # ^^^ gets caught on a prior condition - no attributes- weird.
+
+    # class :            :         :         <- this is the else case.
+    # print(basic_validate("ClassA: : : "))
+
+    # class :            :         : options
+    # print(basic_validate(" ClassA: : : -e -t"))
+    ### no confirmation ^^^

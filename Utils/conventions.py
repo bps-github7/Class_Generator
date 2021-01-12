@@ -123,6 +123,8 @@ def class_correct_convention(item):
             item = item.split("_")
         item = list(map(lambda x: x.title(), item))
         return ("".join(item)).replace("_", "").replace(" ","")
+    # do we need to worry about case corection at this point? 
+    return item
 
 def field_correct_convention(item):
     # the best we can do for correcting field word spacing.
