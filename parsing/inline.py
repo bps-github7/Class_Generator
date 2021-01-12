@@ -189,13 +189,13 @@ arguments\nRefer to the README file for instructions on proper inline format")
 
 if __name__ == "__main__":
     # also not reading -e values now
-    # main(Inline("classA : attr1, attr2, attr3 : method1 -t -e{ut,cc}"))
+    print(Inline("ClassA : attr1, attr2 : method1 : -t"))
 
     # instead of rewriting the constructor, wrote this
     # classmethod/alt constructor for this use case
-    item = Inline.from_individual_arguments("Biscuit", ['gravy', 'sausage'], ['method1', 'method2'], '-t -e{ut}')
-    print(item)
-    # items = Inline.from_individual_arguments("Biscuit",
+    # item = Inline.from_individual_arguments("Biscuit", ['gravy', 'sausage'], ['method1', 'method2'], '-t -e{ut}')
+    # print(item)
+    # # items = Inline.from_individual_arguments("Biscuit",
     # ['gravy', 'sausage'], ['method1', 'method2'], '-t -e{ut}')
     # print(items)
 
