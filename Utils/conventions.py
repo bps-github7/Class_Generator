@@ -115,6 +115,21 @@ def coerce_case(item, item_type="class"):
         return module_correct_convention(item)
 
 def class_correct_convention(item):
+    """
+    I suspect this function is causing
+    problems down the line (see test_validation.py)
+    test_validate_four_piece_inline-
+
+    ClassA is getting mapped to all four
+    arguments for inline- check here, validate_members
+    and Inline.from_individual_arguments alt constructor.
+
+    Args:
+        item ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     if item.count(" ") or item.count("_"):
         # checking whether space or underscore was used as word delimiter.
         if item.count(" ") > item.count("_"):

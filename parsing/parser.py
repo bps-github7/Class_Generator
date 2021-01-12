@@ -17,7 +17,7 @@ from parsing.packaging import packaging
 from parsing import inheritance_builder
 from parsing.inline import Inline
 from parsing.class_dict import ClassDict
-from parsing.validation import validate, validate_file, validate_inheritance, validate_mulitple, validate_packaging, validate_packaging_inline
+from parsing.validation import validate, validate_file, validate_inheritance, validate_multiple, validate_packaging, validate_packaging
 from utils.interactive import interactive_mode
 from utils.options import args
 from utils.editing_menu import get_feedback
@@ -86,7 +86,7 @@ def parse_inline(inline : Inline, verbose=False):
                     if verbose:
                         print("parsing an inline spec containing inheritance hierarchy.")
         else:
-            if validate_mulitple(inline):
+            if validate_multiple(inline):
                 parsed_classes.append(multiple_inline_handler(inline))
                 if verbose:
                     print("parsing non inheritance inline w multiple classes")

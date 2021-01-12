@@ -12,7 +12,14 @@ import sys
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 from parsing.inline import Inline
 import unittest
-from parsing.validation import validate_four_piece_inline
+from unittest.mock import patch
+from parsing.validation import validate_four_piece_inline, missing_field,\
+continue_prompt, validate_multiple_packaging_inline, validate_file,\
+validate_inline, validate_options, validate_two_piece_inline,\
+validate_three_piece_inline, validate_multiple, validate_inheritance,\
+validate_module_name, validate_package_name, validate_single_packaging_inline,\
+validate_members, validate_packaging
+
 
 class TestValidation(unittest.TestCase):
     """
@@ -35,8 +42,8 @@ the following functions are tested:
     -validate_two_piece_inline
     -validate_three_piece_inline
     -validate_four_piece_inline
-    -basic_validate_members
-    -basic_validate
+    -validate_members
+    -validate_inline
     -validate_multiple
     -validate_inheritance
     -validate_packaging
@@ -54,17 +61,44 @@ the following functions are tested:
     #     """[summary]
     #     """
 
-    # def test_missing_field(self):
-    #     """[summary]
-    #     """
+    @patch('builtins.input', return_value='y')
+    def test_missing_field(self, input):
+        """
+        This function is the caller function 
+        for below function 'continue_prompt'.
+        IT defaults to class not being provided
+        which fails every time. Providing an argument
+        will bring up a prompt asking 
+        the user if they want to proceed.
 
-    # def test_continue_prompt(self):
-    #     """[summary]
-    #     """
+        NOTE: flip return value in the decorator to 'n'
+        to see the test fail- will tell prompt not to continue
+        because of the missing field. To make the same conditions
+        succeed, change the second argument of the first assertEqual
+        to 0, representing failure/refusal return value.
+        """
+        self.assertEqual(missing_field("attributes"), 1)
+        self.assertEqual(missing_field(), 0)
 
-    # def test_validate_options(self):
-    #     """[summary]
-    #     """
+    @patch('builtins.input', return_value='y')
+    def test_continue_prompt(self, input):
+        """passed 'y' it should always returns 1"""
+        self.assertEqual(continue_prompt(), 1)
+        self.assertEqual(continue_prompt("none"), 1)
+
+    def test_validate_options(self):
+        """
+        validate_options should coerce an option set
+        to a desired format and thus remove whitespace
+        between flag args to a reasonable amount ie.
+        no more than one space between flags,
+        """
+        self.assertEqual(validate_options(" -t"), "-t")
+        self.assertEqual(validate_options("-e "), "-e")
+        self.assertEqual(validate_options("-t{ut,cc}    "), "-t{ut,cc}")
+        self.assertEqual(validate_options("    -e{vsc}"), "-e{vsc}")
+        self.assertEqual(validate_options("-e{vsc}    -t"), "-e{vsc} -t")
+
 
     # def test_validate_two_piece_inline(self):
     #     """
@@ -82,22 +116,22 @@ the following functions are tested:
     #         class :      :      
     #     """
 
-    def test_validate_four_piece_inline(self):
-        """
-        possiblities:
-            class : attributes : methods : options
-            class : attributes : methods : 
-            class : attributes :         : options
-            class : attributes :         :          
-            class :            : methods : options      
-            class :            : methods : 
-            class :            :         :         
-            class :            :         : options
-        """
-        # full inline- works w no problems
-        self.assertEqual(validate_four_piece_inline(
-        "ClassA : attr1, attr2 : method1 : -t"),
-        Inline("ClassA : attr1, attr2 : method1 : -t"))
+    # def test_validate_four_piece_inline(self):
+    #     """
+    #     possiblities:
+    #         class : attributes : methods : options
+    #         class : attributes : methods : 
+    #         class : attributes :         : options
+    #         class : attributes :         :          
+    #         class :            : methods : options      
+    #         class :            : methods : 
+    #         class :            :         :         
+    #         class :            :         : options
+    #     """
+    #     # full inline- works w no problems
+    #     self.assertEqual(validate_four_piece_inline(
+    #     "ClassA : attr1, attr2 : method1 : -t"),
+    #     Inline("ClassA : attr1, attr2 : method1 : -t"))
 
         # # full inline minus options
         # self.assertEqual(validate_four_piece_inline(

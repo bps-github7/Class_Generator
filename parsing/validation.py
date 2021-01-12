@@ -94,7 +94,7 @@ def validate_options(items : str):
     items = items.split("-")
     for item in items:
         if item.startswith("e") or item.startswith("t") or item.startswith("{"):
-            continue
+            item = item.strip()
         # ignore white space
         elif item in (""," "):
             del item
@@ -285,7 +285,7 @@ def validate_inline(inline : str, verbose=False):
     else:
         return missing_field()
 
-def validate_mulitple(inline: str):
+def validate_multiple(inline: str):
     """
     """
     inline = Inline.from_individual_arguments(*inline.split(":"))
