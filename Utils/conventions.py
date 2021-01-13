@@ -18,10 +18,52 @@ the main functions of the module are
     returns -> a potentially case corrected name.
 -is_identifier(ident)
     returns -> bool based on whether or not a given identifier is valid.
-"""
 
+Functions implemented in Conventions.py module:
+
+-is_identifier(ident) -> [bool] : returns True if the argument
+    provided is a valid python identifier.
+
+-ask_case(item, item_type="class") -> [return value(s)] : asks if user wants 
+    to correct case of an identifier provided with incorrect case.
+
+-case_prompt(item, item_type="class") -> [return value(s)] : about
+
+-coerce_case(item, item_type="class") -> [return value(s)] : about
+
+-case_check(positional, keyword) -> [return value(s)] : about
+
+-class_correct_convention(positional, keyword) -> [return value(s)] : about
+
+-field_correct_convention(positional, keyword) -> [return value(s)] : about
+
+-package_correct_convention(positional, keyword) -> [return value(s)] : about
+
+-module_correct_convention(positional, keyword) -> [return value(s)] : about
+"""
 import keyword
 
+version=1.2
+
+def is_identifier(ident: str) -> bool:
+    """Determines if string is valid Python identifier.
+
+    ident [str] - the real time value of identifier
+
+    returns [bool]- True or False based on whether
+    the ident argument is an identifier.
+    """
+
+    if not isinstance(ident, str):
+        raise TypeError("expected str, but got {!r}".format(type(ident)))
+
+    if not ident.isidentifier():
+        return False
+
+    if keyword.iskeyword(ident):
+        return False
+
+    return True
 
 def ask_case(item, item_type="class"):
     """
@@ -88,8 +130,9 @@ This violates PEP8 best practices- should this be corrected (y/n)?\n")
         elif item_type == "field":
             response = input(f"your field name {item} violates naming\
 conventions\nsuch as improper capitalization or incorrect use of whitespace\
-(attributes should be all uppercase and have no whitespace between words)\n\
-This violates PEP8 best practices- should this be corrected (y/n)?\n")
+(attributes and methods should be all uppercase and have no whitespace\
+between words)\n\ This violates PEP8 best \
+practices- should this be corrected (y/n)?\n")
         elif item_type == "package":
             response = input(f"your package name {item} violates naming\
 conventions\nsuch as improper capitalization or incorrect use of whitespace\
@@ -113,6 +156,28 @@ def coerce_case(item, item_type="class"):
         return package_correct_convention(item)
     elif item_type == "module":
         return module_correct_convention(item)
+
+
+def case_check(item, item_type="class", preferences="ask"):
+    """
+    based on user preferences, set in rc file:
+    either coerce, ask user or do nothing about
+    incorrectly cased identifiers.
+
+    item [str] - the real time value of the identifier.
+    item_type="class" [str] - can be class or field.
+    preference="ask" [str] - what the user prefers
+    regarding correction of case.
+
+    return [str] - the modified value of the identifier,
+    according to what the user requested.
+    """
+    if preferences == "ask":
+        return ask_case(item, item_type=item_type)
+    elif preferences == "none":
+        return item
+    else:
+        return coerce_case(item, item_type=item_type)
 
 def class_correct_convention(item):
     """
@@ -138,8 +203,8 @@ def class_correct_convention(item):
             item = item.split("_")
         item = list(map(lambda x: x.title(), item))
         return ("".join(item)).replace("_", "").replace(" ","")
-    # do we need to worry about case corection at this point? 
-    return item
+    # if there is no white space, best we can do it capitalize first letter 
+    return item[0].upper() + item[1:]
 
 def field_correct_convention(item):
     # the best we can do for correcting field word spacing.
@@ -150,44 +215,3 @@ def package_correct_convention(item):
 
 def module_correct_convention(item):
     return item.strip().lower().replace(" ","_")
-
-def case_check(item, item_type="class", preferences="ask"):
-    """
-    based on user preferences, set in rc file:
-    either coerce, ask user or do nothing about
-    incorrectly cased identifiers.
-
-    item [str] - the real time value of the identifier.
-    item_type="class" [str] - can be class or field.
-    preference="ask" [str] - what the user prefers
-    regarding correction of case.
-
-    return [str] - the modified value of the identifier,
-    according to what the user requested.
-    """
-    if preferences == "ask":
-        return ask_case(item, item_type=item_type)
-    elif preferences == "none":
-        return item
-    else:
-        return coerce_case(item, item_type=item_type)
-
-def is_identifier(ident: str) -> bool:
-    """Determines if string is valid Python identifier.
-
-    ident [str] - the real time value of identifier
-
-    returns [bool]- True or False based on whether
-    the ident argument is an identifier.
-    """
-
-    if not isinstance(ident, str):
-        raise TypeError("expected str, but got {!r}".format(type(ident)))
-
-    if not ident.isidentifier():
-        return False
-
-    if keyword.iskeyword(ident):
-        return False
-
-    return True
