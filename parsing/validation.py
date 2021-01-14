@@ -423,7 +423,7 @@ if __name__ == "__main__":
     # testing = Inline("ClassA : attr1, attr2 : method1 : -t")
     # print(testing)
 
-    print(validate_four_piece_inline("ClassA : skone, dalone : method : -e"))
+    print(validate_two_piece_inline("ClassA : skone, dalone"))
 
     # validate_four_piece_inline("ClassA : attr1, attr2 : method1 : -t")
 

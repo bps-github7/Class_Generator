@@ -56,10 +56,12 @@ strip white space from fields, which is noise in the classGen mini language.
     Exceptions: Unknown at this point.
     '''
 
-    version = 2.1
+    version = 3.0
 
     def __init__(self, inline : str, verbose = False):
         self.inline = inline.split(":")
+        # gives progress tracking output text when set to True. nifty
+        self.verbose = verbose
         self.options = None
         self.attributes = None
         self.methods = None
@@ -96,6 +98,53 @@ strip white space from fields, which is noise in the classGen mini language.
             if verbose:
                 print(f"class {self.classes}: options not provided.")
 
+    # For comparing two Inlines- only return True 
+    # if all contained fields (nd maybe formating) match
+    # had 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            if self.classes == other.classes:
+                if self.attributes == other.attributes:
+                    if self.methods == other.methods:
+                        if self.options == other.options:
+                            return True
+                        # Hamfisted debug method...
+                        # gotta be better way of outputing verbosely
+                        else:
+                            if self.verbose:
+                                print("options do not match")
+                            return self.strict_not_equals(other)
+                    else:
+                        if self.verbose:
+                            print("methods do not match")
+                        return self.strict_not_equals(other)
+                else:
+                    if self.verbose:
+                        print("attributes do not match")
+                    return self.strict_not_equals(other)
+            else:
+                if self.verbose:
+                    print("class does not match")
+                return self.strict_not_equals(other)
+        else:
+            if self.verbose:
+                print("not the same kind of type/ class")
+            return False
+
+
+    ### flipped the names.. that might be confusing
+    ### had an idea for eliminating the redundant lines
+    ### of code above, but we will double back to fix that up
+    ### for now, the function in use is less processor demanding.
+    def __ne__(self, other):
+        if self.classes != other.classes or self.attributes != \
+        other.attributes or self.methods != other.methods or \
+        self.options != other.options:
+            return not self.__eq__(other)
+
+    def strict_not_equals(self, other):
+        return not self.__eq__(other)
+
     # def set_attributes(self):
     #     try:
     #         self.inline[2]
@@ -108,28 +157,6 @@ strip white space from fields, which is noise in the classGen mini language.
     #             self.attributes = self.inline[1].strip()
     #     else:
     #         print("attributes not provided")
-
-
-    def has_inheritance(self):
-        """checks self.classes to see if it has > token in it.
-            having this token indicates inline spec has inheritance.
-
-        Returns:
-            Boolean : based off whether inline has inheritance
-        """
-        if self.classes.count(">"):
-            return True
-        return False
-
-    def has_packaging(self):
-        """checks self.classes to see if it has < token in it.
-            having this token indicates inline spec has packaging.
-            note: rudimentary check- more parsing required than this.
-
-        Returns:
-            Boolean : based off whether inline has packaging
-        """
-        return True if self.inline.count("<") else False
 
     def __repr__(self):
         return ":".join(self.inline)
@@ -189,7 +216,13 @@ arguments\nRefer to the README file for instructions on proper inline format")
 
 if __name__ == "__main__":
     # also not reading -e values now
-    print(Inline.from_individual_arguments("ClassA","attr1, attr2"))
+    if Inline.from_individual_arguments("ClassA", "attr1, attr2") == Inline("ClassA :attr1, attr2"):
+        print("You may have sesame bagel")
+
+    # first = Inline.from_individual_arguments("ClassA", "attr1, attr2")
+    # second = Inline("ClassA : attr1, attr2")
+
+    # print(f"from ind args: {first}\nFrom class constructor: {second}")    
 
     # instead of rewriting the constructor, wrote this
     # classmethod/alt constructor for this use case
