@@ -13,7 +13,7 @@ sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 from parsing.inline import Inline
 from parsing.class_dict import ClassDict
 from parsing.class_dict import ClassDict
-from utils.conventions import is_identifier, case_check
+from utils.conventions import class_correct_convention, is_identifier, case_check
 
 def missing_field(type="class"):
     """
@@ -117,8 +117,7 @@ def validate_members(items, item_type="class"):
 
     """
     if item_type == "class":
-        if is_identifier(items):
-            return(case_check(items))
+        return class_correct_convention(items)
     elif item_type == "options":
         return validate_options(items)
     elif item_type in ("attribute","method"):
@@ -130,13 +129,14 @@ def validate_members(items, item_type="class"):
             container.append(case_check(item, item_type=item_type))
     return container
 
-def validate_two_piece_inline(inline : str):
+def validate_two_piece_inline(inline : list):
     """[summary]
 
     Args:
         inline (str): [description]
     """
-    classes = validate_members(inline[0].strip())
+    inline = inline.split(":")
+    classes = validate_members(inline[0].strip(), item_type="class")
     if inline[1].strip():
         attributes = validate_members(
         (inline[1].strip()).split(","), item_type="attribute")
@@ -146,13 +146,14 @@ def validate_two_piece_inline(inline : str):
         if missing_field("attributes"):
             return Inline.from_individual_arguments(classes)
 
-def validate_three_piece_inline(inline):
+def validate_three_piece_inline(inline : list):
     """[summary]
 
     Args:
         inline ([type]): [description]
     """
-    classes = validate_members(inline[0].strip())
+    inline = inline.split(":")
+    classes = validate_members(inline[0].strip(), item_type="class")
     # class + attributes + methods
     if inline[1].strip() and inline[2].strip():
         attributes = validate_members(
@@ -160,33 +161,36 @@ def validate_three_piece_inline(inline):
         methods = validate_members(
             (inline[2].strip()).split(","), item_type="method")
         return Inline.from_individual_arguments(classes,
-        attributes, methods)
+        attributes, methods, None)
     # class and attribute provided but no methods
     elif inline[1].strip() and not inline[2].strip():
         attributes = validate_members(
         (inline[1].strip()).split(","), item_type="attribute")
         if missing_field("methods"):
             return Inline.from_individual_arguments(classes,
-            attributes)
+            attributes, None, None)
     # class + methods
     elif inline[2].strip() and not inline[1].strip():
         methods = validate_members(
             (inline[2].strip()).split(","), item_type="method")
         if missing_field("attributes"):
             return Inline.from_individual_arguments(classes,
-            None, methods)
+            None, methods, None)
     else:
         if missing_field("attributes or methods"):
             return Inline.from_individual_arguments(classes, None,
-            None)
+            None, None)
 
-def validate_four_piece_inline(inline):
+def validate_four_piece_inline(inline : list):
     """[summary]
 
     Args:
         inline ([type]): [description]
     """
-    classes = validate_members(inline[0].strip())
+    inline = inline.split(":")
+    classes = validate_members(inline[0].strip(), item_type="class")
+    if isinstance(classes, list):
+        print("youre a dumbass")
     # class + attributes + methods + options
     if inline[1].strip() and inline[2].strip() and inline[3].strip():
         attributes = validate_members(
@@ -206,7 +210,7 @@ def validate_four_piece_inline(inline):
             (inline[2].strip()).split(","), item_type="field")
         if missing_field("options"):
             return Inline.from_individual_arguments(classes,
-            attributes, methods)
+            attributes, methods, None)
     # class + attributes + options but no methods
     elif inline[1].strip() and inline[3].strip() and\
     not inline[2].strip():
@@ -223,7 +227,7 @@ def validate_four_piece_inline(inline):
         attributes = validate_members(
             (inline[1].strip()).split(","), item_type="attribute")
         if missing_field("methods or options"):
-            return Inline.from_individual_arguments(classes, attributes)
+            return Inline.from_individual_arguments(classes, attributes, None,)
     # class + methods + options but no attributes
     elif inline[2].strip() and inline[3].strip() and not\
     inline[1].strip():
@@ -247,7 +251,6 @@ def validate_four_piece_inline(inline):
     # class + options no attributes or methods
     elif inline[3].strip() and not\
     (inline[1].strip() or inline[2].strip()):
-        print("they call me pacho")
         options = validate_members(
             (inline[3].strip()), item_type="options")
         if missing_field("attributes or methods"):
@@ -270,9 +273,12 @@ def validate_inline(inline : str, verbose=False):
     1. inline [Inline] - generates an inline w/ one to all arguments included.
 
     """
+    # Pass by reference BRUH. the inline variable 
+    # you pass to functions in here does not persist
+    # the changes!
     inline = inline.split(":")
     #fall through test - cant generate class if no class names are provided
-    classes = validate_members(inline[0].strip())
+    classes = validate_members(inline[0].strip(), item_type="class")
     if inline[0].strip():
         # need to figure out which arguments are provided
         if len(inline) > 1:
@@ -410,7 +416,16 @@ or special chars except for underscores.")
 if __name__ == "__main__":
     # case correction does not work if whitespace convention is initailly correct.
 
-    validate_four_piece_inline("ClassA : attr1, attr2 : method1 : -t")
+
+
+
+    #Inline works as expected:
+    # testing = Inline("ClassA : attr1, attr2 : method1 : -t")
+    # print(testing)
+
+    print(validate_four_piece_inline("ClassA : skone, dalone : method : -e"))
+
+    # validate_four_piece_inline("ClassA : attr1, attr2 : method1 : -t")
 
     # testing multiple_validate:
     # TESTING = validate_mulitple("classA, classB : attr1, attr2 / attr3, attr4 : methodA / methodB : -e{vsc} / -e -t{ut,cc}")

@@ -91,11 +91,11 @@ class TestConventions(unittest.TestCase):
         """
         self.assertEqual(case_prompt("banana"), 1)
 
-        # how do i pass multiple return values to unittest.mock.patch
+        # TODO do i pass multiple return values to unittest.mock.patch
         # self.assertEqual(case_prompt("Banana", item_type="n"), 0)
 
 
-
+    #TODO: how can we 'easily' detect space between words w/o whitespace or _?
     def test_class_correct_convention(self):
         """[summary]
         """

@@ -189,7 +189,7 @@ arguments\nRefer to the README file for instructions on proper inline format")
 
 if __name__ == "__main__":
     # also not reading -e values now
-    print(Inline("ClassA : attr1, attr2 : method1 : -t"))
+    print(Inline.from_individual_arguments("ClassA","attr1, attr2"))
 
     # instead of rewriting the constructor, wrote this
     # classmethod/alt constructor for this use case

@@ -4,8 +4,11 @@ Program: conventions module
 Software: Python Class Generator
 Date: 1/9/2021
 
-Module provides various functions for enforcing the following
-python nameing conventions, in accordance with pep8 naming conventions:
+"Conventions" implies the things which are considered 'best practice'
+for that reason, all changes to identifiers imposed by side effects of
+this module will require the users input unless instructed otherwise ("coereced")
+
+all identifiers (when instructed / prefered to) will abide by the following pep8 guidelines:
 
 1. class name: all first letters of words capitalized, no spaces between words.
 2. attributes and methods: all lowercase with underscores seperating words when nescesary.
