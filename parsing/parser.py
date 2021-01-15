@@ -102,6 +102,9 @@ def parse_inline(inline : Inline, verbose=False):
                 print("parsed a single inline specification.")
     return parsed_classes
 
+### worried you are criss crossing responsbilities
+### this might have been better left in inline.
+### and called 'main'- who calls it tho?
 def parse(inline: Inline) -> int:
     classes = parse_inline(inline)
     return get_feedback(classes)
@@ -113,6 +116,10 @@ def nesting_check(line):
 def inheritance_check(line):
     return True if line.count(">") else False
 
+### confusing how you seem to have 3 differnet functions
+### that do a job that would indicate being the main function
+
+# This could be the main function in utils.options.py  
 def main():
     """Using args passed in from the cmd line
     further delegates the tasks of the program
@@ -134,7 +141,8 @@ def main():
     elif args.file:
         if args.verbose:
             print("reading classes from a file...")
-        return validate_file(args.file)
+        # if validate_file(args.file):
+            # return parse(Inline)
     else:
         if args.verbose:
             print("using interactive mode")

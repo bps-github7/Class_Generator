@@ -94,7 +94,7 @@ def validate_options(items : str):
     items = items.split("-")
     for item in items:
         if item.startswith("e") or item.startswith("t") or item.startswith("{"):
-            item = item.strip()
+            continue
         # ignore white space
         elif item in (""," "):
             del item
@@ -103,6 +103,7 @@ def validate_options(items : str):
             print(f"please only use accepted switches: -t, -e")
             print("or their attached argument list -t{ut,cc,sa} -e{send,vsc,zip,tgz}")
             return 0
+        items = list(map(lambda x : x.strip(), items))
     return "-".join(items)
 
 def validate_members(items, item_type="class"):

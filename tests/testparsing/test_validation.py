@@ -102,24 +102,32 @@ the following functions are tested:
 
     # NOTE there are 3 other methods for testing w/ unittest
     # assertTrue, assertFalse and assertException
-    # use them son
-    def test_validate_two_piece_inline(self):
+    @patch('builtins.input', return_value='y')
+    def test_validate_two_piece_inline(self, input):
         """
         possibilities:
             class : attr
             class :     
         """
-        # have to prevent the sub functions from coercing ClassA -> Classa
         self.assertEqual(validate_two_piece_inline("ClassA : attr1, attr2"), Inline("ClassA:attr1,attr2:None:None"))
+        self.assertEqual(validate_two_piece_inline("ClassA : "), Inline("ClassA : "))
 
-    # def test_validate_three_piece_inline(self):
-    #     """
-    #     possiblities:
-    #         class : attr : method
-    #         class :      : method
-    #         class : attr :
-    #         class :      :      
-    #     """
+    def test_validate_three_piece_inline(self):
+        """
+        possiblities:
+            class : attr : method
+            class :      : method
+            class : attr :
+            class :      :      
+        """
+        self.assertEqual(validate_three_piece_inline("ClassA : attr1, attr2: method"), Inline("ClassA:attr1,attr2:method:None"))
+        
+        # not sure why but None is not being injected to attributes on this line- soure code analysis explains nada.   
+        self.assertEqual(validate_three_piece_inline("ClassA : None : method"), Inline("ClassA:None:method:None"))
+        self.assertEqual(validate_three_piece_inline("ClassA : attr1, attr2: None"), Inline("ClassA:attr1,attr2:None:None"))
+        self.assertEqual(validate_three_piece_inline("ClassA : None : None"), Inline("ClassA:None:None:None"))
+
+
 
     # TODO very irritatingly broken
     # def test_validate_four_piece_inline(self):
@@ -139,40 +147,40 @@ the following functions are tested:
     #     "ClassA : attr1, attr2 : method1 : -t"),
     #     Inline("ClassA : attr1, attr2 : method1 : -t"))
 
-        # # full inline minus options
-        # self.assertEqual(validate_four_piece_inline(
-        # "ClassA : attr1, attr2 : method1 : "),
-        # Inline("ClassA : attr1, attr2 : method1 : "))
+    #     # full inline minus options
+    #     self.assertEqual(validate_four_piece_inline(
+    #     "ClassA : attr1, attr2 : method1 : "),
+    #     Inline("ClassA : attr1, attr2 : method1 : "))
 
-        # # full inline minus methods
-        # self.assertEqual(validate_four_piece_inline(
-        # "ClassA : attr1, attr2 : : -t "),
-        # Inline("ClassA : attr1, attr2 : : -t "))
+    #     # full inline minus methods
+    #     self.assertEqual(validate_four_piece_inline(
+    #     "ClassA : attr1, attr2 : : -t "),
+    #     Inline("ClassA : attr1, attr2 : : -t "))
 
-        # # methods and options missing
-        # self.assertEqual(validate_four_piece_inline(
-        # "ClassA : attr, batter :  : "),
-        # Inline("ClassA : attr, batter :  : "))
+    #     # methods and options missing
+    #     self.assertEqual(validate_four_piece_inline(
+    #     "ClassA : attr, batter :  : "),
+    #     Inline("ClassA : attr, batter :  : "))
 
-        # # attributes missing
-        # self.assertEqual(validate_four_piece_inline(
-        # "ClassA : : method :-t"),
-        # Inline("ClassA : : method :-t"))
+    #     # attributes missing
+    #     self.assertEqual(validate_four_piece_inline(
+    #     "ClassA : : method :-t"),
+    #     Inline("ClassA : : method :-t"))
 
-        # # attributes and options missing
-        # self.assertEqual(validate_four_piece_inline(
-        # "ClassA : : method :"),
-        # Inline("ClassA : : method :"))
+    #     # attributes and options missing
+    #     self.assertEqual(validate_four_piece_inline(
+    #     "ClassA : : method :"),
+    #     Inline("ClassA : : method :"))
 
-        # # attributes and methods missing
-        # self.assertEqual(validate_four_piece_inline(
-        # "ClassA : : :-e -t"),
-        # Inline("ClassA : : :-e -t"))
+    #     # attributes and methods missing
+    #     self.assertEqual(validate_four_piece_inline(
+    #     "ClassA : : :-e -t"),
+    #     Inline("ClassA : : :-e -t"))
 
-        # # attributes methods and options missing
-        # self.assertEqual(validate_four_piece_inline(
-        # "ClassA : : :"),
-        # Inline("ClassA : : :"))
+    #     # attributes methods and options missing
+    #     self.assertEqual(validate_four_piece_inline(
+    #     "ClassA : : :"),
+    #     Inline("ClassA : : :"))
 
     # def test_validate_members(self):
     #     """[summary]
