@@ -7,11 +7,9 @@ Software: Python class generator
 
 Defining various methods that facilitate cmd line execution of class generator"""
 import argparse
-from parsing.inline import Inline, parse
-from parsing.validation import validate, validate_file, validate_inheritance, validate_multiple, validate_packaging, validate_packaging
+from parsing.inline import Inline
+from parsing.parser import parse_inline
 from utils.interactive import interactive_mode
-from utils.options import args
-
 
 
 parser = argparse.ArgumentParser(
@@ -103,7 +101,10 @@ def main():
     if args.verbose:
         print("determining source of input... (cmd line arg, file or interactive mode)")
     if args.inline:
-        return parse(Inline(args.inline))
+        ### be v. careful to note- here inline is str
+        #  after validation its type == Inline
+        ### do not treat them as the same.
+        return parse_inline(args.inline)
     elif args.file:
         if args.verbose:
             print("reading classes from a file...")
