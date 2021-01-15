@@ -6,9 +6,12 @@ Software: Python class generator
 
 
 Defining various methods that facilitate cmd line execution of class generator"""
-
-# from parsing.inline import Inline
 import argparse
+from parsing.inline import Inline, parse
+from parsing.validation import validate, validate_file, validate_inheritance, validate_multiple, validate_packaging, validate_packaging
+from utils.interactive import interactive_mode
+from utils.options import args
+
 
 
 parser = argparse.ArgumentParser(
@@ -82,4 +85,35 @@ args = parser.parse_args()
 
 # switches("classA : attr1, attr2 : method")
 
+# This could be the main function in utils.options.py  
+def main():
+    """Using args passed in from the cmd line
+    further delegates the tasks of the program
 
+    args : None
+
+    returns A class_dict or list of class_dicts built out of input specifications.
+    """
+    ### should probably check here if .rc file is provided.
+    #  set the defaults if so
+    project_name = args.name
+    project_path = args.path
+    print(f"proposed project path: {project_path}/{project_name}")
+    # make dir / file with this ^^^ and change to that directory.
+    if args.verbose:
+        print("determining source of input... (cmd line arg, file or interactive mode)")
+    if args.inline:
+        return parse(Inline(args.inline))
+    elif args.file:
+        if args.verbose:
+            print("reading classes from a file...")
+        # if validate_file(args.file):
+            # return parse(Inline)
+    else:
+        if args.verbose:
+            print("using interactive mode")
+        return interactive_mode()
+
+    # Reaching here means the parsing was unsuccessful
+    # and class will not be generated
+    return 0

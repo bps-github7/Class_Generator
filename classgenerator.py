@@ -3,7 +3,7 @@
 # # from parsing.class_dict import ClassDict
 import sys
 sys.path.insert(0,"C:\\Users\\Ben\\VsCode\\python")
-from parsing.parser import main as parser
+from parsing.inline import main as parser_main
 from generation.generator import class_generator
 
 def main() -> int:
@@ -15,7 +15,7 @@ def main() -> int:
         1 = success
         0 = failure
     """
-    parsed_inline = parser()
+    parsed_inline = parser_main()
     for items in parsed_inline:
         class_generator(items)
     # class_generator(parsed_inline)
