@@ -111,7 +111,10 @@ the following functions are tested:
         """
         self.assertEqual(validate_two_piece_inline("ClassA : attr1, attr2"), Inline("ClassA:attr1,attr2:None:None"))
         self.assertEqual(validate_two_piece_inline("ClassA : "), Inline("ClassA : "))
-
+    
+    # need to figure out how to pass multiple return values to mock fn.
+    # for this one and test_validate_four_piece_inline.
+    @patch('builtins.input', return_value='y')
     def test_validate_three_piece_inline(self):
         """
         possiblities:
@@ -121,7 +124,6 @@ the following functions are tested:
             class :      :      
         """
         self.assertEqual(validate_three_piece_inline("ClassA : attr1, attr2: method"), Inline("ClassA:attr1,attr2:method:None"))
-        
         # not sure why but None is not being injected to attributes on this line- soure code analysis explains nada.   
         self.assertEqual(validate_three_piece_inline("ClassA : None : method"), Inline("ClassA:None:method:None"))
         self.assertEqual(validate_three_piece_inline("ClassA : attr1, attr2: None"), Inline("ClassA:attr1,attr2:None:None"))
