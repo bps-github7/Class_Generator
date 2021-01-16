@@ -1,11 +1,10 @@
 """[summary]
 """
 
-from parsing.class_dict import ClassDict
 import sys
 
 sys.path.insert(0,"C:\\Users\\Ben\\VsCode\\python\\classgenerator")
-
+from parsing.class_dict import ClassDict
 from parsing.inline import Inline, multiple_inline_handler
 from parsing.validation import validate_inheritance, validate_file,\
 validate_inline, validate_multiple, validate_packaging
@@ -40,18 +39,23 @@ See README.md for more details. Inline specs must have at least one : (colon")
         if classes.count(">"):
             if classes.count("<"):
                 if validate_packaging(inline):
-                    parsed_classes.append(packaging_main(inline))
+                    print("doing the packaging thing!")
+                    # parsed_classes.append(packaging_main(Inline(inline)))
                     if verbose:
                         print("parsing an packaging inline\n\
  containing inheritance and multiple classes.")
             else:
                 if validate_inheritance(inline):
-                    parsed_classes.append(inheritance_main(inline))
+                    # this would earase already parsed stuff if you had different types in a session
+                    # ie a normal inline and a multiple inline.
+                    parsed_classes = inheritance_main(Inline(inline))
                     if verbose:
                         print("parsing an inline spec containing inheritance hierarchy.")
         else:
             if validate_multiple(inline):
-                parsed_classes.append(multiple_inline_handler(inline))
+                # this would earase already parsed stuff if you had different types in a session
+                # ie a normal inline and a multiple inline.
+                parsed_classes = multiple_inline_handler(Inline(inline))
                 if verbose:
                     print("parsing non inheritance inline w multiple classes")
     else:

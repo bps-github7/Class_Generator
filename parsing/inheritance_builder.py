@@ -83,17 +83,17 @@ def main(inline : Inline):
     """
     return InheritanceBuilder(inline).classes
 
-item = Inline("classA > classB : attr1, attr2, attr3 > mastadon,\
-bucket, shallot: method1 > method2 -t -e{ut,cc}")
-multi_item = Inline("Person1, Person2 > Employee > Dish_washer,\
-Short_Order_Cook, Sous_Chef : P1A, P1B / P2A, P2B > E1, E2, E3 >\
-D1, D2 / S1, S2 / SC1, SC2 : P1method / P2method > SMmethod\
-> CMmethod / SMmethod / method")
+# item = Inline("classA > classB : attr1, attr2, attr3 > mastadon,\
+# bucket, shallot: method1 > method2 -t -e{ut,cc}")
+# multi_item = Inline("Person1, Person2 > Employee > Dish_washer,\
+# Short_Order_Cook, Sous_Chef : P1A, P1B / P2A, P2B > E1, E2, E3 >\
+# D1, D2 / S1, S2 / SC1, SC2 : P1method / P2method > SMmethod\
+# > CMmethod / SMmethod / method")
 
-InheritanceBuilder(item)
-processed = InheritanceBuilder(multi_item)
-# print(processed.classes)
-print(main(multi_item))
+# InheritanceBuilder(item)
+# processed = InheritanceBuilder(multi_item)
+# # print(processed.classes)
+# print(main(multi_item))
 
 # print(InheritanceBuilder.member_splitter(['Classa, Classb', 'Classc']))
 # print(InheritanceBuilder.member_splitter(['A1, A2 / B1, B2', 'C1, C2'], token="/"))

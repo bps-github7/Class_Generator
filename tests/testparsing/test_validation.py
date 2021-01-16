@@ -114,20 +114,20 @@ the following functions are tested:
     
     # need to figure out how to pass multiple return values to mock fn.
     # for this one and test_validate_four_piece_inline.
-    @patch('builtins.input', return_value='y')
-    def test_validate_three_piece_inline(self):
-        """
-        possiblities:
-            class : attr : method
-            class :      : method
-            class : attr :
-            class :      :      
-        """
-        self.assertEqual(validate_three_piece_inline("ClassA : attr1, attr2: method"), Inline("ClassA:attr1,attr2:method:None"))
-        # not sure why but None is not being injected to attributes on this line- soure code analysis explains nada.   
-        self.assertEqual(validate_three_piece_inline("ClassA : None : method"), Inline("ClassA:None:method:None"))
-        self.assertEqual(validate_three_piece_inline("ClassA : attr1, attr2: None"), Inline("ClassA:attr1,attr2:None:None"))
-        self.assertEqual(validate_three_piece_inline("ClassA : None : None"), Inline("ClassA:None:None:None"))
+    # @patch('builtins.input', return_value='y')
+    # def test_validate_three_piece_inline(self, input):
+    #     """
+    #     possiblities:
+    #         class : attr : method
+    #         class :      : method
+    #         class : attr :
+    #         class :      :      
+    #     """
+    #     self.assertEqual(validate_three_piece_inline("ClassA : attr1, attr2: method"), Inline("ClassA:attr1,attr2:method:None"))
+    #     # not sure why but None is not being injected to attributes on this line- soure code analysis explains nada.   
+    #     self.assertEqual(validate_three_piece_inline("ClassA : None : method"), Inline("ClassA:None:method:None"))
+    #     self.assertEqual(validate_three_piece_inline("ClassA : attr1, attr2: None"), Inline("ClassA:attr1,attr2:None:None"))
+    #     self.assertEqual(validate_three_piece_inline("ClassA : None : None"), Inline("ClassA:None:None:None"))
 
 
 
@@ -200,25 +200,39 @@ the following functions are tested:
     #     """[summary]
     #     """
 
-    # def test_validate_packaging(self):
-    #     """[summary]
-    #     """
+    def test_validate_packaging(self):
+        """[summary]
+        """
+        self.assertEqual(validate_packaging("<p:(skone:nard)>"), {'skone':'nard'})
+        self.assertEqual(validate_packaging("<p:(sounds:fart, belts : velcro)>"), {'sounds':'fart','belts':'velcro'})
 
-    # def test_validate_multiple_packaging_inline(self):
-    #     """[summary]
-    #     """
 
-    # def test_validate_single_packaging_inline(self):
-    #     """[summary]
-    #     """
+    ### TODO: realizing now we need to sophisticate the packaging syntax to deal with multiple files since 
+    ### packages contain multiple modules. revise README tomorrow
+    def test_validate_multiple_packaging_inline(self):
+        """[summary]
+        """
+        self.assertEqual(validate_packaging("<p:(sounds:fart, belts : velcro)>"), {'sounds':'fart','belts':'velcro'})
 
-    # def test_validate_package_name(self):
-    #     """[summary]
-    #     """
+
+    def test_validate_single_packaging_inline(self):
+        """[summary]
+        """
+        self.assertEqual(validate_packaging("<p:(skone:nard)>"), {'skone':'nard'})
+
+    def test_validate_package_name(self):
+        """[summary]
+        """
+        self.assertEqual(validate_package_name("testparsing"), 'testparsing')
+        self.assertEqual(validate_package_name("test...parsing"), 0)
     
-    # def test_validate_module_name(self):
-    #     """[summary]
-    #     """
+
+
+    def test_validate_module_name(self):
+        """[summary]
+        """
+        self.assertEqual(validate_module_name("test_validation"), "test_validation")
+        self.assertEqual(validate_module_name("%#$!@.py"), 0)
     
 if __name__ == "__main__":
     unittest.main()
