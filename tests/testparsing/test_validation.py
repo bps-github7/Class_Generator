@@ -235,4 +235,54 @@ the following functions are tested:
         self.assertEqual(validate_module_name("%#$!@.py"), 0)
     
 if __name__ == "__main__":
-    unittest.main()
+    # unittest.main()
+    
+
+    ### simplifying realization- classDicts are not helpful AT ALL
+    ### as looping over the indiv. items keys and values is not simple
+    
+    classA = {"ClassA" : [["attr1", "attr2"],["method1"]]}
+    classB = {"ClassB" : [["attrA", "attrB"],["method2"]]}
+    classC = {"ClassC" : [["attrR", "attrQ"],["method3"]]}
+
+    test = [classA, classB, classC]
+
+
+    for i in test:
+        # theres no EASY way to only get class name, or only get details
+        print(i)
+
+        # the key for the current iterated class is obscured as
+        current_name = list(i.keys())
+        print(current_name)
+
+        # accessing the values- ewww
+        print(i[current_name])
+
+        
+    ### TODO: for serious consideration-
+    ### isnt it easier to do away with classDicts entirely
+    ### and store class info as positional args in a list like
+
+
+    classA = ["ClassA",["attr1", "attr2"],["method1"]]
+    classB = ["ClassB", ["attrA", "attrB"],["method2"]]
+    classC = ["ClassC",["attrR", "attrQ"],["method3"]]
+
+    test = [classA, classB, classC]
+
+    # print(test)
+
+    for i in test:
+        print(f"Class names: {i[0]}\nAttributes: {i[1]}\nMethods: {i[2]}\n\n")
+
+
+    #Sort of think this is the moves. accessing the keys and values
+    # while iterating is not imppossible but not worth the trouble
+
+    ### i reccomend mulling over this some more. and for sure, make an 
+    ## experimental branch for removing the class dict as this will for sure
+    ### break the main parser, get_feedback, classgenerator main etc.
+
+    #also worth considering first- is there any method or utility provided
+    ### by classdict that outweighs the cons above and justifies keeping it?

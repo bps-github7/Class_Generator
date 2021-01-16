@@ -235,11 +235,21 @@ you can nest an inline spec inside each of these arguments for p and c,
 
 The base syntax for defining a package structure where p is the package name and c is the class names
 
-> <p: c:> 
+> <p: ( package_name : module_names)>
 
-you can either write a name or names delimited by comas,
-or supply either or both argumements as inline specs nested inside parentheses.
+use forward slash "/" (member delimiting token) to enumerate the modules in a package. like so
 
+> <p: ( sounds : iguana / belt / tire)>
+
+this way, the comma can be used to denote multiple packages in the same inline:
+
+> <p: ( dinosaurs : velociraptor / stegasaurus, lizards : iguana / snake, mamals : human / monkey)>
+
+
+
+### TODO: these examples need to be revised per the above noted changes
+### ALSO: consider making the inline follow the same convention-
+### ++ uniformity, and user comprehension- plus it will more easily be able to be parsed to a dictionary **
 > <p: package_name c: (classA, classB, classC : A1, A2 / B1, B2 / C1, C2 : Amethod / Bmethod / Cmethod)>
 
 creates: 
