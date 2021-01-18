@@ -211,9 +211,10 @@ print("skonedalone- this file needs to be debugged big time buster!")
 #         return 1
 #     return 0
 
-# def get_feedback(classes):
-#     """[summary]
-#     """
+def get_feedback(classes):
+    """[summary]
+    """
+    return "weasels"
 #     while True:
 #         # helps format output
 #         print("\n\n")

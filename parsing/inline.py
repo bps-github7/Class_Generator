@@ -236,16 +236,14 @@ def multiple_inline_handler(inline : Inline):
 
 if __name__ == "__main__":
     # also not reading -e values now
-    if Inline.from_individual_arguments("ClassA", "attr1, attr2") == Inline("ClassA :attr1, attr2"):
-        print("You may have sesame bagel")
+    # if Inline.from_individual_arguments("ClassA", "attr1, attr2") == Inline("ClassA :attr1, attr2"):
+    #     print("You may have sesame bagel")
 
 
-    # first = Inline("ClassA", "attr1, attr2")
-    # first.verbose = True
-    # second = Inline("ClassA : xyz, abc")
 
-    # print(first == second)
+    first = Inline("ClassA, ClassB, ClassC : attr1, attr2 / attr3, attr4 / attr5, attr6 : methodA, method1 / methodB, method2 / methodC, method3 : -t -e / =e{vsc,send} / -t{ut,cc}")
 
+    print(multiple_inline_handler(first))
 
 
     # print(f"from ind args: {first}\nFrom class constructor: {second}")    

@@ -21,8 +21,22 @@ class InheritanceBuilder:
     version = 1.0
 
     def __init__(self, inline):
-        class_fams, attr_fams, method_fams = [], [], []
-        for cls, attr, method in zip(
+        """
+        At this point, the inline will be validated.
+        So we dont have to worry about attr, method, option being
+        null or unequal.
+
+        Args:
+            inline ([type]): [description]
+        """
+        class_fams, attr_fams, method_fams, options_fams = [], [], [], []
+   
+   
+        ### splits the parts of the inline into 'families'
+        ### (if there are multiple parents/ inheritances)
+        ### like so:
+        # parent1, parent2 > child1, child2 > sub-child-1 ... sub-child-N
+        for cls, attr, method, opts in zip(
                 inline.classes.split(">"),
                 inline.attributes.split(">"),
                 inline.methods.split(">"),
@@ -30,34 +44,52 @@ class InheritanceBuilder:
             class_fams.append(cls.strip())
             attr_fams.append(attr.strip())
             method_fams.append(method.strip())
-            options_fams.append(options.strip())
+            options_fams.append(opts.strip())
+        
+        
+        ### Make a list of all the classes in the "family"
+        ### that need to be generated,
+        ###  like so:
+        # [parent1, parent2] > [ child  ,... child-N] 
         classes, attributes, methods, options = [], [], [], []
-        for cls, attr, method in zip(class_fams, attr_fams, method_fams):
+        for cls, attr, method, option in zip(class_fams, attr_fams, method_fams, options_fams):
+            # note the singular for looping variables.
             classes.append(InheritanceBuilder.member_splitter(cls))
             attributes.append(InheritanceBuilder.member_splitter(attr, token="/"))
             methods.append(InheritanceBuilder.member_splitter(method, token="/"))
+            options.append(InheritanceBuilder.member_splitter(option, token="/"))
+        
+        ### generate classes 
         new = []
-        #might have some kinks to work out with this one here vvv...
         parent = 'object'
-        for cls, attr, method in zip(classes, attributes, methods):
+        for cls, attr, method, opts in zip(classes, attributes, methods, options):
+            print("son:")
+            print(opts)
+            print()
             if isinstance(cls, list):
-                for x,y,z in zip(cls, attr, method):
-                    new.append([x,y,z,"object","root", None, None])
+                for w,x,y,z in zip(cls, attr, method, opts):
+                    new.append([w,x,y, parent, "root", z])
+                    # new.append(Inline(x,y,z, parents=parent, packages="root", options=opts))
             else:
-                new.append(ClassDict(cls, attr, method, parents=parent))
+                new.append([cls, attr, method, parent, "root", opts])
             parent = cls
+        
+        # only attribute in this class that matters.
+        # does this even need to be a class?
         self.classes = new
-
-
-        # parent = 'object'
-        # for x,y,z in zip(classes,attributes,methods):
-        #     print(f"the parent package of {x} is {parent}")
-        #     parent = x
-
-
 
     @staticmethod
     def member_splitter(container, token=","):
+        """Not really sure what this method does to be honest
+        D O C U M E N T A T I O N POR FAVOR!
+
+        Args:
+            container ([type]): [description]
+            token (str, optional): [description]. Defaults to ",".
+
+        Returns:
+            [type]: [description]
+        """
         if isinstance(container, list):
             for num, item in enumerate(container):
                 if container[num].count(token):
@@ -84,17 +116,17 @@ def main(inline : Inline):
     """
     return InheritanceBuilder(inline).classes
 
-# item = Inline("classA > classB : attr1, attr2, attr3 > mastadon,\
-# bucket, shallot: method1 > method2 -t -e{ut,cc}")
-# multi_item = Inline("Person1, Person2 > Employee > Dish_washer,\
-# Short_Order_Cook, Sous_Chef : P1A, P1B / P2A, P2B > E1, E2, E3 >\
-# D1, D2 / S1, S2 / SC1, SC2 : P1method / P2method > SMmethod\
-# > CMmethod / SMmethod / method")
+item = Inline("classA > classB : attr1, attr2, attr3 > mastadon,\
+bucket, shallot: method1 > method2 : -t -e{ut,cc} > -t -e")
+multi_item = Inline("Person1, Person2 > Employee > Dish_washer,\
+Short_Order_Cook, Sous_Chef : P1A, P1B / P2A, P2B > E1, E2, E3 >\
+D1, D2 / S1, S2 / SC1, SC2 : P1method / P2method > SMmethod\
+> CMmethod / SMmethod / method : -t / -e > -t -e > -t / -e{vsc,send} / -t")
 
 # InheritanceBuilder(item)
-# processed = InheritanceBuilder(multi_item)
-# # print(processed.classes)
-# print(main(multi_item))
+processed = InheritanceBuilder(multi_item)
+# print(processed.classes)
+print(main(multi_item))
 
 # print(InheritanceBuilder.member_splitter(['Classa, Classb', 'Classc']))
 # print(InheritanceBuilder.member_splitter(['A1, A2 / B1, B2', 'C1, C2'], token="/"))
