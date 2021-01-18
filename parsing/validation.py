@@ -11,8 +11,6 @@ import sys
 
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 from parsing.inline import Inline
-from parsing.class_dict import ClassDict
-from parsing.class_dict import ClassDict
 from utils.conventions import class_correct_convention, is_identifier, case_check
 
 def missing_field(type="class"):

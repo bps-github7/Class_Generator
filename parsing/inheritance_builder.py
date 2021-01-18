@@ -10,7 +10,6 @@ sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 
 # dont get why its partially initialized if it has not been imported already>?
 from parsing.inline import Inline
-from parsing.class_dict import ClassDict
 
 # print(sys.path)
 
@@ -26,11 +25,13 @@ class InheritanceBuilder:
         for cls, attr, method in zip(
                 inline.classes.split(">"),
                 inline.attributes.split(">"),
-                inline.methods.split(">")):
+                inline.methods.split(">"),
+                inline.options.split(">")):
             class_fams.append(cls.strip())
             attr_fams.append(attr.strip())
             method_fams.append(method.strip())
-        classes, attributes, methods = [], [], []
+            options_fams.append(options.strip())
+        classes, attributes, methods, options = [], [], [], []
         for cls, attr, method in zip(class_fams, attr_fams, method_fams):
             classes.append(InheritanceBuilder.member_splitter(cls))
             attributes.append(InheritanceBuilder.member_splitter(attr, token="/"))
@@ -41,7 +42,7 @@ class InheritanceBuilder:
         for cls, attr, method in zip(classes, attributes, methods):
             if isinstance(cls, list):
                 for x,y,z in zip(cls, attr, method):
-                    new.append(ClassDict(x,y,z, parents=parent))
+                    new.append([x,y,z,"object","root", None, None])
             else:
                 new.append(ClassDict(cls, attr, method, parents=parent))
             parent = cls

@@ -1,10 +1,9 @@
-"""[summary]
+"""
 """
 
 import sys
 
 sys.path.insert(0,"C:\\Users\\Ben\\VsCode\\python\\classgenerator")
-from parsing.class_dict import ClassDict
 from parsing.inline import Inline, multiple_inline_handler
 from parsing.validation import validate_inheritance, validate_file,\
 validate_inline, validate_multiple, validate_packaging
@@ -48,24 +47,24 @@ See README.md for more details. Inline specs must have at least one : (colon")
                 if validate_inheritance(inline):
                     # this would earase already parsed stuff if you had different types in a session
                     # ie a normal inline and a multiple inline.
-                    parsed_classes = inheritance_main(Inline(inline))
+                    parsed_classes.append(inheritance_main(Inline(inline)))
                     if verbose:
                         print("parsing an inline spec containing inheritance hierarchy.")
         else:
             if validate_multiple(inline):
                 # this would earase already parsed stuff if you had different types in a session
                 # ie a normal inline and a multiple inline.
-                parsed_classes = multiple_inline_handler(Inline(inline))
+                parsed_classes.append(multiple_inline_handler(Inline(inline)))
                 if verbose:
                     print("parsing non inheritance inline w multiple classes")
     else:
         print("single class ready for validation")
         # casting to a list for safety reasons.
         if validate_inline(inline):
-            parsed_classes.append(ClassDict(inline.classes,
+            parsed_classes.append([inline.classes,
                 inline.attributes, inline.methods,
                 object, 'root',
-                inline.options))
+                inline.options])
             if verbose:
                 print("parsed a single inline specification.")
     return parsed_classes
@@ -74,4 +73,5 @@ See README.md for more details. Inline specs must have at least one : (colon")
 
 def main(inline: Inline) -> int:
     classes = parse_inline(inline)
-    return get_feedback(classes)
+    return classes
+    # return get_feedback(classes)
