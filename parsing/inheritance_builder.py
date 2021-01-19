@@ -8,7 +8,6 @@ inheritance containing inline specs.
 import sys
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 from parsing.inline import Inline
-from parsing.class_list import ClassList
 
 # print(sys.path)
 
@@ -68,10 +67,10 @@ class InheritanceBuilder:
             if isinstance(cls, list):
                 for w,x,y,z in zip(cls, attr, method, opts):
                     ### NOTE: TODO : Cant we just use Inline from front to back?
-                    new.append([w.strip(),x.split(","),y.split(","), parent, "root", z])
+                    new.append(Inline.from_individual_arguments(w.strip(),x.split(","),y.split(","), parent, "root", z))
                     # new.append(Inline(x,y,z, parents=parent, packages="root", options=opts))
             else:
-                new.append([cls.strip(), attr.split(","), method.split(","), parent, "root", opts])
+                new.append(Inline.from_individual_arguments(cls.strip(), attr.split(","), method.split(","), parent, "root", opts))
             parent = cls
         
         # only attribute in this class that matters.

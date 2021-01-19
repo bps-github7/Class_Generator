@@ -7,7 +7,6 @@ Module level docstring: implements the Inline class
 
 import sys
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
-from parsing.class_list import ClassList
 
 # from parsing import inheritance_builder
 # from parsing.validation import validate_inheritance, validate_multiple, validate_package_name, validate_packaging, validate_single_packaging_inline
@@ -69,6 +68,34 @@ strip white space from fields, which is noise in the classGen mini language.
         self.inline = inline.split(":")
         # gives progress tracking output text when set to True. 
         self.verbose = verbose
+        classes = inline[0]
+        # Handles the case where Inlines are fully fleshed out 
+        # - class_name(parents) (packages)
+        # - class_name(parents)
+        # - class_name (packages)
+        if classes.count(" "):
+            classes = classes.split(" ")
+            # this is the case where there is both parents and packages
+            if classes[0].count("("):
+                self.parents = classes[0].split("(")[1].strip(")")
+                self.classes = classes[0].split("(")[0]
+                self.packages = classes[1].strip("(").strip(")")
+                # print(f"class_name: {class_name}\nParents: {parents}\nPackages: {packages}\n\n")
+            else:
+                self.class_name = classes[0]
+                self.packages = classes[1].strip("(").strip(")")
+                # print(f"Class name: {class_name}\nPackages: {packages}\n\n")
+        else:
+            # the case that there is no whitespace between parens
+            classes = classes.split("(")
+            self.classes = classes[0]
+            self.parents = classes[1].strip(")")
+            # print(f"class name: {class_name}\nParents: {parents}\n\n")
+        
+        ### this else block above should be used to 
+        ### to handle the cases where there are no extras!
+        
+        
         self.options = None
         self.attributes = None
         self.methods = None
@@ -151,9 +178,11 @@ strip white space from fields, which is noise in the classGen mini language.
     #         print("attributes not provided")
 
     def __repr__(self):
+        # needs work
         return ":".join(self.inline)
 
     def __str__(self, single_line=True):
+        # also needs work - second conditional for extra stuff
         if single_line:
             return "{} : {} : {} : {}".format(self.classes, self.attributes, self.methods, self.options)
         else:
@@ -162,6 +191,10 @@ attributes: {}\n\
 methods: {}\n\
 options: {}".format(self.classes, self.attributes,
                       self.methods, self.options)
+
+    @classmethod
+    def from_details(cls, attr, method, parents, packages, opts):
+        return Inline(f"{cls}({parents}) ({packages}) : {attr} : {method} : {opts}")
 
     @classmethod
     def from_individual_arguments(cls, *args, verbose=False):
@@ -229,7 +262,7 @@ def multiple_inline_handler(inline : Inline):
     # until we sophisticate the packaging and inheritance functionality a bit more.
 
     ### should call basic_Validate here instead of classdict- do that later..
-    specifications = [ClassList(class_title, attribute_group, method_group, object, 
+    specifications = [Inline.from_details(class_title, attribute_group, method_group, object, 
     'root', options_group) for class_title, attribute_group, method_group,
     options_group in zip(classes, attributes, methods, options)]
     return specifications
@@ -241,7 +274,17 @@ if __name__ == "__main__":
 
 
 
-    first = Inline("ClassA, ClassB, ClassC : attr1, attr2 / attr3, attr4 / attr5, attr6 : methodA, method1 / methodB, method2 / methodC, method3 : -t -e / =e{vsc,send} / -t{ut,cc}")
+    first = Inline("ClassA() (), ClassB, ClassC : attr1, attr2 / attr3, attr4 / attr5, attr6 : methodA, method1 / methodB, method2 / methodC, method3 : -t -e / =e{vsc,send} / -t{ut,cc}")
+    second = Inline("Ostrich : weasel, vaccum : method : -t{ut,cc}")
+
+
+    # new = []
+    # new.append(first)
+    # new.append(second)
+
+    # # print(new)
+    # for i in new:
+    #     print(i.attributes)
 
     print(multiple_inline_handler(first))
 
