@@ -13,6 +13,37 @@ sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 
 """Module defines miscellaneous functions used for the class generator"""
 
+def cleanse(items: any):
+        """format properties by strip and lowercase of each elements.
+        side-effect: coerces ',' delimited string to formatted list.
+        """
+        if isinstance(items, list):
+            return list(map(
+                lambda item: item.strip().lower(), items))
+        return list(map(
+            lambda item: item.strip().lower(), items.split(",")))
+
+
+def clean_list(args):
+    """Turns a list of arguments into a clean list of string arguments.
+    This makes it possible to take a machine readable class spec and pass it
+    to Inline alternative constructor
+
+    Arguments:
+        *args [string []] : up to four pieces of Inline.
+
+    Returns:
+        item [list]: A list of comma seperated values
+    """
+    items = [*args]
+    for i, value in enumerate(items):
+        if value is None:
+            continue
+        if isinstance(value, list):
+            items[i] = ",".join(value)
+    return items
+
+
 
 def get_confirmation(opt_code, line):
     """Asks user if they are satisfied with their choice"""

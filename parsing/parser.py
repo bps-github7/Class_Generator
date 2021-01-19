@@ -4,12 +4,45 @@
 import sys
 
 sys.path.insert(0,"C:\\Users\\Ben\\VsCode\\python\\classgenerator")
-from parsing.inline import Inline, multiple_inline_handler
+from parsing.inline import Inline
 from parsing.validation import validate_inheritance, validate_file,\
 validate_inline, validate_multiple, validate_packaging
 from parsing.inheritance_builder import main as inheritance_main
 from parsing.packaging import main as packaging_main
 from utils.editing_menu import get_feedback
+
+def multiple_inline_handler(inline : Inline):
+    """[summary]
+
+    Args:
+        inline ([type]): [description]
+    """
+    specifications = []
+    classes, attributes, methods, options = [], [], [], []
+    ### need to validate the inline before using this
+    ### to confirm number of / and , match up correctly.
+    for single_class, its_attributes, its_methods, its_options in zip(
+            inline.classes.split(","),
+            inline.attributes.split("/"),
+            inline.methods.split("/"),
+            inline.options.split("/")):
+        classes.append(single_class)
+        attributes.append(its_attributes)
+        methods.append(its_methods)
+        options.append(its_options)
+    # setting parent and package to defaults in this and else block below
+    # until we sophisticate the packaging and inheritance functionality a bit more
+
+    ### Two things to note here- 1 is this fn returning a nested list which is then
+    ### appended to another list? messy complicated JA? 2. how to do the same as above
+    ### with packaging and parents? make a mini fn for parsing parent and package out of class? 
+    ### these attributes should be accessible from out here...
+
+    specifications = [Inline.from_details(class_title, attribute_group, method_group, object, 
+    'root', options_group) for class_title, attribute_group, method_group,
+    options_group in zip(classes, attributes, methods, options)]
+    return specifications
+
 
 def parse_inline(inline : str, verbose=False):
     """[summary]

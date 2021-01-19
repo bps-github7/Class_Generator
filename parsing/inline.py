@@ -6,106 +6,52 @@ Module level docstring: implements the Inline class
 '''
 
 import sys
+import re
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
-
-# from parsing import inheritance_builder
-# from parsing.validation import validate_inheritance, validate_multiple, validate_package_name, validate_packaging, validate_single_packaging_inline
-# from utils.editing_menu import get_feedback
-# from parsing.parser import parse_inline
+from utils.misc_functions import clean_list
 
 class Inline:
     '''
 Class Level Docstring: this is a class that repersents inline class
 specifications.
 
-constructor: creates an instance of the Inline class. performs cleansing to
-strip white space from fields, which is noise in the classGen mini language.
+Return values: Inline object
 
-    Parameters:
-        inline [str]: a string containing the following tokens
-        
-            -basic layout: "classes : attributes : methods : options"
-            -some incomplete yet accepted alternative basic layouts:
-                - "classes : : :"
-                - "classes : attributes : methods : "
-                - "classes : attributes : : options "
-                - any combination including or excluding - attributes, methods, options
-                - classes must be included, or the parsing will fail
-                as a nameless class cannot be generated.
+Side-effects: creates an Inline object in the scope of the
+invokation/call to the constructor. Memory is consumed while
+the object is in use.
 
-            -mutliple class layouts
-                - "class1, class2 : attributes / attributes : methods / methods : options / options"
-                will be parsed into indivdual basic layout:
-                ["class1 : attributes : methods : options",
-                "class2 : attributes : methods : options"]
-
-            -inheritance hierarchy layout:
-            "class1 > class2 : attribute1 > attribute2 : method1 > method2 : options > options" 
-            will be parsed to a similar list as above, where class1 is parent of class2.
-
-
-        -classes : repersents the class to be generated's identifier
-        -attributes = None : repersents the class to be generated's attribute(s)
-        -methods = None : repersents the class to be generated's method(s)
-        -options = None : the options fpr generating the class (-t = testing, -e = exporting)
-        each -t and -e can have optional argument lists appened to the end like so:
-        -t{ut,cc,sa} - for unit testing, code coverage, static analysis
-        -e{send,vsc,tgz,zip} - for sending via email or ssh, vsc - source code management, tgz and zip - compression algorithms
-
-
-    Return values: Inline object
-
-    Side-effects: creates an Inline object in the scope of the
-    invokation/call to the constructor. Memory is consumed while
-    the object is in use.
-
-    Exceptions: Unknown at this point.
+Exceptions: Unknown at this point.
     '''
 
-    version = 3.0
+    version = 4.0
 
     def __init__(self, inline : str, verbose = False):
         self.inline = inline.split(":")
         # gives progress tracking output text when set to True. 
         self.verbose = verbose
-        classes = inline[0]
-        # Handles the case where Inlines are fully fleshed out 
-        # - class_name(parents) (packages)
-        # - class_name(parents)
-        # - class_name (packages)
-        if classes.count(" "):
-            classes = classes.split(" ")
-            # this is the case where there is both parents and packages
-            if classes[0].count("("):
-                self.parents = classes[0].split("(")[1].strip(")")
-                self.classes = classes[0].split("(")[0]
-                self.packages = classes[1].strip("(").strip(")")
-                # print(f"class_name: {class_name}\nParents: {parents}\nPackages: {packages}\n\n")
-            else:
-                self.class_name = classes[0]
-                self.packages = classes[1].strip("(").strip(")")
-                # print(f"Class name: {class_name}\nPackages: {packages}\n\n")
-        else:
-            # the case that there is no whitespace between parens
-            classes = classes.split("(")
-            self.classes = classes[0]
-            self.parents = classes[1].strip(")")
-            # print(f"class name: {class_name}\nParents: {parents}\n\n")
-        
-        ### this else block above should be used to 
-        ### to handle the cases where there are no extras!
-        
-        
-        self.options = None
+        ### Initializing these in advance to avoid not defined errors
         self.attributes = None
         self.methods = None
+        self.options = None
+        self.defensive_initialize()
+
+    def defensive_initialize(self):
+        """Keeps the Inline from being
+        Initialized with incorrect or badly
+        formated values.
+
+        Returns:
+            [type]: [description]
+        """
         #### cant make class with no name
-        if inline[0] is None:
+        if self.inline[0] is None:
             print("Inline cannot be parsed if no class identifier is provided")
             return None
         else:
             self.classes = self.inline[0].strip()
-            if verbose:
+            self.get_extension()
+            if self.verbose:
                 print(f"creating inline (human readable representation) for class {self.classes}")
         # defensive prograamming to avoid IndexError
         # in cases where no colons are provided or attr was skipped.
@@ -122,69 +68,58 @@ strip white space from fields, which is noise in the classGen mini language.
         if len(self.inline) > 3:
             if len(self.inline) == 4:
                 self.options = self.inline[3].strip()
-    # For comparing two Inlines- only return True 
-    # if all contained fields (nd maybe formating) match
-    # have matching values 
+
+    def get_extension(self):
+        """Handles any case where class meta data
+        is passed in when Inline is initialized.
+        """
+        ### example(parents) (packages)
+        if self.classes.count(") ("):
+            classes = self.classes.split(") (")
+            self.classes = classes[0].split("(")[0].strip()
+            self.parents = classes[0].split("(")[1].strip()
+            self.packages = classes[1].strip(")")
+        ### Only the packaging - example (packages)
+        elif self.classes.count(" ("):
+            classes = self.classes.split(" (")
+            self.classes = classes[0].strip()
+            self.packages = classes[1].strip(")").strip()
+        ### only the parent - example(parents)
+        elif re.match(r"(\w)*[()]", self.classes):
+            # the python equivalent of above expression
+            # will snag on undesired tokens, resulting in wrong values.
+            classes = self.classes.split("(")
+            self.classes = classes[0].strip()
+            self.parents = classes[1].strip(")").strip()
+        else:
+            self.classes = self.classes.strip()
+            self.parents = object
+            self.packages = "root"
 
     def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            if self.classes == other.classes:
-                if self.attributes == other.attributes:
-                    if self.methods == other.methods:
-                        if self.options == other.options:
-                            return True
-                        # Hamfisted debug method...
-                        # gotta be better way of outputing verbosely
-                        else:
-                            if self.verbose:
-                                print("options do not match")
-                            return False
-                    else:
-                        if self.verbose:
-                            print("methods do not match")
-                        return False
-                else:
-                    if self.verbose:
-                        print("attributes do not match")
-                    return False
-            else:
-                if self.verbose:
-                    print("class does not match")
-                return False
-        else:
-            if self.verbose:
-                print("not the same kind of type/ class")
-            return False
+        if isinstance(other, self.__class__) and \
+        self.classes == other.classes and \
+        self.attributes == other.attributes and \
+        self.methods == other.methods and \
+        self.options == other.options:
+            return True
+        print("Not the same Inline")
+        return False
 
-
-    ### flipped the names.. that might be confusing
-    ### had an idea for eliminating the redundant lines
-    ### of code above, but we will double back to fix that up
-    ### for now, the function in use is less processor demanding.
     def __ne__(self, other):
         return not self.__eq__(other)
 
-    # def set_attributes(self):
-    #     try:
-    #         self.inline[2]
-    #     except IndexError:
-    #         return 0
-    #     if len(inline) > 1:
-    #         if len(inline) >= 2 and inline[1] in ('', ' ', None):
-    #             pass
-    #         else:
-    #             self.attributes = self.inline[1].strip()
-    #     else:
-    #         print("attributes not provided")
-
     def __repr__(self):
-        # needs work
-        return ":".join(self.inline)
+        # not safe but what can we do?
+        return self.__str__()
 
     def __str__(self, single_line=True):
-        # also needs work - second conditional for extra stuff
         if single_line:
-            return "{} : {} : {} : {}".format(self.classes, self.attributes, self.methods, self.options)
+            # Dont need to test if parents or packages is defined,
+            # we can just output the machine readable version.
+            # globs it up a bit, but it is more informative than prev iters.
+            classes = f"{self.classes}({self.parents}) ({self.packages})"
+            return "{} : {} : {} : {}".format(classes, self.attributes, self.methods, self.options)
         else:
             return "class(es): {}\n\
 attributes: {}\n\
@@ -193,28 +128,17 @@ options: {}".format(self.classes, self.attributes,
                       self.methods, self.options)
 
     @classmethod
-    def from_details(cls, attr, method, parents, packages, opts):
-        return Inline(f"{cls}({parents}) ({packages}) : {attr} : {method} : {opts}")
+    def from_details(cls, classname, attr, method, parents, packages, opts):
+        return Inline(f"{classname}({parents}) ({packages}) : {attr} : {method} : {opts}")
 
     @classmethod
     def from_individual_arguments(cls, *args, verbose=False):
-        """ turns the 4 components (or less) of Inline 
-                (class, attributes, methods and options)
-        into an inline object. if any of the items are lists, turn them into
-        comma delimited strings that Inline constructor expects. 
-
-        NOTE: that this fn is not robust enough to handle a multiple
-        class inline such as 'classA, classB : attr1, attr2 / attrA, attrB'
-
+        """
+        Builds an inline object from the component parts.
         Returns:
             [type]: [description]
         """
-        items = [*args]
-        for i, value in enumerate(items):
-            if value is None:
-                continue
-            if isinstance(value, list):
-                items[i] = ",".join(value)
+        items = clean_list(args)
         if len(items) == 1:
             return Inline(items[0], verbose=verbose)
         elif len(items) == 2:
@@ -228,76 +152,18 @@ options: {}".format(self.classes, self.attributes,
 arguments\nRefer to the README file for instructions on proper inline format")
             return 0
 
-    @staticmethod
-    def cleanse(items: any):
-        """format properties by strip and lowercase of each elements.
-        side-effect: coerces ',' delimited string to formatted list.
-        """
-        if isinstance(items, list):
-            return list(map(
-                lambda item: item.strip().lower(), items))
-        return list(map(
-            lambda item: item.strip().lower(), items.split(",")))
-
-def multiple_inline_handler(inline : Inline):
-    """[summary]
-
-    Args:
-        inline ([type]): [description]
-    """
-    specifications = []
-    classes, attributes, methods, options = [], [], [], []
-    ### need to validate the inline before using this
-    ### to confirm number of / and , match up correctly.
-    for single_class, its_attributes, its_methods, its_options in zip(
-            inline.classes.split(","),
-            inline.attributes.split("/"),
-            inline.methods.split("/"),
-            inline.options.split("/")):
-        classes.append(single_class)
-        attributes.append(its_attributes)
-        methods.append(its_methods)
-        options.append(its_options)
-    # setting parent and package to defaults in this and else block below
-    # until we sophisticate the packaging and inheritance functionality a bit more.
-
-    ### should call basic_Validate here instead of classdict- do that later..
-    specifications = [Inline.from_details(class_title, attribute_group, method_group, object, 
-    'root', options_group) for class_title, attribute_group, method_group,
-    options_group in zip(classes, attributes, methods, options)]
-    return specifications
-
 if __name__ == "__main__":
-    # also not reading -e values now
-    # if Inline.from_individual_arguments("ClassA", "attr1, attr2") == Inline("ClassA :attr1, attr2"):
-    #     print("You may have sesame bagel")
+    first = Inline.from_individual_arguments("ClassA(aloha, doorknob-grenade) (biscuits, chalpskone, arf)", ['attr1', 'attr2'], ['method1', 'method2'], "-t -e" )
+    second = Inline.from_details("ClassA", ['attr1', 'attr2'], ['method1', 'method2'], "funky, bisk, capitler", "Hi Moofa, Chalpskone", "-t -e")
 
+    new = [first, second]
 
-
-    first = Inline("ClassA() (), ClassB, ClassC : attr1, attr2 / attr3, attr4 / attr5, attr6 : methodA, method1 / methodB, method2 / methodC, method3 : -t -e / =e{vsc,send} / -t{ut,cc}")
-    second = Inline("Ostrich : weasel, vaccum : method : -t{ut,cc}")
-
-
-    # new = []
-    # new.append(first)
-    # new.append(second)
-
-    # # print(new)
-    # for i in new:
-    #     print(i.attributes)
-
-    print(multiple_inline_handler(first))
-
-
-    # print(f"from ind args: {first}\nFrom class constructor: {second}")    
-
-    # instead of rewriting the constructor, wrote this
-    # classmethod/alt constructor for this use case
-    # item = Inline.from_individual_arguments("Biscuit", ['gravy', 'sausage'], ['method1','method2'], '-t -e{ut}')
-    # print(item)
-    # # items = Inline.from_individual_arguments("Biscuit",
-    # ['gravy', 'sausage'], ['method1', 'method2'], '-t -e{ut}')
-    # print(items)
-
-
-
+    print(new)
+    for i in new:
+        print(i.classes)
+        print(i.attributes)
+        print(i.methods)
+        print(i.parents)
+        print(i.packages)
+        print(i.options)
+        print("\n\n")
