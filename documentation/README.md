@@ -19,31 +19,30 @@ In most cases, the program takes a **inline specification**
 
 `class_name : attr1, _attr2, __attr3 : SMmethod, CMmethod : -t -e`
 
-The only exception being interactive mode, where you can choose
-to be walked through building a class, piece by piece.
 
 #### 1.2 OUTPUTS: 
 Generates a directory, or series of directories of class files, unit tests,
-documentation structuring that matches the specifcation provided through input.
+documentation structuring that matches the specification provided through input.
 
 #### 1.3 DETAILS: 
-This program defaults to creating a new directory, labeled with project name, that contains all generated files. 
-    * This directory will be produced as a subdirectory in the same directory where the Class_Generator.py script is run.
-    * You can custom where the output will be generated with command line arguments or
-      the use of .rc file for customization (add link here: see 'customization with .rc file' or 'Running in cmd line mode')
+This program defaults to creating a new directory, 
+labeled with project name, that contains all generated files. 
+* This directory will be produced as a subdirectory in the same directory where the Class_Generator.py script   is run.
 
-##### 1.4 ADDITIONAL: 
-* features include:
-    * Generate simple to sophisticated classes and directory (packaging) structuring with a simple, easy to learn and understand syntax.
-    * Choice of 3 modes for providing input, ranging from on the go (command line), mass production (input file) and ease of use orieinted, assited (interactive mode)
-    * Create multiple, fleshed out classes with a single argument (link - text: see inline specification)
-    * Create simple or complex multiple inheritance hierarchies with a single argument (link - text: see inheritance)
-    * Create packaging structure/ hierachy with a single argument (link - text: see packaging inline).
-    * Easily generate additional files and perform actions with generated classes (link - text: see optional arguments specifications)
-    * Easily customize and persist multiple users preferences with .rc file (link - text: see customization with .rc file)
+* You can custom where the output will be generated with command line arguments or
+the use of .rc file for customization (add link here: see 'customization with .rc file' or 'Running in cmd line mode')
+
+##### 1.4 ADDITIONAL features include:
+* Generate simple to sophisticated classes and directory (packaging) structuring with a simple, easy to learn and understand syntax.
+* Choice of 3 modes for providing input, ranging from on the go (command line), mass production (input file) and ease of use orieinted, assited (interactive mode)
+* Create multiple, fleshed out classes with a single argument (link - text: see inline specification)
+* Create simple or complex multiple inheritance hierarchies with a single argument (link - text: see inheritance)
+* Create packaging structure/ hierachy with a single argument (link - text: see packaging inline).
+* Easily generate additional files and perform actions with generated classes (link - text: see optional arguments specifications)
+* Easily customize and persist multiple users preferences with .rc file (link - text: see customization with .rc file)
 
 
-##### 1.5 Inline Quick reference:
+##### 1.5 Inline Quick Reference:
 Note this is a light introduction for purpose of providing a basic understanding of the Inline.
 For a detailed, full specification, see this section (link- inline spec)
 
@@ -75,25 +74,51 @@ In short:
     to seperate the sets of multiple identifiers (because comma is already in use seperating individual members)
 
 5. `>` (right carrot) is used to denote a parent child relationship (for both classes and packages)
-> ClassA > ClassB : attr1, attr2 > attr3, attr4 : method1 > method2 : -t > -e
-> `<p:(package1 > package2 : class1/ class2, class3, module4)>`
+`ClassA > ClassB : attr1, attr2 > attr3, attr4 : method1 > method2 : -t > -e`
+`<p:(package1 > package2 : class1/ class2, class3, module4)>`
 
 5. `<p: ( keys : values)>` is used to describe a packaging structure, where keys are package names and values are
     `/`( forward slash) seperated module/class file identifiers
 
+6. The Inline spec is designed to be robust. You can withhold any argument except the class name,
+    however, be sure to include the correct amount of colons so that the correct arguments are parsed.
+    (attributes get recognized as attributes, methods get recognized as methods, etc...)
 
-##### 1.5.1 Basic Inline Specification:
+7. The final area of the inline, following the third colon is for optional arguments (switches)
+    providing -e or -t there will apply exporting or testing to the generated class. 
+    
 
-You can use the 'inline specification' ( the ClassGen's primary/prefered input ) for
-1. specification of classes and their attributes and or fields ( optionally, with multi level or multiple inheritance(s)).
-2. specification of packaging within your project.
-3. NOT both of these purposes at once
-
+Recap:
 `<identifier -> class name>(,)* : <identifier -> attributes>(,)* : <identifier -> methods>(,)* : <?-t?{?ut,?cc,?sa}> <-e{}>`
 
-    key:
-'*' denotes repition,` attribute(,)*` means there can be N many attributes seperated by commas
-'?' denotes optional arguments- `<?-t?{?ut,?cc,?sa}>` means that -t is optional, as well as the curly brackets and enclosed text. (link to optional arguments)
+
+**the following tokens/ operators have the folllowing meaning in an inline spec:**
+* ':' <colon> seperates classname, attributes and methods
+* ',' <comma> seperates non grouped identifiers - list of sibling classes, lone list of attributes or methods
+* '/' <forward-slash> delimits groups in grouped identifiers-
+* '>' <rightwards-anglebracket> denotes an inheritance relationship (parent) > (child)
+* '<p:()>' is the encasing membrane for packaging inline.
+
+`classA, classB : A_attr1, A_attr2 / B_attr1, B_attr2`
+* in this example, a '/' <forward-slash> is nessecary to denote where class1 attributes end and class2 attributes begin.
+
+`<p:(package1 : class1,class2,class3)>`
+`<p:(package1, package2 : class1, class2 / class3, class4)>`
+`<p:(package1 > package2 : class1, class2 > class3, class4)>`
+`<p:(package1, package2 > package3 (package1): class1, class2 / class3, module1 > class4)>`
+* packages use the same syntax are inlines do in inheritance. The last example
+will result in the following directory structuring:
+
+<dir> package1
+        <file> class1.py
+        <file> class2.py
+        <dir> package3
+                <file> class4.py
+<dir> package2
+        <file> class3.py
+        <file> module1.py
+
+
 
 **Throughout these examples, we must keep in mind the following rules...**
 1. either attributes or methods can be blank in the inline, but not the class identifier (can't make a nameless class).
@@ -106,15 +131,6 @@ You can use the 'inline specification' ( the ClassGen's primary/prefered input )
 > ClassA : attr1, attr2 : method1 : -t -e       creates a ClassA with attributes, method and optional arguments for testing and exporting
 > ClassA : : : -t -e                            creates a ClassA with only testing and exporting (no attributes or methods)
 
-**the following tokens/ operators have the folllowing meaning in an inline spec:**
-* ':' <colon> seperates classname, attributes and methods
-* ',' <comma> seperates non grouped identifiers - list of sibling classes, lone list of attributes or methods
-* '/' <forward-slash> delimits groups in grouped identifiers-
-    `classA, classB : A_attr1, A_attr2 / B_attr1, B_attr2`
-    * in this second example, a '/' <forward-slash> is nessecary to denote where class1 attributes end and class2 attributes begin.
-
-see Inline_specifications.md (link to exact line no.) for examples of the mini langauge in use for 
-describing classes or packages about to be generated.
 
 ## 2) Features:
 ##### 2.1 all components of PEP8 new style class are generated, including:

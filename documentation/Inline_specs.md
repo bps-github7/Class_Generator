@@ -266,3 +266,38 @@ packaging: <package structuring> : <class file placement within package structur
 
 classes: <class Identifiers> : <atributes for an individual class (delimted by , and grouped by /)> : <methods for an individual class (delimted by , and grouped by /)>  
 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Another chunk of weasel bisk ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+##### 1.5.1 Basic Inline Specification:
+
+You can use the 'inline specification' ( the ClassGen's primary/prefered input ) for
+1. specification of classes and their attributes and or fields ( optionally, with multi level or multiple inheritance(s)).
+2. specification of packaging within your project.
+3. NOT both of these purposes at once
+
+`<identifier -> class name>(,)* : <identifier -> attributes>(,)* : <identifier -> methods>(,)* : <?-t?{?ut,?cc,?sa}> <-e{}>`
+
+    key:
+'*' denotes repition,` attribute(,)*` means there can be N many attributes seperated by commas
+'?' denotes optional arguments- `<?-t?{?ut,?cc,?sa}>` means that -t is optional, as well as the curly brackets and enclosed text. (link to optional arguments)
+
+**Throughout these examples, we must keep in mind the following rules...**
+1. either attributes or methods can be blank in the inline, but not the class identifier (can't make a nameless class).
+2. to leave either attributes or methods blank, include the typical amount of colons but leave the section blank
+> ClassA::                                      creates a classA with no methods or fields       
+> ClassA : : method                             creates a classA with only a method
+> ClassA : attr1, attr2 :                       creates a classA with only attributes
+
+3. the fourth, optional field can always be left out, unless one wants to use these switches/ optional arguments like so:
+> ClassA : attr1, attr2 : method1 : -t -e       creates a ClassA with attributes, method and optional arguments for testing and exporting
+> ClassA : : : -t -e                            creates a ClassA with only testing and exporting (no attributes or methods)
+
+**the following tokens/ operators have the folllowing meaning in an inline spec:**
+* ':' <colon> seperates classname, attributes and methods
+* ',' <comma> seperates non grouped identifiers - list of sibling classes, lone list of attributes or methods
+* '/' <forward-slash> delimits groups in grouped identifiers-
+    `classA, classB : A_attr1, A_attr2 / B_attr1, B_attr2`
+    * in this second example, a '/' <forward-slash> is nessecary to denote where class1 attributes end and class2 attributes begin.
+
+see Inline_specifications.md (link to exact line no.) for examples of the mini langauge in use for 
+describing classes or packages about to be generated.
