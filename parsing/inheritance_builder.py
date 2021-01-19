@@ -7,9 +7,8 @@ inheritance containing inline specs.
 """
 import sys
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
-
-# dont get why its partially initialized if it has not been imported already>?
 from parsing.inline import Inline
+from parsing.class_list import ClassList
 
 # print(sys.path)
 
@@ -68,10 +67,11 @@ class InheritanceBuilder:
             print()
             if isinstance(cls, list):
                 for w,x,y,z in zip(cls, attr, method, opts):
-                    new.append([w,x,y, parent, "root", z])
+                    ### NOTE: TODO : Cant we just use Inline from front to back?
+                    new.append([w.strip(),x.split(","),y.split(","), parent, "root", z])
                     # new.append(Inline(x,y,z, parents=parent, packages="root", options=opts))
             else:
-                new.append([cls, attr, method, parent, "root", opts])
+                new.append([cls.strip(), attr.split(","), method.split(","), parent, "root", opts])
             parent = cls
         
         # only attribute in this class that matters.
@@ -116,17 +116,20 @@ def main(inline : Inline):
     """
     return InheritanceBuilder(inline).classes
 
-item = Inline("classA > classB : attr1, attr2, attr3 > mastadon,\
-bucket, shallot: method1 > method2 : -t -e{ut,cc} > -t -e")
-multi_item = Inline("Person1, Person2 > Employee > Dish_washer,\
-Short_Order_Cook, Sous_Chef : P1A, P1B / P2A, P2B > E1, E2, E3 >\
-D1, D2 / S1, S2 / SC1, SC2 : P1method / P2method > SMmethod\
-> CMmethod / SMmethod / method : -t / -e > -t -e > -t / -e{vsc,send} / -t")
+# item = Inline("classA > classB : attr1, attr2, attr3 > mastadon,\
+# bucket, shallot: method1 > method2 : -t -e{ut,cc} > -t -e")
+# multi_item = Inline("Person1, Person2 > Employee > Dish_washer,\
+# Short_Order_Cook, Sous_Chef : P1A, P1B / P2A, P2B > E1, E2, E3 >\
+# D1, D2 / S1, S2 / SC1, SC2 : P1method / P2method > SMmethod\
+# > CMmethod / SMmethod / method : -t / -e > -t -e > -t / -e{vsc,send} / -t")
 
-# InheritanceBuilder(item)
-processed = InheritanceBuilder(multi_item)
-# print(processed.classes)
-print(main(multi_item))
+# # InheritanceBuilder(item)
+# processed = InheritanceBuilder(multi_item)
+# # print(processed.classes)
+# result = main(multi_item)
 
-# print(InheritanceBuilder.member_splitter(['Classa, Classb', 'Classc']))
-# print(InheritanceBuilder.member_splitter(['A1, A2 / B1, B2', 'C1, C2'], token="/"))
+# for i in result:
+#     print(i.classes)
+
+# # print(InheritanceBuilder.member_splitter(['Classa, Classb', 'Classc']))
+# # print(InheritanceBuilder.member_splitter(['A1, A2 / B1, B2', 'C1, C2'], token="/"))

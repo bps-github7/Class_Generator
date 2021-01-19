@@ -7,7 +7,7 @@ Module level docstring: implements the Inline class
 
 import sys
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
-
+from parsing.class_list import ClassList
 
 # from parsing import inheritance_builder
 # from parsing.validation import validate_inheritance, validate_multiple, validate_package_name, validate_packaging, validate_single_packaging_inline
@@ -229,8 +229,8 @@ def multiple_inline_handler(inline : Inline):
     # until we sophisticate the packaging and inheritance functionality a bit more.
 
     ### should call basic_Validate here instead of classdict- do that later..
-    specifications = [[class_title, attribute_group, method_group, object, 
-    'root', options_group] for class_title, attribute_group, method_group,
+    specifications = [ClassList(class_title, attribute_group, method_group, object, 
+    'root', options_group) for class_title, attribute_group, method_group,
     options_group in zip(classes, attributes, methods, options)]
     return specifications
 

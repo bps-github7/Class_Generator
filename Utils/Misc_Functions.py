@@ -129,4 +129,4 @@ containing class dict specifications inline format.
             results.append(line)
         return results
 
-print(from_file("classes.txt"))
+# print(from_file("classes.txt"))

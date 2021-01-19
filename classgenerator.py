@@ -17,7 +17,7 @@ def main() -> int:
     """
     parsed_inline = options_main()
     for items in parsed_inline:
-    #     print(items)
+        # print(items)
         class_generator(items)
     # class_generator(parsed_inline)
     # generate the class based on the specs

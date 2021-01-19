@@ -4,6 +4,7 @@
 import sys
 
 sys.path.insert(0,"C:\\Users\\Ben\\VsCode\\python\\classgenerator")
+from parsing.class_list import ClassList
 from parsing.inline import Inline, multiple_inline_handler
 from parsing.validation import validate_inheritance, validate_file,\
 validate_inline, validate_multiple, validate_packaging
@@ -61,10 +62,10 @@ See README.md for more details. Inline specs must have at least one : (colon")
         print("single class ready for validation")
         # casting to a list for safety reasons.
         if validate_inline(inline):
-            parsed_classes.append([inline.classes,
+            parsed_classes.append(ClassList(inline.classes,
                 inline.attributes, inline.methods,
                 object, 'root',
-                inline.options])
+                inline.options))
             if verbose:
                 print("parsed a single inline specification.")
     return parsed_classes

@@ -17,17 +17,8 @@ Decides what function to run to build the specified class list.
 NOTE: assumes that the current working dir is the project folder and it is writable.
 for inheritance, invoked inside a loop to create correct parents, children etc
     '''
-    # # test for inheritance
-    # if name.count(">") > 0:
-    #     inheritance(name, attributes, parent)
-    # elif name.startswith("ABC"):
-    #     name = name[3:]
-    #     make_abc(name, attributes)
-    #     # parent also needs to include any parents from up the inheritance hierarchy
-    # else:
-    #     make_class(name, attributes, parent=parent)
 
-    # makes the clss an abc if name is prepended with ABC
+    # makes the clss an abc if name is prepended with ABC    
     if cls.classes.startswith("ABC"):
         cls.classes = cls.classes[3:]
         make_abc(cls.classes, cls.attributes)

@@ -9,7 +9,7 @@ displays class specs in a table, allows them to edit, delete indivudal items
 or confirm the whole lot.
 """
 
-print("skonedalone- this file needs to be debugged big time buster!")
+# print("skonedalone- this file needs to be debugged big time buster!")
 
 # def display_classes(classes):
 #     """[summary]

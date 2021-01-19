@@ -113,7 +113,7 @@ def main():
     else:
         if args.verbose:
             print("using interactive mode")
-        return interactive_mode()
+        # return interactive_mode()
 
     # Reaching here means the parsing was unsuccessful
     # and class will not be generated
