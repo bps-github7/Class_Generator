@@ -1,8 +1,7 @@
 """main function for class generator, called at begining of program runtime.
 """
-# # from parsing.class_dict import ClassDict
-import sys
-sys.path.insert(0,"C:\\Users\\Ben\\VsCode\\python")
+
+from parsing.inline import Inline
 from utils.options import main as options_main
 from generation.generator import class_generator
 
@@ -17,12 +16,10 @@ def main() -> int:
     """
     parsed_inline = options_main()
     for items in parsed_inline:
-        # print(items)
+        # if isinstance(items[0], Inline):
+        #     print("you got da skone da lone!")
+
         class_generator(items)
-    # class_generator(parsed_inline)
-    # generate the class based on the specs
     return 1
 
-# for debugging...
-# print(main())
 main()

@@ -83,6 +83,7 @@ Exceptions: Unknown at this point.
         elif self.classes.count(" ("):
             classes = self.classes.split(" (")
             self.classes = classes[0].strip()
+            self.parents = object
             self.packages = classes[1].strip(")").strip()
         ### only the parent - example(parents)
         elif re.match(r"(\w)*[()]", self.classes):
@@ -91,6 +92,7 @@ Exceptions: Unknown at this point.
             classes = self.classes.split("(")
             self.classes = classes[0].strip()
             self.parents = classes[1].strip(")").strip()
+            self.packages = "root"
         else:
             self.classes = self.classes.strip()
             self.parents = object
@@ -113,11 +115,10 @@ Exceptions: Unknown at this point.
         # not safe but what can we do?
         return self.__str__()
 
-    def __str__(self, single_line=True):
+    def __str__(self, single_line=True, simple_print=False):
         if single_line:
-            # Dont need to test if parents or packages is defined,
-            # we can just output the machine readable version.
-            # globs it up a bit, but it is more informative than prev iters.
+            if simple_print:
+                return "{} : {} : {} : {}".format(self.classes, self.attributes, self.methods, self.options)
             classes = f"{self.classes}({self.parents}) ({self.packages})"
             return "{} : {} : {} : {}".format(classes, self.attributes, self.methods, self.options)
         else:
