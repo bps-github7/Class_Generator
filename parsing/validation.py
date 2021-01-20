@@ -295,28 +295,29 @@ def validate_multiple(inline: str):
     """
     # need to ignore extension to prevent snagging on the parenthesized arguments in class name.
     inline = Inline.from_individual_arguments(*inline.split(":"), ignore_extensions=True)
-    if inline.classes.count(",") < inline.attributes.count("/"):
-        print("Error: too many attributes.\n\
-make sure the number of ',' in classes is equal to num of '/' in attributes.")
-        return 0
-    if inline.classes.count(",") > inline.attributes.count("/"):
-        print("Error: not enough attributes.\n\
-make sure the number of ',' in classes is equal to num of '/' in attributes.")
-        return 0
-    if inline.classes.count(",") < inline.methods.count("/"):
-        print("Error: too many methods.\n\
-make sure the number of ',' in classes is equal to num of '/' in methods.")
-        return 0
-    if inline.classes.count(",") > inline.methods.count("/"):
-        print("Error: not enough methods.\n\
-make sure the number of ',' in classes is equal to num of '/' in methods.")
-        return 0
-    if inline.classes.count(",") < inline.options.count("/"):
-        print("Too many options.\n\
-make sure the number of ',' in classes is equal to num of '/' in options.")
-        return 0
-    ### What else could go wrong with multiple class inline spec?
-    return 1
+    print(inline)
+#     if inline.classes.count(",") < inline.attributes.count("/"):
+#         print("Error: too many attributes.\n\
+# make sure the number of ',' in classes is equal to num of '/' in attributes.")
+#         return 0
+#     if inline.classes.count(",") > inline.attributes.count("/"):
+#         print("Error: not enough attributes.\n\
+# make sure the number of ',' in classes is equal to num of '/' in attributes.")
+#         return 0
+#     if inline.classes.count(",") < inline.methods.count("/"):
+#         print("Error: too many methods.\n\
+# make sure the number of ',' in classes is equal to num of '/' in methods.")
+#         return 0
+#     if inline.classes.count(",") > inline.methods.count("/"):
+#         print("Error: not enough methods.\n\
+# make sure the number of ',' in classes is equal to num of '/' in methods.")
+#         return 0
+#     if inline.classes.count(",") < inline.options.count("/"):
+#         print("Too many options.\n\
+# make sure the number of ',' in classes is equal to num of '/' in options.")
+#         return 0
+#     ### What else could go wrong with multiple class inline spec?
+#     return 1
 
 def validate_inheritance(inline: str):
     """[summary]
@@ -428,15 +429,17 @@ if __name__ == "__main__":
     # validate_four_piece_inline("ClassA : attr1, attr2 : method1 : -t")
 
     # testing multiple_validate:
-    TESTING = validate_mulitple("classA, classB : attr1, attr2 / attr3, attr4 : methodA / methodB : -e{vsc} / -e -t{ut,cc}")
-    print(TESTING)
+    # TESTING = validate_mulitple("classA, classB : attr1, attr2 / attr3, attr4 : methodA / methodB : -e{vsc} / -e -t{ut,cc}")
+    # print(TESTING)
+
+    validate_multiple("classA(hello) (cog, weasel), classB(bran,oats) (bisk): attr1, attr2 / attr3, attr4 : methodA / methodB : -e{vsc} / -e -t{ut,cc}")
 
     # # are these values case corrected and indeed identifiers?
     # print(validate_members(['  attr1', ' attr2 '], item_type="field"))
 
     # # does validate_packaging work for a single package spec
-    if valid := validate_packaging("<p:(skone : nard)>"):
-        print(f"validated package: {valid}")
+    # if valid := validate_packaging("<p:(skone : nard)>"):
+    #     print(f"validated package: {valid}")
     
     # # # what about a multiple package spec?
     # if validate_packaging("<p:(skone : !nard, moofy : mofty, shitpike : w90easel, monkey : orangutang)>"):

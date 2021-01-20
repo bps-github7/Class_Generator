@@ -140,6 +140,7 @@ options: {}".format(self.classes, self.attributes,
             [type]: [description]
         """
         items = clean_list(args)
+        print(items)
         if ignore_extensions:
             class_names = []
             if items[0].count("),"):
