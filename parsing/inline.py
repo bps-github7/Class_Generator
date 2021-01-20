@@ -133,13 +133,21 @@ options: {}".format(self.classes, self.attributes,
         return Inline(f"{classname}({parents}) ({packages}) : {attr} : {method} : {opts}")
 
     @classmethod
-    def from_individual_arguments(cls, *args, verbose=False):
+    def from_individual_arguments(cls, *args, verbose=False, ignore_extensions=False):
         """
         Builds an inline object from the component parts.
         Returns:
             [type]: [description]
         """
         items = clean_list(args)
+        if ignore_extensions:
+            class_names = []
+            if items[0].count("),"):
+                classes = items[0].split("),")
+                for item in classes:
+                    if item.count("("):
+                        class_names.append(item.split("(")[0])
+        items[0] = ",".join(class_names)
         if len(items) == 1:
             return Inline(items[0], verbose=verbose)
         elif len(items) == 2:
@@ -154,17 +162,17 @@ arguments\nRefer to the README file for instructions on proper inline format")
             return 0
 
 if __name__ == "__main__":
-    first = Inline.from_individual_arguments("ClassA(aloha, doorknob-grenade) (biscuits, chalpskone, arf)", ['attr1', 'attr2'], ['method1', 'method2'], "-t -e" )
-    second = Inline.from_details("ClassA", ['attr1', 'attr2'], ['method1', 'method2'], "funky, bisk, capitler", "Hi Moofa, Chalpskone", "-t -e")
+    first = Inline.from_individual_arguments("ClassA(aloha, doorknob-grenade) (biscuits, chalpskone, arf), ClassB(A1,A2) (PA,PB)", ['attr1', 'attr2'], ['method1', 'method2'], "-t -e", ignore_extensions=True)
+    # second = Inline.from_details("ClassA", ['attr1', 'attr2'], ['method1', 'method2'], "funky, bisk, capitler", "Hi Moofa, Chalpskone", "-t -e")
+    print(first.classes)
+    # new = [first, second]
 
-    new = [first, second]
-
-    print(new)
-    for i in new:
-        print(i.classes)
-        print(i.attributes)
-        print(i.methods)
-        print(i.parents)
-        print(i.packages)
-        print(i.options)
-        print("\n\n")
+    # print(new)
+    # for i in new:
+    #     print(i.classes)
+    #     print(i.attributes)
+    #     print(i.methods)
+    #     print(i.parents)
+    #     print(i.packages)
+    #     print(i.options)
+    #     print("\n\n")

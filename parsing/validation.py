@@ -293,7 +293,8 @@ def validate_inline(inline : str, verbose=False):
 def validate_multiple(inline: str):
     """
     """
-    inline = Inline.from_individual_arguments(*inline.split(":"))
+    # need to ignore extension to prevent snagging on the parenthesized arguments in class name.
+    inline = Inline.from_individual_arguments(*inline.split(":"), ignore_extensions=True)
     if inline.classes.count(",") < inline.attributes.count("/"):
         print("Error: too many attributes.\n\
 make sure the number of ',' in classes is equal to num of '/' in attributes.")
@@ -427,8 +428,8 @@ if __name__ == "__main__":
     # validate_four_piece_inline("ClassA : attr1, attr2 : method1 : -t")
 
     # testing multiple_validate:
-    # TESTING = validate_mulitple("classA, classB : attr1, attr2 / attr3, attr4 : methodA / methodB : -e{vsc} / -e -t{ut,cc}")
-    # print(TESTING)
+    TESTING = validate_mulitple("classA, classB : attr1, attr2 / attr3, attr4 : methodA / methodB : -e{vsc} / -e -t{ut,cc}")
+    print(TESTING)
 
     # # are these values case corrected and indeed identifiers?
     # print(validate_members(['  attr1', ' attr2 '], item_type="field"))
