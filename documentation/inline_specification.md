@@ -1,9 +1,15 @@
 
 ### Inline Specification
+##### index:
+* Inline Mini language Full Specification (link)
+* 
+
+
 
 `ClassA : attr1 / attr2 : method : -t`
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~mini-langauge spec~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##### 1. Inline Mini-Language Full Specifications
+
 
 `ClassA / ClassB : attrA1/attrA2,attrB1/attrB2 : methodA1/methodA2, methodB1/methodB2 : -te / -e`
 
@@ -24,7 +30,7 @@
 to specify who the files parents are and where it should be generated.
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~extensions~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##### 2 Extensions
 Extensions: you can elaborate with your inline spec by providing parent and package with an 'extension'
         
 `ClassA(parent1) (packageA) : attr1, attr2, attr3 : method : -te`
@@ -70,7 +76,7 @@ will be generated in the default directory
 (C://project//path//project_name)
 unless told otherwise
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Common Inlines Examples: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##### 3 Some Common Inline Examples
 
 basic inline spec: 
 `class_name : attrA / attrB / attrC : method1 / method2 : -t`
@@ -101,9 +107,8 @@ To do so, an class specifying inline can be used
 `<p: (package1 / package 2 > package3 : class1/ class2, class1/ module1 > class3/ class4))>`
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Swithes/ flags- optional arguments ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##### 4 Optional Arguments
 
-Guide for switches/flags (optional arguments):
 `-t` <testing> generates the file with testing suite
 `-e` <exporting> export the class after generation
 `-a` <ABC> generate a abstract-base-class
@@ -173,8 +178,7 @@ To switch the keyword to an option other than its default, assign a valid choice
 `-e{vsc='commit; merge HEAD'}`
 assuming the program is aware of the repository and git account in use, runs the supplied commands with git.
 
-
-##### 1.4.3 Exporting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Have you made a decision- delete or keep? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Do you want to do anything with these newly generated packages- compress, send to an email address, init git repo?
 * attach this dictionary to the end of the inline for exportation of your class files
 
@@ -246,25 +250,111 @@ instead:
 `BiscuitFrontier : : : -a`
 
 
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Inheritance within the Inline Specification:~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##### 6 Inheritance with the Inline Specification
 
 This inline specifies that class2 is a descendant of class1 and inherits any fields or methods unique to the parent class1.
 
 `class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB : -t > -e`
 
+This same syntax applies to packaging inlines. a '>' indicates that the left operand contains the right
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Multiple Inheritances: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`<p:(package1 > package2 : class1 / module1 > class2 / module2)>`
+
 
 When nessecary, use the basic inline grouping syntax to specify multiple inheritances
 
 `classA, classB, classC > classD : A1, A2, A3 / B1, B2,B3 / C1, C2, C3 > D1, D2, D3 : Amethod / Bmethod / Cmethod > Dmethod`
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Packaging Inline syntax ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##### 7 Packaging Inline
 
-write it...
+The inline spec can also be used to describe a packaging structure, and 
+uses all the same tokens as a normal inline. just add the packaging decorator to distinguish:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Common examples of packaging inline ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`<p:( package_name : module_name )>`
+
+`<p:( Package1 : class1/ module1/ class2 / module3 )>`
+
+in practice, you can append a '-m' to files you want to designate as modules like so 
+
+`<p:( Package1 : file1 / file2 -m/ file3 / file4 -m )>`
+
+generates file2 and file4 as a module.
+
+Note these important guidelines
+1. If you are generating packaging and regular files in the same session, then generate the packaging first
+(failure to do so may result in duplicate files ).
+2. using the full extension for regular inlines is reccomended for seamless coordination of these two types
+of inlines (this way, the two inlines can work together to create the packaging and files as specificed)
+
+`demonstrate this`
+
+3. you can also use the extension syntax, and this is nescary for multiple inheritances, when it comes to packaging inlines
+
+`<p:(package1 / package2 > package3 (package1) : module1 (package1) / module2 (package2) , ...)>`
+
+the extension is required to tell the parser where each file goes in the packaging hierarchy.
+
+In either case (packaging or regular inlines) the extensions are simply reccomended for seamless generating.
+withholding that, the program must ask during run time where each nested package and or file is placed
+in the case of a complex packaging structure.
+
+`some more examples of this, showing the inline and the packaging and files it creates`
+
+~~~~~~~~~~~~~~~~~~~~~~~~~ link to: fully fleshed out inline, and package placement ~~~~~~~~~~~~~~~~
+
+### fully fleshed out inline. (not nessecary but you can provide input like:)
+ 
+`ClassA(parent) (package) : attributes : methods : opts`
+
+Please note the difference in whitespace between the parenthesized string that
+denotes parent versus package. without one or the other, it would instead look like:
+
+`ClassA (package) : ...`
+`ClassB(parent) : ...`
+
+parent parenthesized text always touches the class identifier, much like a function signature or 
+python's method for denoting the parent of a class `class Chef(Employee):`
+
+Like noted above, this syntax is NOT nessecary, but may be helpful in some instances.
+In all cases, the two examples below will produce the same inheritance hierarchy:
+
+`ClassA > ClassB > ClassC : ...`
+`ClassA(object), ClassB(ClassA), ClassC(ClassB) : ...`
+
+To avoid providing the package for a class in parenthesized text:
+1. Provide packaging inlines FIRST, then upon generation, the program will ask
+   if each class should be generated in a specific package.
+2. Do nothing and the classes will be generated in the directory or package where the class generator file was run.
+
+The above practices are commonly manifested in denoting what package
+each file in a multiple file inline belong in. like so
+
+assume we have the following packaging structure
+/*changes*/
+<dir package 1>
+    __init__.py
+    README.md
+    some_module.py
+    some_class.py
+    <dir package 2>
+        __init__.py
+        README.md
+        some_module.py
+        some_class.py
+<dir package 3>
+    __init__.py
+    README.md
+    some_module.py
+    some_class.py
+
+when the main script is run inside one of the packages, it will create
+the generated files there by default, in a sub directory with the project name.
+
+you can override this by configuration(***), or by using packaging part of extension to
+denote where the file(s) should be generated.
+
+
+###### 8 Common examples of Packaging Inlines
 
 `<p:(package1 : classA, ClassB : moduleA : -t/ /-e)>`
 creates: 
@@ -317,55 +407,3 @@ DIR audio
 * _NOTE:_ that there is not an argument (or functionality) provided for nesting upwards (towards the file system root), or creating a multi package root package (the root of your project having multiple directories- instead, call the program multiple times and generate individual packages in the same directory).
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~ link to: fully fleshed out inline, and package placement ~~~~~~~~~~~~~~~~
-
-### fully fleshed out inline. (not nessecary but you can provide input like:)
- 
-`ClassA(parent) (package) : attributes : methods : opts`
-
-Please note the difference in whitespace between the parenthesized string that
-denotes parent versus package. without one or the other, it would instead look like:
-
-`ClassA (package) : ...`
-`ClassB(parent) : ...`
-
-parent parenthesized text always touches the class identifier, much like a function signature or 
-python's method for denoting the parent of a class `class Chef(Employee):`
-
-Like noted above, this syntax is NOT nessecary, but may be helpful in some instances.
-In all cases, the two examples below will produce the same inheritance hierarchy:
-
-`ClassA > ClassB > ClassC : ...`
-`ClassA(object), ClassB(ClassA), ClassC(ClassB) : ...`
-
-To avoid providing the package for a class in parenthesized text:
-1. Provide packaging inlines FIRST, then upon generation, the program will ask
-   if each class should be generated in a specific package.
-2. Do nothing and the classes will be generated in the directory or package where the class generator file was run.
-
-The above practices are commonly manifested in denoting what package
-each file in a multiple file inline belong in. like so
-
-assume we have the following packaging structure
-
-<dir package 1>
-    __init__.py
-    README.md
-    some_module.py
-    some_class.py
-    <dir package 2>
-        __init__.py
-        README.md
-        some_module.py
-        some_class.py
-<dir package 3>
-    __init__.py
-    README.md
-    some_module.py
-    some_class.py
-
-when the main script is run inside one of the packages, it will create
-the generated files there by default, in a sub directory with the project name.
-
-you can override this by configuration(***), or by using packaging part of extension to
-denote where the file(s) should be generated.
