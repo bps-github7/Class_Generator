@@ -2,14 +2,15 @@
 #### Programmer: Ben P. Sehnert
 #### Date: 2/11/2020
 
-## Index:
-1. Usage
-2. Features
-3. Customization with .rc file
-4. Running in command line mode
-5. Running in interactive mode
+# Index:
+1. [Usage](#Usage)
+2. [Features](#Features)
+3. [Customization with .rc file](#Customization)
+4. [Running in command line mode](#Command-line-mode)
+5. [Running with a file as input](#File-as-input)
+5. [Running in interactive mode](#Interactive-mode)
 
-## Usage:
+# Usage
 _Input of class specifications_ can be provided through three different methods:
 1. command line arguments
 2. input file(s)
@@ -185,35 +186,58 @@ will result in the following directory structuring:
 > ClassA : : : -t -e                            creates a ClassA with only testing and exporting (no attributes or methods)
 
 
-## 2) Features:
-##### 2.1 all components of PEP8 new style class are generated, including:
+# Features
+## all components of PEP8 new style class are generated, including:
 * constructor(__init__)
-* __str__, __repr__
+* dundr str and dundr repr
 * header/script stub: `if name == main: ...`
 
-##### 2.2 All classes are generated in new object syntax, meaning
+## All classes are generated in new object syntax, meaning:
 * getters and setters are not implemented by default.
-* if the class is specified as 'protected' (by prepending the class name with one or two dashed)
-  its attributes will be generated with methods, in accordance with the descriptor protocol.
 
-## 3) Customization with .rc file:
-TODO need to implement functionality for this
+* if the class is specified as 'protected' (by prepending the class name with one or two dashed), its attributes will be generated with methods, in accordance with the descriptor protocol.
 
-## 4) Running in cmd line mode:
+## prepend-options (link here from examples)
+* 'SM' prepended to a method identifier will generate the method as a static method.
+* 'CM' prepended to a method identifier will generate the method as a class method.
+* 'CV' prepended to a attribute identifier will generate the attribute as a class variable (NOTE only works with class inlines, not modules)
+* '_' prepended to a attribute identifier will generate it as protected (needs confirmation) (NOTE only works with class inlines, not modules)
+* '__' prepended to a attribute identifier will generate it as a name mangled attribute (NOTE only works with class inlines, not modules)
+
+# Customization
+Using an .rc file (in the format of what? csv, json, xhtml (no)?)
+
+
+# Command-line-mode:
 * 4.1 interpret the file, passing in the following positional arguments
 
+## Default-package
+
+is created based on the 'name' and 'path (optinal)' arguments provided
+by command line invokation:
+
+
+`python -m filegenerator.py 'myexampleproject' --path 'C://path//to//here'`
+
+creates a default package of:
+`C://path//to//here//myexampleproject`
+
+this is the path where files generated in the current session are created (unless otherwise specified by a provided packaging inline)
+
+
+# File-as-input
 _double back when the program is finished and replace this_
         
-* 4.2  moved to the top of the file/ index
+## input file for argument
+`#Unix`
 
-* 4.6 input file for argument
-> <Unix>
-> $ ./cls_gen example
+`$ ./cls_gen example`
 
-> <NT>
-> $ python cls_gen.py -f example.txt
+`#NT / Windows`
 
-* <syntax for the input file>
+`$ python cls_gen.py -f example.txt`
+
+* Input file syntax
 
 in the input file, seperate inline specifications with a single newline character
 
@@ -231,8 +255,37 @@ inheritance and method designation follows the same syntax used in traditional c
 > class_1 : attr1, attr2, attr3 : method_1, method_2, SMmethod_3, CMmethod_4
 
 
-## 5) Running in interactive mode
-* 5.1 How To:
-    * Running in interactive mode is the default user interface when the program is run without arguments or the option -i is used.
-You can either provide inlines to the interactive prompt until done,
+# Interactive-mode
+
+* Running in interactive mode is the default user interface when the program is run without arguments or the option -i is used.
+
+* You can either provide inlines to the interactive prompt until done,
 or be guided through the process of creating a class or package step by step.
+
+## Getting to know Inlines with Interative mode:  
+
+Interactive mode is reccomended for first time users. The process of building the classes or modules from the ground up will help users understand the logical construction of inlines. Because packaging inlines are required first in the interactive mode, this enforces rules presumed as 'best practices' in the alternative modes. 
+
+As explained in previous sections, packaging is required first because it creates files. While regular inlines also create files, the parser can fill in the gaps by determining which generated classes from the packaging get filled with what data from the regular inputs. 
+
+for example:
+
+`<p:(package1 : classA, moduleA)>`
+`ClassA : attr1, attr2 : method1 : -te`
+
+creates a 'ClassA' with the specified members, and assumes that
+the extension is:
+
+`ClassA (package1): attr1, attr2 : method1 : -te`
+
+because of the previously provided class file. 
+
+A more problematic example would be:
+
+`ClassA / classB : attr1/attr2, attr3,attr4 : method1 , method2 : -t / -e`
+`<p:(package1 : ClassA, ClassB)>`
+
+unless the packaging is explicitly provided and declares that ClassA and ClassB are members of a different package, then a duplicate version of ClassA and ClassB will be created in the [default package](##default-package)
+
+
+
