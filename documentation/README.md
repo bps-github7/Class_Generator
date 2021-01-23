@@ -8,7 +8,6 @@
 3. Customization with .rc file
 4. Running in command line mode
 5. Running in interactive mode
-6. Developer notes, miscelaneous, software specifications
 
 ## Usage:
 _Input of class specifications_ can be provided through three different methods:
