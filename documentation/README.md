@@ -1,6 +1,6 @@
-#### File Generator Program: A Software Development utility that generates files.
-#### Programmer: Ben P. Sehnert
-#### Date: 2/11/2020
+# File Generator Program
+### A utility tool that generates files for python development.
+### Programmer: Ben P. Sehnert
 
 # Index:
 1. [Usage](#Usage)
@@ -11,20 +11,19 @@
 5. [Running in interactive mode](#Interactive-mode)
 
 # Usage
-_Input of class specifications_ can be provided through three different methods:
-1. command line arguments
-2. input file(s)
-3. interactive mode
+Input can be provided through three different methods:
+1. [command line arguments](#Command-line-mode)
+2. [input file(s)](#File-as-input)
+3. [interactive mode](#Interactive-mode)
 
+```
 List all arguments below vvv 
-
 to get to this screen:
 `$ python -m classgenerator.py --help`
+```
 
-#### 1.1 INPUTS:
-In most cases, the program takes a **inline specification** 
-(put a link to section 1.5 on inline specification text)
-Here are some quick examples:  
+## Input
+In most cases, the program takes a *inline specification* as input 
 
 `BiscuitFactory : attr1/ _attr2/ __attr3 : SMmethod/ CMmethod : -t -e`
 
@@ -34,21 +33,18 @@ Here are some quick examples:
 
 In order of appearance, the following inline specs will create the following files:
 
-1. a class named 'BiscuitFactory' with 3 attributes, a static method, a class method
-generated with a testing suite (unittest and code coverage report) and prepared for exporting.
-NOTE: The default behavior is to generate a class
+1. a class named 'BiscuitFactory' with 3 attributes, a static method, a class method generated with a testing suite (unittest and code coverage report) and prepared for exporting.
+*NOTE: The default behavior is to generate a class*
 
-2. a module called 'my_cool_module' with 2 variables and 2 functions, generated with a
-testing suite. The '-m' flag declares a module.
+2. a module called 'my_cool_module' with 2 variables and 2 functions, generated with a testing suite. The '-m' flag declares a module.
 
-3. an abscract base class called 'undefined_mess' with no attributes or methods. 
-the '-a' flag declares an abstract base class
+3. an abscract base class called 'undefined_mess' with no attributes or methods. The '-a' flag declares an abstract base class
 
-#### 1.2 OUTPUTS: 
+## Output 
 Generates a directory, or series of directories of files, unit tests,
 documentation structuring that matches the specification provided through input.
 
-#### 1.3 DETAILS: 
+## Details 
 This program defaults to creating a new directory, 
 labeled with project name, that contains all generated files. 
 
@@ -59,27 +55,9 @@ labeled with project name, that contains all generated files.
 arguments or the use of .rc file for customization 
 (add link here: see 'customization with .rc file' or 'Running in cmd line mode')
 
-##### 1.4 ADDITIONAL features include:
-* Generate simple to sophisticated classes/modules and directory (packaging)
-  structuring with a simple, easy to learn and understand syntax.
-
-* Choice of 3 modes for providing input, ranging from on the go (command line),
-  mass production (input file) and ease of use orieinted, assited (interactive mode)
-
-* Create multiple, fleshed out classes with a single argument (link: see inline specification)
-
-* Create simple or complex multiple inheritance hierarchies with a single argument (link - text: see inheritance)
-
-* Create packaging structure/ hierachy with a single argument (link - text: see packaging inline).
-
-* Easily generate additional files and perform actions with generated classes (link: see optional arguments)
-
-* Easily customize and persist multiple users preferences with .rc file (link: customization with .rc file)
-
-
 ##### 1.5 Inline Quick Reference:
 Note this is a light introduction for purpose of providing a basic understanding
-of the Inline. For a detailed, full specification, see this section (link: inline_specification.md)
+of the Inline. For a detailed explanation, see the [full specification](classgenerator\documentation\inline_specification.md)
 
 
 __Inline Summary__: the inline spec is used for quick writing of class specs. 
@@ -108,7 +86,7 @@ and optional arguments are seperated by `:` (colons)
 `ClassA : attr1/attr2 : method1/method2 `
 `ClassA : attr1/attr2 : method1/method2 : -t -e`
 
-3. NOTE: pre-pend arguments exist for applying slight changes to the to-be-generated class:
+3. NOTE: [pre-pend arguments](##prepend-options) exist for applying slight changes to the to-be-generated class:
     * CVattr1   : generates attr1 as a class variable
     * SMmethod1 : generates method1 as a static method
     * CMmethod2 : generates method2 as a Class method
@@ -136,68 +114,62 @@ Recap:
 `class_name_1 / ...class_name_N : attribute1_A, attribute2_B / ...attributeN_1 : `
 
 
-**the following tokens/ operators have the folllowing meaning in an inline spec:**
-* ':' <colon> seperates classname, attributes and methods
-* ',' <comma> seperates non grouped identifiers - list of sibling classes, lone list of attributes or methods
-* '/' <forward-slash> delimits groups in grouped identifiers-
-* '>' <rightwards-anglebracket> denotes an inheritance relationship (parent) > (child)
-* '<p:()>' is the encasing membrane for packaging inline.
-* '-t -e -m' <optional-flags/switches> Include any of the following as the fourth argument 
-                                        in the inline to activate the corresponding option
-    * '-t' <testing> automatically generate testing suite with the specified class(es). (**)
-    * '-e' <exporting> automatically zip (compress) the specified class and attach it to a blank email (**)
-    * '-m' <module> generate a module rather than a class (see- link)
-    * '-a' <Abstract-base-class> generate the class as an abstract base class (no implmenetation details) 
-
-
-    ** testing and exporting will execute the default behaivor noted above, but this can be controlled
-    with the .rc file. See the complete Inline spec to learn more about potential behaivors.
-
-`classA, classB : A_attr1, A_attr2 / B_attr1, B_attr2`
-* in this example, a '/' <forward-slash> is nessecary to denote where class1 attributes end and class2 attributes begin.
-
-`<p:(package1 : class1,class2,class3)>`
-`<p:(package1, package2 : class1, class2 / class3, class4)>`
-`<p:(package1 > package2 : class1, class2 > class3, class4)>`
-`<p:(package1, package2 > package3 (package1): class1, class2 / class3, module1 > class4)>`
-* packages use the same syntax are inlines do in inheritance. The last example
-will result in the following directory structuring:
-
-<dir> package1
-        <file> class1.py
-        <file> class2.py
-        <dir> package3
-                <file> class4.py
-<dir> package2
-        <file> class3.py
-        <file> module1.py
-
-
-
-**Throughout these examples, we must keep in mind the following rules...**
+**we must keep in mind the following rules...**
 1. either attributes or methods can be blank in the inline, but not the class identifier (can't make a nameless class).
+
 2. to leave either attributes or methods blank, include the typical amount of colons but leave the section blank
-> ClassA::                                      creates a classA with no methods or fields       
-> ClassA : : method                             creates a classA with only a method
-> ClassA : attr1, attr2 :                       creates a classA with only attributes
+
+`ClassA::`                                      
+
+creates a classA with no methods or fields       
+
+
+`ClassA : : method`
+
+creates a classA with only a method
+
+`ClassA : attr1, attr2 :`
+
+creates a classA with only attributes
 
 3. the fourth, optional field can always be left out, unless one wants to use these switches/ optional arguments like so:
-> ClassA : attr1, attr2 : method1 : -t -e       creates a ClassA with attributes, method and optional arguments for testing and exporting
-> ClassA : : : -t -e                            creates a ClassA with only testing and exporting (no attributes or methods)
 
+`ClassA : attr1, attr2 : method1 : -t -e`       
+
+creates a ClassA with attributes, method and optional arguments for testing and exporting
+
+`ClassA : : : -t -e`                            
+
+creates a ClassA with only testing and exporting (no attributes or methods)
 
 # Features
-## all components of PEP8 new style class are generated, including:
+
+* Generate simple to sophisticated classes/modules and directory (packaging)
+  structuring with a [simple, easy to learn and understand syntax](#).
+
+* Choice of 3 modes for providing input- [command line](#), [input file](#) and [interactive mode](#)
+
+* Create multiple, fleshed out classes with a single argument.
+
+* Create [simple or complex multiple inheritance hierarchies with a single argument](#)
+
+* Create [packaging structure/ hierachy with a single argument](#).
+
+* Easily generate [additional files and perform actions with generated classes](#)
+
+* Easily customize and persist multiple users preferences with [.rc file](#)
+
+
+## Classes
+### all components of PEP8 new style class are generated, including:
 * constructor(__init__)
 * dundr str and dundr repr
-* header/script stub: `if name == main: ...`
+* header/script stub (if desired)
+* All classes are generated in new object syntax, meaning:
+    * getters and setters are not implemented by default.
+    * if the class is specified as 'protected' (see [prepended arguments](#)) then its attributes will be generated with (@property and @setter)methods.
 
-## All classes are generated in new object syntax, meaning:
-* getters and setters are not implemented by default.
-
-* if the class is specified as 'protected' (by prepending the class name with one or two dashed), its attributes will be generated with methods, in accordance with the descriptor protocol.
-
-## prepend-options (link here from examples)
+## prepend-options
 * 'SM' prepended to a method identifier will generate the method as a static method.
 * 'CM' prepended to a method identifier will generate the method as a class method.
 * 'CV' prepended to a attribute identifier will generate the attribute as a class variable (NOTE only works with class inlines, not modules)
@@ -207,9 +179,35 @@ will result in the following directory structuring:
 # Customization
 Using an .rc file (in the format of what? csv, json, xhtml (no)?)
 
+customize the following:
+* testing- what should the '-t' option do?
+* exporting- what should the '-e' option do?
+* default-package- what is it?
 
 # Command-line-mode:
-* 4.1 interpret the file, passing in the following positional arguments
+
+to use the command line, the following arguments are mandatory:
+
+-name: pass it in as a positional argument
+`python -m filegenerator.py 'my_cool_project'`
+
+--path: its an optional argument
+`python -m filegenerator.py 'my_cool_project' --path 'C://some//path'`
+
+--inline: its an optional argument
+`python -m filegenerator.py 'my_cool_project' --path 'C://some//path' --inline 'ClassA : attr1, attr2 : method1 : -t'`
+
+additional optional arguments can be passed in as switches/flags
+
+* '-abc' generate the class as an abstract base class
+* '-m' generate the file as a module
+* '-sa' generate file(s) without attributes/variables *
+* '-sm' generate file(s) without methods/functions *
+* '-sb' generate file(s) with no fields of any kinds *  
+* '-t'  generates the file with testing suite
+* '-e' generates the file and exports it.
+
+
 
 ## Default-package
 
@@ -220,15 +218,16 @@ by command line invokation:
 `python -m filegenerator.py 'myexampleproject' --path 'C://path//to//here'`
 
 creates a default package of:
+
 `C://path//to//here//myexampleproject`
 
 this is the path where files generated in the current session are created (unless otherwise specified by a provided packaging inline)
 
 
 # File-as-input
-_double back when the program is finished and replace this_
-        
-## input file for argument
+    
+you can pass a file in as the sole argument to the file generator, where each line of the file is a inline spec. 
+
 `#Unix`
 
 `$ ./cls_gen example`
@@ -239,21 +238,14 @@ _double back when the program is finished and replace this_
 
 * Input file syntax
 
-in the input file, seperate inline specifications with a single newline character
+in the input file, seperate inline specifications with a single newline character:
+`class_1 : attr1, attr2, attr3 : method1, method2, method3 : -te`
 
+`class_2 : attr1, attr2, attr3 : method1, method2, method3: -e`
 
-> class_1 : attr1, attr2, attr3 : method1, method2, method3
-> class_2 : attr1, attr2, attr3 : method1, method2, method3
-> ...
-> class_n : attr1, attr2, attr3 : method1, method2, method3
+`...`
 
-inheritance and method designation follows the same syntax used in traditional cmd line mode
-
-
-> class_1, class_2 > class_3 > class_4 : attr1, attr2 / attr3, attr4 > attr5, attr6 > attr7, attr8
-> class_1 > class_2, class_3, class_4 : attr1, attr2 > attr3, attr4 / attr5, attr6 / attr7, attr8
-> class_1 : attr1, attr2, attr3 : method_1, method_2, SMmethod_3, CMmethod_4
-
+`class_n : attr1, attr2, attr3 : method1, method2, method3 : -t`
 
 # Interactive-mode
 
