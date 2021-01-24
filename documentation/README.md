@@ -1,6 +1,6 @@
 # File Generator Program
 ### A utility tool that generates files for python development.
-### Programmer: Ben P. Sehnert
+### Developed by Ben P. Sehnert
 
 # Index:
 1. [Usage](#Usage)
@@ -16,6 +16,8 @@ Input can be provided through three different methods:
 2. [input file(s)](#File-as-input)
 3. [interactive mode](#Interactive-mode)
 
+ 
+
 ```
 List all arguments below vvv 
 to get to this screen:
@@ -25,18 +27,18 @@ to get to this screen:
 ## Input
 In most cases, the program takes a *inline specification* as input 
 
-`BiscuitFactory : attr1/ _attr2/ __attr3 : SMmethod/ CMmethod : -t -e`
+`BiscuitFactory : attr1, _attr2, __attr3, CVattr4 : SMmethod(x), CMmethod(x,y,z), method(height) : -te`
 
-`my_cool_module : some / variables : some / functions : -t -m`
+`my_cool_module : some, variables : some(x,y), function(length, height) : -tm`
 
 `undefined_mess : : : -a`
 
 In order of appearance, the following inline specs will create the following files:
 
-1. a class named 'BiscuitFactory' with 3 attributes, a static method, a class method generated with a testing suite (unittest and code coverage report) and prepared for exporting.
+1. a class named 'BiscuitFactory' with 3 instance variables, a class variable, a static method, class method, and regular method, generated with a testing suite (unittest and code coverage report) and prepared for exporting by compressing and attaching to an email.
 *NOTE: The default behavior is to generate a class*
 
-2. a module called 'my_cool_module' with 2 variables and 2 functions, generated with a testing suite. The '-m' flag declares a module.
+2. a module called 'my_cool_module' with two variables and two functions, generated with a testing suite. The '-m' flag declares a module. Note that you can pass in either function names alone or their signatures.
 
 3. an abscract base class called 'undefined_mess' with no attributes or methods. The '-a' flag declares an abstract base class
 
@@ -44,103 +46,125 @@ In order of appearance, the following inline specs will create the following fil
 Generates a directory, or series of directories of files, unit tests,
 documentation structuring that matches the specification provided through input.
 
-## Details 
-This program defaults to creating a new directory, 
+### Details 
+* Defaults to creating a [default package](#): a new directory, 
 labeled with project name, that contains all generated files. 
 
-* This directory will be produced as a subdirectory in the
- same directory where the script is run.
+* With no '--path' argument, the default package will be produced as a subdirectory in the same directory where the script is run.
 
-* You can custom where the output will be generated with command line
-arguments or the use of .rc file for customization 
-(add link here: see 'customization with .rc file' or 'Running in cmd line mode')
-
-##### 1.5 Inline Quick Reference:
-Note this is a light introduction for purpose of providing a basic understanding
-of the Inline. For a detailed explanation, see the [full specification](classgenerator\documentation\inline_specification.md)
+* You can customize where the output will be generated with 
+[command line arguments](#) or the use of [.rc file for customization](#) 
 
 
-__Inline Summary__: the inline spec is used for quick writing of class specs. 
-it consists of a single line of text with 1-4 sets of identifiers and optional
-arguments, delimited by colons, which seperate file names from optional (but helpful)
-attributes/variables and methods/functions.
+### Inline Quick Reference:
+Note this is a light introduction for purpose of providing a basic understanding. For a detailed explanation, see the [full specification](..documentation\inline_specification.md) link does not work
 
-Inline Specification can also be used to produce design of your packaging structure,
-with slight adjustments to the syntax.
+The regular inline generates classes unless instructred otherwise with the '-m' or '-a' flags for modules or abstract-base-classes (interfaces)
 
-###### In short: 
+### Basic Inline:
+`File1 : var1, var2 : function(x,y) : -t`
+
+Consists of a single line of text with 1-4 sets of identifiers and optional arguments, delimited by colons
+
+
+### Inline generating multiple files:
+`ClassA / ClassB : attr1,attr2/ attr3,attr4 : method1 / method2 : -t/-e`
+
+Forward slashes seperate multiple classes, whereas the comma delimits the individual members of each classes fields (seperating the individual attributes per one class)
+
+### Inline with basic inheritance:
+`ClassA > ClassB : attr1,attr2 > attr3,attr4 : method1 > method2 : -t > -e`
+
+same rules as the basic inline, except that '>' has been used to indicate a `parent > child` relationship
+
+### Inline with multiple inheritance:
+
+`ClassA / ClassB > ClassC : attr1,attr2/ attr3,attr4 > attr5,attr6 : method1/ method 2 > method3 : -t / -e > -e`
+
+Essentially a Multi-Inline and Inheritance Inline in one- forward slashes and commas still have the same purpose, but in this case, ClassC is a child of both ClassA and ClassB. 
+
+*NOTE the '>'* in attribute, method and option fields __does not__ indicate inheritance relationship between the terms but rather an aid to organization and readability
+
+## Packaging Inline
+`<p:(package:module)`
+
+this enhanced Inline follows all the syntax rules of previous examples, but the 'package:module' part only takes these two arguments.
+
+### Simle example
+`<p:(package1:file1,file2)>`
+
+### denote a file as  a module with `-m`
+
+`<p:(package1:file1 -m,file2)>`
+
+again, default behavior is to assume the files are classes
+
+### Multiple Packages
+
+`<p:(package1/package2:file1,file2 / file3,file4)`
+
+### Package Containing Other Packages
+
+`<p:(package1 > package2 : file1,file2 > file3)`
+
+### When there are multiple containing packages
+you need to declare what package a contained package belongs to
+
+`<p:(package1 / package2 > package3 (package1) : ...)>`
+
+This is only nessecary if it is ambiguous which package a contained package belongs to
+
+If the containing package can be assumed based on position, then this syntax is not needed.
+
+### A multiple-inheritance packaging-inline
+
+`<p:(package1 / package > package3 (package2): file1, file2 / file3, file4 > file5, file6)>`
+
+
+
+
+
+
+
+
+## Summary: 
 
 1. identifier (class name, attributes and methods)
-and optional arguments are seperated by `:` (colons)
+and optional arguments are seperated by colons
 
-`Class_name : attributes : methods`
-`classA : attributes : methods : -t -e`
-`Mandatory : optional : optional : optional`
+    `Mandatory : optional : optional : optional`
 
-(link- inline_specification.md/ withholding arguments)
+    (link- inline_specification.md/ withholding arguments)
 
-2. Members of the file (such as attributes, class variables, methods of all types) are seperated by 
-`/`(forward-slash)
+2. use comma to seperate individual attributes, forward slashes to seperat multiple classes, and > to indicate inheritance.
 
+    `ClassA : attr1,attr2 : method1,method2 `
 
-`ClassA : attr1/attr2 : method1/method2 `
-`ClassA : attr1/attr2 : method1/method2 : -t -e`
+    `ClassA : attr1,attr2 : method1,method2 : -t -e`
 
 3. NOTE: [pre-pend arguments](##prepend-options) exist for applying slight changes to the to-be-generated class:
     * CVattr1   : generates attr1 as a class variable
     * SMmethod1 : generates method1 as a static method
     * CMmethod2 : generates method2 as a Class method
 
+6. The Inline spec is designed to be robust. You can withhold any argument except the class name. However, you need to be sure to include the correct amount of colons so that the correct arguments are parsed.
 
-4. if multiple classes are generated in the same inline- use comas to seperate the class identifier and `/` (forward slash)
-    to seperate the sets of multiple identifiers (because comma is already in use seperating individual members)
-
-5. `>` (right carrot) is used to denote a parent child relationship (for both classes and packages)
-`ClassA > ClassB : attr1, attr2 > attr3, attr4 : method1 > method2 : -t > -e`
-`<p:(package1 > package2 : class1/ class2, class3, module4)>`
-
-5. `<p: ( keys : values)>` is used to describe a packaging structure, where keys are package names and values are
-    `/`( forward slash) seperated module/class file identifiers
-
-6. The Inline spec is designed to be robust. You can withhold any argument except the class name,
-    however, be sure to include the correct amount of colons so that the correct arguments are parsed.
-    (attributes get recognized as attributes, methods get recognized as methods, etc...)
-
-7. The final area of the inline, following the third colon is for optional arguments (switches)
-    providing -e or -t there will apply exporting or testing to the generated class. 
+7. The final area of the inline, following the third colon is for optional arguments (switches) including '-t', '-e', '-m', '-a' for testing, exporting, modules and abstract base classes
     
+Rules:
 
-Recap:
-`class_name_1 / ...class_name_N : attribute1_A, attribute2_B / ...attributeN_1 : `
-
-
-**we must keep in mind the following rules...**
 1. either attributes or methods can be blank in the inline, but not the class identifier (can't make a nameless class).
 
 2. to leave either attributes or methods blank, include the typical amount of colons but leave the section blank
 
-`ClassA::`                                      
+    `ClassA::`                                      
 
-creates a classA with no methods or fields       
+    creates a classA with no methods or fields       
 
+    `ClassA : : : -t -e`                            
 
-`ClassA : : method`
+    creates a ClassA with only testing and exporting (no attributes or methods)
 
-creates a classA with only a method
-
-`ClassA : attr1, attr2 :`
-
-creates a classA with only attributes
-
-3. the fourth, optional field can always be left out, unless one wants to use these switches/ optional arguments like so:
-
-`ClassA : attr1, attr2 : method1 : -t -e`       
-
-creates a ClassA with attributes, method and optional arguments for testing and exporting
-
-`ClassA : : : -t -e`                            
-
-creates a ClassA with only testing and exporting (no attributes or methods)
 
 # Features
 
@@ -206,8 +230,6 @@ additional optional arguments can be passed in as switches/flags
 * '-sb' generate file(s) with no fields of any kinds *  
 * '-t'  generates the file with testing suite
 * '-e' generates the file and exports it.
-
-
 
 ## Default-package
 

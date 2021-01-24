@@ -12,11 +12,11 @@
 
 # Mini-Language
 
-`ClassA : attr1 / attr2 : method : -t`
+`ClassA : attr1, attr2 : method : -t`
 
 A simple inline for generating a single class
 
-`FileA / FileB : A1/A2,B1/B2 : methodA/method1, functionA/function2 : -te / -me`
+`FileA / FileB : A1,A2/B1,B2 : methodA,method1/ functionA,function2 : -te / -me`
 
 A more complex spec that generates a class and a module.
 
@@ -24,9 +24,10 @@ In all cases:
 
 * ':' <colon> seperates classname, attributes, methods and optional arguments.
 
-* '/' <forward-slash> seperates the members of an individual classes' fields, or the individaul class identifier in a multi class inline.
+* ',' <comma> 
+    seperates the members of an individual classes' fields, or the members of each family in a multiple inline.
 
-* ',' <comma> seperates the different families of members in a multi class spec
+* '/' <forward-slash> seperates the different families of members in a multi class spec
     the comma is needed to seperate ClassA's attributes and methods from ClassB's
 
 * '>' <rightward-anglebracket> denotes an inheritance relationship between the
@@ -72,11 +73,6 @@ if you were to provide only parents
 
 if you were to provide only packages
 `ClassA (package1, package2) : attr1 / attr2 : method : -t`
-
-you must respect the adherence to whitespace
-in order to delineate parents from packages.
-much like you must respect the adherence to
-colons to designate where attributes end and methods begin.
 
 NOTE that providing the extension of parents and packaging
 is not nessecary but is helpful. without it, classes will 
@@ -127,34 +123,58 @@ each file in a multiple file inline belong in. like so
 # Inline Examples
 
 #### basic inline spec: 
-* `class_name : attrA / attrB / attrC : method1 / method2 : -t`
+* `class_name : attrA, attrB, attrC : method1, method2 : -t`
 
 
 #### inline spec with multiple classes:
-* `classA / classB, ... ClassN : attrA1, attrA2 / attrB1, attrB2 / ... / attrN1, attrN2 : methodA / methodB / ... / methodN : -t -e / -t / ... / -t -e`
+* `classA / classB/ ... ClassN : attrA1, attrA2 / attrB1, attrB2 / ... / attrN1, attrN2 : methodA / methodB / ... / methodN : -t -e / -t / ... / -t -e`
 
 
 #### inline spec with simple inheritance:
-* `class1 > class2 : attr1 / attr2 > attr1 / attr2 : methodA > methodB : -t > -e`
+* `class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB : -t > -e`
 
 
 #### inline spec with complex, hierachircal and/or multiple inheritances:
-* `classA / classB/ classC > classD : A1/ A2/ A3 , B1/ B2/ B3 , C1/ C2/ C3 > D1/ D2/ D3 : Amethod / Bmethod / Cmethod > Dmethod : -e / -e / -t > -e -t`
+* `classA / classB/ classC > classD : A1, A2, A3/ B1, B2, B3/ C1, C2, C3/ D1, D2, D3 : Amethod/ Bmethod/ Cmethod/ Dmethod : -e / -e / -t > -e -t`
 
 
 #### package structuring with the inline spec
 
-* `<p:( package1 / package2 : module1/ class1, module2/ module3)>` 
+* `<p:( package1 / package2 : module1, class1/ module2, module3)>` 
 
 #### packaging structuring with multiple tiers (package 1 contains package 2)
 
-* `<p:( package1 > package2 : module1 / class1 > module2 / module3)>` 
+* `<p:(package1 > package2 : module1, class1 > module2, module3)>` 
 
-__NOTE__: this does not indicate modules1 and class1 are inherited by modules2 and 3.
-To do so, a regular inline can be used
+__NOTE__: this does not indicate modules1 and class1 are inherited by modules2 and 3. To do so, a regular inline can be used
 
 `<p: (package1 / package 2 > package3 : class1/ class2, class1/ module1 > class3/ class4))>`
 
+# Pre-pend-arguments
+* 'CV'
+* 'SM'
+* 'CM'
+* '' prepend nothing for instance variables or regular Functions
+
+### A note on methods and functions
+
+because of the limited nature of a utility command line tool, we cannot provide any implementation of methods or functions. However, two things can be done to help:
+
+1. The method signature can be provided in the inline, but is not nescessary.
+
+    `class : attributes : method_name(x,y)`
+
+    However, the mandatory arguments 'self' and 'cls' do not need to be provided and will be filled in automatically in any case.
+
+    `class : attributes : method_name(x,y)`
+
+    yields
+
+    `def method_name(self, x,y):`
+
+2. A correctly formatted pep8 docstring will be provided by default
+
+3. Both these features are configurable and can be customized via the .rc file.
 
 # Optional-Arguments
 * `-t` <testing> generates the file with testing suite
@@ -164,7 +184,7 @@ To do so, a regular inline can be used
 
 1. Append the switch to the end of a single class spec (as the fourth argument, procceding from methods) to apply the switch to ALL file.
 
-`Class_A / Class_B : A1 / A2, B1 / B2  : SMmethod/ CMmethod, method1 : -t -e{comp,send}` 
+`Class_A / Class_B : A1, A2/ B1, B2  : SMmethod/ CMmethod, method1 : -t -e{comp,send}` 
 
 generated files will be generated with testing and then be compressed and sent via email. (non-specific)
 
