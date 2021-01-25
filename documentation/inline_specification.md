@@ -1,16 +1,16 @@
 
 ### Inline Specification
 ##### index:
-1. [Inline Mini-Language Full specification](#Mini-Language)
+1. [Inline Mini-Language Full specification](#Inline-Mini-Language)
 2. [Extensions](#Extensions)
-3. [Some common inline examples](#Inline-Examples)
-4. [optional aruments](#Optional-Arguments)
-5. [Withholding arguments](#A-note-on-withholding-arguments)
+3. [Pre-pend arguments](#Pre-pend-Arguments)
+4. [Optional Aruments](#Optional-Arguments)
+4. [Withholding Arguments](#A-note-on-withholding-arguments)
 5. [Inheritance](#Inheritance)
-6. [Packaging syntax](#Packaging-Inline-Syntax)
-7. [Some common packaging inline examples](#Packaging-Examples)
+7. [Packaging Syntax](#Packaging-Inline-Syntax)
+8. [Some Common Inline Examples](#Inline-Examples)
 
-# Mini-Language
+# Inline-Mini-Language
 
 `ClassA : attr1, attr2 : method : -t`
 
@@ -22,22 +22,21 @@ A more complex spec that generates a class and a module.
 
 In all cases:
 
-* ':' <colon> seperates classname, attributes, methods and optional arguments.
+* ':' <colon> seperates classname, attributes, mAthods and optional arguments.
 
 * ',' <comma> 
     seperates the members of an individual classes' fields, or the members of each family in a multiple inline.
 
-* '/' <forward-slash> seperates the different families of members in a multi class spec
-    the comma is needed to seperate ClassA's attributes and methods from ClassB's
+* '/' <forward-slash> seperates the different families of members in a multi class spec.
+The comma is needed to seperate ClassA's attributes and methods from ClassB's
 
 * '>' <rightward-anglebracket> denotes an inheritance relationship between the
         first operand and the second- in the case of the above example.
         ClassA is ClassB's parent and inherits its attributes and methods (configurable ***)
 
-* '<p:()>' <packaging-syntax> this is how we differentiate file inlines from packaging inlines.
+* '<p:()>' <packaging-syntax> this is how we differentiate file inlines from packaging inlines. learn about the packaging inline [here](##Packaging-Inline-Syntax)
 
-* 'file_identifier(parents) (packages)' <extension> include either parenthesized text block
-to specify who the files parents are and where it should be generated.
+* 'file_identifier(parents) (packages)' <extension> include either parenthesized text block to specify who the files parents are and where it should be generated (the package(s)).
 
 
 # Extensions
@@ -55,10 +54,6 @@ you can include multiple parents and/or packages like this:
 
 `ClassA(parent1,parent2) (packageA,packageB,packageC) : attr1, attr2, attr3 : method : -te`
 
-synopsis:
-
-`class identifier(parent(s,)) (package(s,))`
-
 parents : What file(s), if the file is a class, does it inherit from?
 packages: Where should the file be generated?
 
@@ -74,83 +69,7 @@ if you were to provide only parents
 if you were to provide only packages
 `ClassA (package1, package2) : attr1 / attr2 : method : -t`
 
-NOTE that providing the extension of parents and packaging
-is not nessecary but is helpful. without it, classes will 
-inherit from object unless told otherwise, and all files
-will be generated in the default directory 
-(C://project//path//project_name)
-unless told otherwise
-
-*Continued...*
-
-
-when the main script is run inside one of the packages, it will create
-the generated files there by default, in a sub directory with the project name.
-
-you can override this by configuration(***), or by using packaging part of extension to
-denote where the file(s) should be generated.
-
-
-
-`ClassA(parent) (package) : attributes : methods : opts`
-
-Please note the difference in whitespace between the parenthesized string that
-denotes parent versus package. without one or the other, it would instead look like:
-
-`ClassA (package) : ...`
-`ClassB(parent) : ...`
-
-parent parenthesized text always touches the class identifier, much like a function signature or 
-python's method for denoting the parent of a class `class Chef(Employee):`
-
-Like noted above, this syntax is NOT nessecary, but may be helpful in some instances.
-In all cases, the two examples below will produce the same inheritance hierarchy:
-
-`ClassA > ClassB > ClassC : ...`
-`ClassA(object), ClassB(ClassA), ClassC(ClassB) : ...`
-
-To avoid providing the package for a class in parenthesized text:
-1. Provide packaging inlines FIRST, then upon generation, the program will ask
-   if each class should be generated in a specific package.
-2. Do nothing and the classes will be generated in the directory or package where the class generator file was run.
-
-The above practices are commonly manifested in denoting what package
-each file in a multiple file inline belong in. like so
-
-
-
-
-# Inline Examples
-
-#### basic inline spec: 
-* `class_name : attrA, attrB, attrC : method1, method2 : -t`
-
-
-#### inline spec with multiple classes:
-* `classA / classB/ ... ClassN : attrA1, attrA2 / attrB1, attrB2 / ... / attrN1, attrN2 : methodA / methodB / ... / methodN : -t -e / -t / ... / -t -e`
-
-
-#### inline spec with simple inheritance:
-* `class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB : -t > -e`
-
-
-#### inline spec with complex, hierachircal and/or multiple inheritances:
-* `classA / classB/ classC > classD : A1, A2, A3/ B1, B2, B3/ C1, C2, C3/ D1, D2, D3 : Amethod/ Bmethod/ Cmethod/ Dmethod : -e / -e / -t > -e -t`
-
-
-#### package structuring with the inline spec
-
-* `<p:( package1 / package2 : module1, class1/ module2, module3)>` 
-
-#### packaging structuring with multiple tiers (package 1 contains package 2)
-
-* `<p:(package1 > package2 : module1, class1 > module2, module3)>` 
-
-__NOTE__: this does not indicate modules1 and class1 are inherited by modules2 and 3. To do so, a regular inline can be used
-
-`<p: (package1 / package 2 > package3 : class1/ class2, class1/ module1 > class3/ class4))>`
-
-# Pre-pend-arguments
+# Pre-pend-Arguments
 * 'CV'
 * 'SM'
 * 'CM'
@@ -281,6 +200,7 @@ When nessecary, use the basic inline grouping syntax to specify multiple inherit
 
 `classA, classB, classC > classD : A1, A2, A3 / B1, B2,B3 / C1, C2, C3 > D1, D2, D3 : Amethod / Bmethod / Cmethod > Dmethod`
 
+
 # Packaging-Inline-Syntax
 
 The inline spec can also be used to describe a packaging structure, and 
@@ -316,55 +236,69 @@ in the case of a complex packaging structure.
 
 `some more examples of this, showing the inline and the packaging and files it creates`
 
-# Packaging-Examples
+# Some-Common-Inline-Examples
 
-`<p:(package1 : classA, ClassB : moduleA : -t/ /-e)>`
-creates: 
-```
-<DIR> <package_name>
-    <__init__.py>
-    <README.md>
-    <classA.py>
-    <classB.py>
-    <moduleA.py>
-```
+# Inline Examples
 
-A more complex example, where two directories are nested within the first
-all files are located within the first directory
+A basic inline spec: 
 
-`<p:(audio > sounds/ textures : classA, classB, classC)>`
+`class_name : attrA, attrB, attrC : method1, method2 : -t`
 
-```
-<DIR audio>
-    <__init__.py>
-    <README.md>
-    <classA.py>
-    <classB.py>
-    <classC.py>
-    <DIR sounds>
-    <DIR textures>
-```
-You can also nest folders, using something similar to the extension seen
-with regular inlines for providing the parents and packages
+A basic inline with no methods, but options
+
+`ClassA : attr1, attr2 : : -t`
+
+Similarly
+
+`ClassA : : method1`
+
+Optional arguments can always be with withheld, but appropriate colons are needed use them.
+
+`'ClassA : :' = 'ClassA'`
 
 
-`<p:(audio / textures > sounds : classA, classB, classC, ClassE (textures) > classD (sounds))>`
-```
-<DIR audio>
-    <__init__.py>
-    <README.md>
-    <classA.py>
-    <classB.py>
-    <classC.py>
-    <DIR sounds>
-        <__init__.py>
-        <README.md>
-        <classD.py>
-<DIR textures>
-    <__init__.py>
-    <README.md>
-    <classE.py>
-```
+`geometry : : : -tem`
+
+Examples of prepend arguments and passed in method/function signitures
+
+`CreditCard : CVinterest_rate, __account_number : SMcalculate_apr, CMdo_something_else : -t`
+
+`WaffleMaker : : make_waffles(batter, egg, milk)`
+
+`pentagon : var1, var2 : do_a_pentagon_thing(x,y,z) :-m`
+
+An inline with multiple classes:
+
+`ClassA / ClassB : attr1, attr2 / attr3, attr4 : method1, method2 / method3,method4 : -t / -e`
+
+
+`classA / classB/ ... ClassN : attrA1, attrA2 / attrB1, attrB2 / ... / attrN1, attrN2 : methodA / methodB / ... / methodN : -t -e / -t / ... / -t -e`
+
+
+inline spec with simple inheritance:
+* `class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB : -t > -e`
+
+
+inline spec with complex, hierachircal and/or multiple inheritances:
+
+`classA / classB/ classC > classD : A1, A2, A3/ B1, B2, B3/ C1, C2, C3/ D1, D2, D3 : Amethod/ Bmethod/ Cmethod/ Dmethod : -e / -e / -t > -e -t`
+
+
+package structuring with the inline spec
+
+`<p:( package1 / package2 : module1, class1/ module2, module3)>` 
+
+packaging structuring with multiple tiers (package 1 contains package 2)
+
+`<p:(package1 > package2 : module1, class1 > module2, module3)>` 
+
+__NOTE__: this does not indicate modules1 and class1 are inherited by modules2 and 3. To do so, a regular inline can be used
+
+`<p: (package1 / package 2 > package3 : class1/ class2, class1/ module1 > class3/ class4))>`
+
+Some more packaging examples may be needed here... lots of potential combos
+
+
 __NOTE__ that the default placement of files is within the first created package.
 
 __NOTE__ if you fail to provide an extension to the files for declaring their package assignemnt, the parser will ask you to provide the name of an existing package, or the name of a package from the current parse.

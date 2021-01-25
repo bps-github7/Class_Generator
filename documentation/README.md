@@ -120,13 +120,6 @@ If the containing package can be assumed based on position, then this syntax is 
 
 `<p:(package1 / package > package3 (package2): file1, file2 / file3, file4 > file5, file6)>`
 
-
-
-
-
-
-
-
 ## Summary: 
 
 1. identifier (class name, attributes and methods)
@@ -245,6 +238,10 @@ creates a default package of:
 
 this is the path where files generated in the current session are created (unless otherwise specified by a provided packaging inline)
 
+__note:__ when the main script is run inside one of the packages, it will create
+the generated files there by default, in a sub directory with the project name.
+
+you can override this by configuration(***), or by using packaging part of extension to denote where the file(s) should be generated. (link : inline_spec/extensions)
 
 # File-as-input
     
