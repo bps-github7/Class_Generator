@@ -33,12 +33,12 @@ In most cases, the program takes a *inline specification* as input
 
 `undefined_mess : : : -a`
 
-In order of appearance, the following inline specs will create the following files:
+In order of appearance, the following three inlines will create the following files:
 
-1. a class named 'BiscuitFactory' with 3 instance variables, a class variable, a static method, class method, and regular method, generated with a testing suite (unittest and code coverage report) and prepared for exporting by compressing and attaching to an email.
+1. A class named 'BiscuitFactory' with 3 instance variables, a class variable, a static method, a class method, and regular method, generated with a testing suite (unittest and code coverage report) and prepared for exporting by compressing the containing folder.
 *NOTE: The default behavior is to generate a class*
 
-2. a module called 'my_cool_module' with two variables and two functions, generated with a testing suite. The '-m' flag declares a module. Note that you can pass in either function names alone or their signatures.
+2. A module called 'my_cool_module' with two variables and two functions, generated with a testing suite. The '-m' flag declares a module. Note that you can pass in either function names alone or their signatures.
 
 3. an abscract base class called 'undefined_mess' with no attributes or methods. The '-a' flag declares an abstract base class
 
@@ -57,14 +57,18 @@ labeled with project name, that contains all generated files.
 
 
 ### Inline Quick Reference:
-Note this is a light introduction for purpose of providing a basic understanding. For a detailed explanation, see the [full specification](..documentation\inline_specification.md) link does not work
+Note this is a light introduction for purpose of providing a basic understanding. For a detailed explanation, see the [full specification](inline_specification.md)
 
-The regular inline generates classes unless instructred otherwise with the '-m' or '-a' flags for modules or abstract-base-classes (interfaces)
+The inline generates classes unless instructred otherwise with the '-m' or '-a' flags for modules or abstract-base-classes (interfaces)
 
 ### Basic Inline:
 `File1 : var1, var2 : function(x,y) : -t`
 
 Consists of a single line of text with 1-4 sets of identifiers and optional arguments, delimited by colons
+
+`class_identifier : attributes : methods : options`
+
+__NOTE__ that all arguments in the inline are optional except class name.
 
 
 ### Inline generating multiple files:
@@ -75,15 +79,16 @@ Forward slashes seperate multiple classes, whereas the comma delimits the indivi
 ### Inline with basic inheritance:
 `ClassA > ClassB : attr1,attr2 > attr3,attr4 : method1 > method2 : -t > -e`
 
-same rules as the basic inline, except that '>' has been used to indicate a `parent > child` relationship
+This uses the same rules as the basic inline, except that '>' has been used to indicate a `parent > child` relationship
 
 ### Inline with multiple inheritance:
 
 `ClassA / ClassB > ClassC : attr1,attr2/ attr3,attr4 > attr5,attr6 : method1/ method 2 > method3 : -t / -e > -e`
 
-Essentially a Multi-Inline and Inheritance Inline in one- forward slashes and commas still have the same purpose, but in this case, ClassC is a child of both ClassA and ClassB. 
+This is a Multiple file inline and Inheritance Inline in one- forward slashes and commas still have the same purpose, but in this case, `ClassC` is a child of both `ClassA` and `ClassB`. 
 
-*NOTE the '>'* in attribute, method and option fields __does not__ indicate inheritance relationship between the terms but rather an aid to organization and readability
+*NOTE the '>'* in attribute, method and option fields __does not__ indicate inheritance relationship between the terms clarification to the parser on where the inherited terms line up.
+
 
 ## Packaging Inline
 `<p:(package:module)`
@@ -112,8 +117,6 @@ you need to declare what package a contained package belongs to
 
 `<p:(package1 / package2 > package3 (package1) : ...)>`
 
-This is only nessecary if it is ambiguous which package a contained package belongs to
-
 If the containing package can be assumed based on position, then this syntax is not needed.
 
 ### A multiple-inheritance packaging-inline
@@ -127,7 +130,6 @@ and optional arguments are seperated by colons
 
     `Mandatory : optional : optional : optional`
 
-    (link- inline_specification.md/ withholding arguments)
 
 2. use comma to seperate individual attributes, forward slashes to seperat multiple classes, and > to indicate inheritance.
 
@@ -135,28 +137,25 @@ and optional arguments are seperated by colons
 
     `ClassA : attr1,attr2 : method1,method2 : -t -e`
 
-3. NOTE: [pre-pend arguments](##prepend-options) exist for applying slight changes to the to-be-generated class:
-    * CVattr1   : generates attr1 as a class variable
-    * SMmethod1 : generates method1 as a static method
-    * CMmethod2 : generates method2 as a Class method
+3. Use prepend arguments to decalre a field as a certain type- class variables, static and class methods, name mangeling and private methods and fields can all be declared. [Learn more by reading the inline specification](inline_specification.md)
 
-6. The Inline spec is designed to be robust. You can withhold any argument except the class name. However, you need to be sure to include the correct amount of colons so that the correct arguments are parsed.
+4. The Inline is designed to be robust. You can withhold any argument except the class name. However, you need to be sure to include the correct amount of colons so that the correct arguments are parsed
 
-7. The final area of the inline, following the third colon is for optional arguments (switches) including '-t', '-e', '-m', '-a' for testing, exporting, modules and abstract base classes
+5. The final area of the inline, following the third colon is for optional arguments (switches) including '-t', '-e', '-m', '-a' for testing, exporting, modules and abstract base classes
     
 Rules:
 
-1. either attributes or methods can be blank in the inline, but not the class identifier (can't make a nameless class).
+1. Either attributes or methods can be blank in the inline, but not the class identifier (can't make a nameless class).
 
-2. to leave either attributes or methods blank, include the typical amount of colons but leave the section blank
+2. To leave either attributes or methods blank, include the typical amount of colons, but leave the section blank
 
     `ClassA::`                                      
 
-    creates a classA with no methods or fields       
+    This creates a classA with no methods or fields       
 
     `ClassA : : : -t -e`                            
 
-    creates a ClassA with only testing and exporting (no attributes or methods)
+    This creates a ClassA with only testing and exporting (no attributes or methods)
 
 
 # Features

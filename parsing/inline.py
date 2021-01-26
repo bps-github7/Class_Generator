@@ -5,10 +5,12 @@ Date: 10/28/2020
 Module level docstring: implements the Inline class
 '''
 
+
 import sys
 import re
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 from utils.misc_functions import clean_list
+
 
 class Inline:
     '''
