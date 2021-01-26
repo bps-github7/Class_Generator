@@ -31,7 +31,7 @@ In all cases:
 The comma is needed to seperate ClassA's attributes and methods from ClassB's
 
 * '>' <rightward-anglebracket> denotes an inheritance relationship between the
-        first operand and the second- in the case of the above example.
+        first operand and the second. In the above example,
         ClassA is ClassB's parent and inherits its attributes and methods (configurable ***)
 
 * '<p:()>' <packaging-syntax> this is how we differentiate file inlines from packaging inlines. learn about the packaging inline [here](##Packaging-Inline-Syntax)
@@ -54,26 +54,29 @@ you can include multiple parents and/or packages like this:
 
 `ClassA(parent1,parent2) (packageA,packageB,packageC) : attr1, attr2, attr3 : method : -te`
 
-parents : What file(s), if the file is a class, does it inherit from?
-packages: Where should the file be generated?
+Parents : What file(s), if the file is a class, does it inherit from?
 
-`ClassA(parent) (package): attr1 / attr2 : method : -t`
+Packages: Where should the file be generated?
+
+`ClassA(parent) (package): attr1, attr2 : method : -t`
 
 note the whitespace seperating the two parenthesized text blocks.
 
-`ClassA(parent1, parent2) (package1, package2) : attr1 / attr2 : method : -t`
+`ClassA(parent1, parent2) (package1, package2) : attr1, attr2 : method : -t`
 
-if you were to provide only parents
+If you were to provide only parents:
+
 `ClassA(parent1, parent2): attr1 / attr2 : method : -t`
 
-if you were to provide only packages
+If you were to provide only packages:
+
 `ClassA (package1, package2) : attr1 / attr2 : method : -t`
 
 # Pre-pend-Arguments
 * 'CV'
 * 'SM'
 * 'CM'
-* '' prepend nothing for instance variables or regular Functions
+* '' default behaivor: prepend nothing for instance variables or regular Functions for modules.
 
 ### A note on methods and functions
 
