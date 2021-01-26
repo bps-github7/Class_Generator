@@ -47,7 +47,7 @@ Generates a directory, or series of directories of files, unit tests,
 documentation structuring that matches the specification provided through input.
 
 ### Details 
-* Defaults to creating a [default package](#): a new directory, 
+* Defaults to creating a [default package](##Default-package): a new directory, 
 labeled with project name, that contains all generated files. 
 
 * With no '--path' argument, the default package will be produced as a subdirectory in the same directory where the script is run.
@@ -76,53 +76,6 @@ __NOTE__ that all arguments in the inline are optional except class name.
 
 Forward slashes seperate multiple classes, whereas the comma delimits the individual members of each classes fields (seperating the individual attributes per one class)
 
-### Inline with basic inheritance:
-`ClassA > ClassB : attr1,attr2 > attr3,attr4 : method1 > method2 : -t > -e`
-
-This uses the same rules as the basic inline, except that '>' has been used to indicate a `parent > child` relationship
-
-### Inline with multiple inheritance:
-
-`ClassA / ClassB > ClassC : attr1,attr2/ attr3,attr4 > attr5,attr6 : method1/ method 2 > method3 : -t / -e > -e`
-
-This is a Multiple file inline and Inheritance Inline in one- forward slashes and commas still have the same purpose, but in this case, `ClassC` is a child of both `ClassA` and `ClassB`. 
-
-*NOTE the '>'* in attribute, method and option fields __does not__ indicate inheritance relationship between the terms clarification to the parser on where the inherited terms line up.
-
-
-## Packaging Inline
-`<p:(package:module)`
-
-this enhanced Inline follows all the syntax rules of previous examples, but the 'package:module' part only takes these two arguments.
-
-### Simle example
-`<p:(package1:file1,file2)>`
-
-### denote a file as  a module with `-m`
-
-`<p:(package1:file1 -m,file2)>`
-
-again, default behavior is to assume the files are classes
-
-### Multiple Packages
-
-`<p:(package1/package2:file1,file2 / file3,file4)`
-
-### Package Containing Other Packages
-
-`<p:(package1 > package2 : file1,file2 > file3)`
-
-### When there are multiple containing packages
-you need to declare what package a contained package belongs to
-
-`<p:(package1 / package2 > package3 (package1) : ...)>`
-
-If the containing package can be assumed based on position, then this syntax is not needed.
-
-### A multiple-inheritance packaging-inline
-
-`<p:(package1 / package > package3 (package2): file1, file2 / file3, file4 > file5, file6)>`
-
 ## Summary: 
 
 1. identifier (class name, attributes and methods)
@@ -131,7 +84,7 @@ and optional arguments are seperated by colons
     `Mandatory : optional : optional : optional`
 
 
-2. use comma to seperate individual attributes, forward slashes to seperat multiple classes, and > to indicate inheritance.
+2. Use comma to seperate individual attributes, forward slashes to seperat multiple classes, and > to indicate inheritance.
 
     `ClassA : attr1,attr2 : method1,method2 `
 
@@ -158,34 +111,37 @@ Rules:
     This creates a ClassA with only testing and exporting (no attributes or methods)
 
 
+To learn more about the syntax and see examples, see the [inline specification](inline_specification.md)
+
+
 # Features
 
 * Generate simple to sophisticated classes/modules and directory (packaging)
-  structuring with a [simple, easy to learn and understand syntax](#).
+  structuring with a simple, easy to learn and understand syntax.
 
-* Choice of 3 modes for providing input- [command line](#), [input file](#) and [interactive mode](#)
+* Choice of 3 modes for providing input- [command line](##Command-line-mode), [input file](#File-as-input) and [interactive mode](#Interactive-mode)
 
 * Create multiple, fleshed out classes with a single argument.
 
-* Create [simple or complex multiple inheritance hierarchies with a single argument](#)
+* Create simple or complex multiple inheritance hierarchies with a single argument.
 
-* Create [packaging structure/ hierachy with a single argument](#).
+* Create packaging structure/ hierachy with a single argument.
 
-* Easily generate [additional files and perform actions with generated classes](#)
+* Easily generate additional files and perform actions with generated classes.
 
-* Easily customize and persist multiple users preferences with [.rc file](#)
+* Easily customize and persist multiple users preferences with [.rc file](#Customization)
 
 
 ## Classes
-### all components of PEP8 new style class are generated, including:
+all components of PEP8 new style class are generated, including:
 * constructor(__init__)
 * dundr str and dundr repr
 * header/script stub (if desired)
 * All classes are generated in new object syntax, meaning:
     * getters and setters are not implemented by default.
-    * if the class is specified as 'protected' (see [prepended arguments](#)) then its attributes will be generated with (@property and @setter)methods.
+    * if the class is specified as 'protected', its attributes will be generated with the `@property` and `@setter` computed property methods (aka getters and setters).
 
-## prepend-options
+## Prepend Arguments
 * 'SM' prepended to a method identifier will generate the method as a static method.
 * 'CM' prepended to a method identifier will generate the method as a class method.
 * 'CV' prepended to a attribute identifier will generate the attribute as a class variable (NOTE only works with class inlines, not modules)
@@ -199,10 +155,13 @@ customize the following:
 * testing- what should the '-t' option do?
 * exporting- what should the '-e' option do?
 * default-package- what is it?
+* override the default-default package. where the program generates the package/files assuming no '--path' argument was provided.
+* Should the 'name' positional argument be mandatory by default? (only makes sense if they are generating packages)
+* ...
 
 # Command-line-mode:
 
-to use the command line, the following arguments are mandatory:
+To use the command line, interpret the main file 'filegenerator.py' as a module. __Note:__ the first argument 'name', the name of the default package is mandatory:
 
 -name: pass it in as a positional argument
 `python -m filegenerator.py 'my_cool_project'`
@@ -223,10 +182,11 @@ additional optional arguments can be passed in as switches/flags
 * '-t'  generates the file with testing suite
 * '-e' generates the file and exports it.
 
+Unless you are using a file as input or the interactive mode, it makes no sense to not provide '--inline' argument. Without it, the program assumes you want to use interactive mode.
+
 ## Default-package
 
-is created based on the 'name' and 'path (optinal)' arguments provided
-by command line invokation:
+This is created based on the 'name' and 'path (optinal)' arguments provided by command line invokation:
 
 
 `python -m filegenerator.py 'myexampleproject' --path 'C://path//to//here'`
@@ -235,9 +195,9 @@ creates a default package of:
 
 `C://path//to//here//myexampleproject`
 
-this is the path where files generated in the current session are created (unless otherwise specified by a provided packaging inline)
+This is the path where files generated in the current session are created (unless otherwise specified by a provided packaging inline)
 
-__note:__ when the main script is run inside one of the packages, it will create
+__note:__ when the main script is run inside a machines file system, it will create
 the generated files there by default, in a sub directory with the project name.
 
 you can override this by configuration(***), or by using packaging part of extension to denote where the file(s) should be generated. (link : inline_spec/extensions)
@@ -248,11 +208,11 @@ you can pass a file in as the sole argument to the file generator, where each li
 
 `#Unix`
 
-`$ ./cls_gen example`
+`$ ./filegenerator example`
 
 `#NT / Windows`
 
-`$ python cls_gen.py -f example.txt`
+`$ python -m filegenerator.py -f example.txt`
 
 * Input file syntax
 
@@ -264,6 +224,8 @@ in the input file, seperate inline specifications with a single newline characte
 `...`
 
 `class_n : attr1, attr2, attr3 : method1, method2, method3 : -t`
+
+For reasons explained below, it makes most sense to provide all packaging inlines BEFORE providing regular ones.
 
 # Interactive-mode
 
@@ -281,6 +243,7 @@ As explained in previous sections, packaging is required first because it create
 for example:
 
 `<p:(package1 : classA, moduleA)>`
+
 `ClassA : attr1, attr2 : method1 : -te`
 
 creates a 'ClassA' with the specified members, and assumes that
@@ -293,9 +256,7 @@ because of the previously provided class file.
 A more problematic example would be:
 
 `ClassA / classB : attr1/attr2, attr3,attr4 : method1 , method2 : -t / -e`
+
 `<p:(package1 : ClassA, ClassB)>`
 
 unless the packaging is explicitly provided and declares that ClassA and ClassB are members of a different package, then a duplicate version of ClassA and ClassB will be created in the [default package](##default-package)
-
-
-
