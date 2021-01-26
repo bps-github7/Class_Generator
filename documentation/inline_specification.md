@@ -3,7 +3,7 @@
 ##### index:
 1. [Inline Mini-Language Full specification](#Inline-Mini-Language)
 2. [Extensions](#Extensions)
-3. [Pre-pend arguments](#Pre-pend-Arguments)
+3. [Prepend arguments](#Prepend-Arguments)
 4. [Optional Aruments](#Optional-Arguments)
 4. [Withholding Arguments](#A-note-on-withholding-arguments)
 5. [Inheritance](#Inheritance)
@@ -66,21 +66,25 @@ note the whitespace seperating the two parenthesized text blocks.
 
 If you were to provide only parents:
 
-`ClassA(parent1, parent2): attr1 / attr2 : method : -t`
+`ClassA(parent1, parent2): attr1, attr2 : method : -t`
 
 If you were to provide only packages:
 
-`ClassA (package1, package2) : attr1 / attr2 : method : -t`
+`ClassA (package1, package2) : attr1, attr2 : method : -t`
 
-# Pre-pend-Arguments
-* 'CV'
-* 'SM'
-* 'CM'
-* '' default behaivor: prepend nothing for instance variables or regular Functions for modules.
+# Prepend-Arguments
+
+These are small texts you prepend to attributes or methods to declare them as a certain type.
+
+* 'CV' class variable
+* 'SM' static method
+* 'CM' class method
+
+The default behaivor (no prepend arguments) generates instance 
+variables and methods, variables and functions for modules.
 
 ### A note on methods and functions
-
-because of the limited nature of a utility command line tool, we cannot provide any implementation of methods or functions. However, two things can be done to help:
+Because of the limited nature of a utility command line tool, we cannot provide any implementation of methods or functions. However, two things can be done to help:
 
 1. The method signature can be provided in the inline, but is not nescessary.
 
@@ -92,11 +96,19 @@ because of the limited nature of a utility command line tool, we cannot provide 
 
     yields
 
-    `def method_name(self, x,y):`
+    `def method_name(self,x,y): ...`
+
+    And in the context of a module:
+
+    `module1 : : function(name, age) : -m`
+
+    yields
+
+    `def function(name, age): ...`
 
 2. A correctly formatted pep8 docstring will be provided by default
 
-3. Both these features are configurable and can be customized via the .rc file.
+3. Both these features can be customized via the .rc file.
 
 # Optional-Arguments
 * `-t` <testing> generates the file with testing suite
@@ -106,18 +118,16 @@ because of the limited nature of a utility command line tool, we cannot provide 
 
 1. Append the switch to the end of a single class spec (as the fourth argument, procceding from methods) to apply the switch to ALL file.
 
-`Class_A / Class_B : A1, A2/ B1, B2  : SMmethod/ CMmethod, method1 : -t -e{comp,send}` 
+`Class_A / Class_B : A1, A2/ B1, B2  : SMmethod/ CMmethod, method1 : -te` 
 
-generated files will be generated with testing and then be compressed and sent via email. (non-specific)
+Generated files will be generated with testing and then be compressed and sent via email. (non-specific)
 
 2. or apply it in coordinatation with your identifiers to apply the switch selectively. 
 
 
 `A/ B/ C: attr1/ _attr2/ __attr3 : SMmethod/ CMmethod / CMmethod2 : -t / / -t`
 
-generates unit testing for classes A and C, but not B.
-
-Elaborate example demonstrating the -m and -a flags
+Generates unit testing for classes A and C, but not B (specific).
 
 `A/ B/ C: attr1/ _attr2/ __attr3 : SMmethod/ CMmethod / CMmethod2 : -m / -a / -m`
 
@@ -127,62 +137,51 @@ A and C are modules, B is an abstract base class
 
 `A / B : attrA1 / attrA2, attrB1 / attrB2 : method1 / method2 : -t -m / -e -a`
 
-generates A as a module with testing
+Generates A as a module with testing.
 B is an abstract base class and will be exported.
 
-NOTE some combinations are not logical and will cause errors,
-such as -m -a (module cannot be an abstract base class)
+__NOTE:__ Some combinations are not logical and will cause errors,
+such as `-ma` as a module cannot be an abstract base class.
 
 
-4. you can collapse switches like possible with bash builtins
+4. You can collapse switches like possible with bash builtins
 
 `my_cool_module : var1, var2, var3 : mycoolfunction : -mte`
 
 generates a module with testing and exporting.
 
-3. note the default/keyword argument dictionary at the end of the -e option.
-
-Withholding any of the arguments in the dictionary deselects them
-
-`-e{vsc}` 
-exports with source code management, but not compression or email/ssh send
-
-withhold the keyword dictionary entirely to choose all the options with their default arguments
-`-e` 
-This switch selects source code management default of initializing a new repo for the project, compression to a .tgz tarball and sending via email
-
-To switch the keyword to an option other than its default, assign a valid choice to it with a string arugment.
-
-`-e{vsc='commit; merge HEAD'}`
-assuming the program is aware of the repository and git account in use, runs the supplied commands with git.
-
 # A-note-on-withholding-arguments
-while the specific arguments after class name are optional
-the semi colons fundemental to coherent inlines.
+While the specific arguments after class name are optional,
+the semi colons are fundemental to coherent inlines.
+
+
 They are needed to designate where one field begins and the other ends.
-(exception being optional fields. for example:)
 
 `BiscuitFrontier` 
 
-creates an empty class called 'BiscuitFrontier'
+This creates an empty class called 'BiscuitFrontier'
 
-however, to designate it as an abscract base class:
+However, to designate it as an abscract base class:
 
-`BiscuitFrontier::-a` 
+`BiscuitFrontier:::-a` 
 
-Meaning, to include only methods or only options, you must
+To include only methods or only options, you must
 provide the right amount of colons, so that the parser can
 identify the correct arguments based on their position in the inline.
 
 `BiscuitFrontier : attr1, attr2` 
-    good
+
+Good. This works.
 
 
 `BiscuitFrontier : method1, method2`
-`BiscuitFrontier : -a`
-    wrong
 
-instead:
+
+`BiscuitFrontier : -a`
+
+Wrong.
+
+Instead do this:
 
 `BiscuitFrontier : : method1, method2`
 
@@ -194,7 +193,7 @@ This inline specifies that class2 is a descendant of class1 and inherits any fie
 
 `class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB : -t > -e`
 
-This same syntax applies to packaging inlines. a '>' indicates that the left operand contains the right
+This same syntax applies to packaging inlines. A '>' indicates that the left operand contains the right.
 
 `<p:(package1 > package2 : class1 / module1 > class2 / module2)>`
 
@@ -207,7 +206,7 @@ When nessecary, use the basic inline grouping syntax to specify multiple inherit
 # Packaging-Inline-Syntax
 
 The inline spec can also be used to describe a packaging structure, and 
-uses all the same tokens as a normal inline. just add the packaging decorator to distinguish:
+uses all the same tokens as a normal inline. Simply add the packaging decorator to distinguish:
 
 `<p:( package_name : module_name )>`
 
@@ -217,13 +216,13 @@ in practice, you can append a '-m' to files you want to designate as modules lik
 
 `<p:( Package1 : file1 / file2 -m/ file3 / file4 -m )>`
 
-generates file2 and file4 as a module.
+This generates file2 and file4 as a module.
 
 Note these important guidelines
 1. If you are generating packaging and regular files in the same session, then generate the packaging first
 (failure to do so may result in duplicate files ).
 2. using the full extension for regular inlines is reccomended for seamless coordination of these two types
-of inlines (this way, the two inlines can work together to create the packaging and files as specificed)
+of inlines (this way, the two inlines can work together to create the packaging and files as specificed, while avoiding duplicate file generation)
 
 `demonstrate this`
 
@@ -231,17 +230,15 @@ of inlines (this way, the two inlines can work together to create the packaging 
 
 `<p:(package1 / package2 > package3 (package1) : module1 (package1) / module2 (package2) , ...)>`
 
-the extension is required to tell the parser where each file goes in the packaging hierarchy.
+The extension is required to tell the parser where each file goes in the packaging hierarchy.
 
-In either case (packaging or regular inlines) the extensions are simply reccomended for seamless generating.
-withholding that, the program must ask during run time where each nested package and or file is placed
+In either case (packaging or regular inlines) the extensions are simply reccomended for seamless generating, when needed.
+Withholding that, the program must ask during runtime where each nested package and or file is placed
 in the case of a complex packaging structure.
 
 `some more examples of this, showing the inline and the packaging and files it creates`
 
 # Some-Common-Inline-Examples
-
-# Inline Examples
 
 A basic inline spec: 
 
@@ -270,7 +267,7 @@ Examples of prepend arguments and passed in method/function signitures
 
 `pentagon : var1, var2 : do_a_pentagon_thing(x,y,z) :-m`
 
-An inline with multiple classes:
+Inlines with multiple classes:
 
 `ClassA / ClassB : attr1, attr2 / attr3, attr4 : method1, method2 / method3,method4 : -t / -e`
 
@@ -278,13 +275,14 @@ An inline with multiple classes:
 `classA / classB/ ... ClassN : attrA1, attrA2 / attrB1, attrB2 / ... / attrN1, attrN2 : methodA / methodB / ... / methodN : -t -e / -t / ... / -t -e`
 
 
-inline spec with simple inheritance:
-* `class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB : -t > -e`
+An inline spec with simple inheritance:
+
+`class1 > class2 : attr1, attr2 > attr1, attr2 : methodA > methodB : -t > -e`
 
 
-inline spec with complex, hierachircal and/or multiple inheritances:
+An inline spec with complex, hierachircal and/or multiple inheritances:
 
-`classA / classB/ classC > classD : A1, A2, A3/ B1, B2, B3/ C1, C2, C3/ D1, D2, D3 : Amethod/ Bmethod/ Cmethod/ Dmethod : -e / -e / -t > -e -t`
+`classA / classB/ classC > classD : A1, A2, A3/ B1, B2, B3/ C1, C2, C3 > D1, D2, D3 : Amethod/ Bmethod/ Cmethod > Dmethod : -e / -e / -t > -e -t`
 
 
 package structuring with the inline spec
