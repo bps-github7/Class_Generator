@@ -67,17 +67,16 @@ class InheritanceBuilder:
         parent = 'object'
         for cls, attr, method, opts in zip(classes, attributes, methods, options):
             # insert the parents into the extension if the class name has one.
-            if parent != object and re.match(r"(\w)*[(]", cls):
-                ### need a foolproof way of getting inheritance working with OR without extensions in class name! aloha!
-                pass
-                # extensions = get_extension(cls)
-                # parents = extensions[1].split(",")
-                # parents.extend(parent.split(","))
-                # extensions = ",".join(parents)
+            if parent != "<class 'object'>" and re.match(r"(\w)*[(]", cls):
+                class_name, rest = cls.split("(")[0], cls.split("(")[1]
+                print(rest.split(")")[0])
+                # print(f"class name : {class_name} rest : {rest}")
+                # cls = f"{class_name}({parent},{rest}"
             else:
-                print("no tienes un extension")
+                parent = cls
+            # are you sure this is a super effective test? cases you are forgetting about?
             new.append(Inline.from_individual_arguments(cls, attr, method, opts))
-            parent = cls
+            
         
         # only attribute in this class that matters.
         # does this even need to be a class?
