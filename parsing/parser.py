@@ -10,7 +10,7 @@ About: handles the parsing of Inlines of various forms.
 import sys
 sys.path.insert(0,"C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 
-import re
+# from utils.misc_functions import get_extension
 from parsing.inline import Inline
 from parsing.validation import validate_inheritance,\
 validate_inline, validate_multiple, validate_packaging
@@ -19,72 +19,77 @@ from parsing.inheritance_builder import main as inheritance_main
 # from parsing.packaging import main as packaging_main
 # from utils.editing_menu import get_feedback
 
-def multiple_inline_handler(inline : Inline):
-    """[summary]
+### Maybe should make a seperate file for multiple inlines?
+
+def four_piece_multiple(inline : list):
+    specs = []
+    for i, value in enumerate(inline):
+        inline[i] = value.split("/")
+    for cls,attr,method,option in zip(inline[0], inline[1], inline[2], inline[3]):
+        specs.append(Inline.from_individual_arguments(cls,attr,method,option))
+    return specs
+
+
+
+def three_piece_multiple(inline : list):
+    specs = []
+    for i, value in enumerate(inline):
+        inline[i] = value.split("/")
+    for cls,attr,method in zip(inline[0], inline[1], inline[2]):
+        specs.append(Inline.from_individual_arguments(cls,attr,method))
+    return specs
+
+# what about missing attributes
+
+# what about missing methods
+
+# what about missing options
+
+
+
+def two_piece_multiple(inline : list):
+    specs = []
+    for i, value in enumerate(inline):
+        inline[i] = value.split("/")
+    for cls,attr in zip(inline[0], inline[1]):
+        specs.append(Inline.from_individual_arguments(cls,attr))
+    return specs
+
+# what about missing attr and methods
+
+# what about missing attr and opt
+
+def one_piece_multiple(inline : list):
+    specs = []
+    inline = inline.split("/")
+    specs.append(Inline.from_individual_arguments(inline))
+    return specs
+
+
+
+
+def multiple_inline_handler(inline : str):
+    """Takes a string containing a multi file inline.
+    turns it into an array of inlines 
+    by following the mini language syntax rules.
 
     Args:
-        inline ([type]): [description]
+        inline (str): A multi family inline containing string.
     """
-    specifications = []
-    classes, attributes, methods, options = [], [], [], []
-    ### need to validate the inline before using this
-    ### to confirm number of / and , match up correctly.
-    for single_class, its_attributes, its_methods, its_options in zip(
-            inline.classes.split(","),
-            inline.attributes.split("/"),
-            inline.methods.split("/"),
-            inline.options.split("/")):
-        classes.append(single_class)
-        attributes.append(its_attributes)
-        methods.append(its_methods)
-        options.append(its_options)
-    # setting parent and package to defaults in this and else block below
-    # until we sophisticate the packaging and inheritance functionality a bit more
-
-    ### Two things to note here- 1 is this fn returning a nested list which is then
-    ### appended to another list? messy complicated JA? 2. how to do the same as above
-    ### with packaging and parents? make a mini fn for parsing parent and package out of class?
-    ### these attributes should be accessible from out here...
-
-    classes = list(map(get_extension, classes))
-
-    specifications = [Inline.from_details(class_title[0], attribute_group, method_group, class_title[1],
-    class_title[2], options_group) for class_title, attribute_group, method_group,
-    options_group in zip(classes, attributes, methods, options)]
-    return specifications
-
-
-def get_extension(cls):
-    """
-takes class string and gets parent and packaging out of it
-    """
-
-    ### NOTE: args must be passed in like they appear in the string
-    ### ie. finished = ['class_name', 'parents', 'packages']
-    finished = []
-    ### example(parents) (packages)
-    if cls.count(") ("):
-        classes = cls.split(") (")
-        finished.append(classes[0].split("(")[0].strip())
-        finished.append(classes[0].split("(")[1].strip())
-        finished.append(classes[1].strip(")"))
-    ### Only the packaging - example (packages)
-    elif cls.count(" ("):
-        classes = cls.split(" (")
-        finished.append(classes[0].strip())
-        finished.append(object)
-        finished.append(classes[1].strip(")").strip())
-    ### only the parent - example(parents)
-    elif re.match(r"(\w)*[()]", cls):
-        classes = cls.split("(")
-        finished.append(classes[0].strip())
-        finished.append(classes[1].strip(")").strip())
-        finished.append("root")
+    inline = inline.split(":")
+    if len(inline) == 4:
+        return four_piece_multiple(inline)
+    elif len(inline) == 3:
+        return three_piece_multiple(inline)
+    elif len(inline) == 2:
+        return two_piece_multiple(inline)
+    elif len(inline) == 1:
+        return one_piece_multiple(inline)
     else:
-        finished.append(cls.strip())
-        finished.append(object)
-        finished.append("root")
-    return finished
+        print("Cannot parse this thing. sorry.")
+        return 0
+
+
 
 def parse_inline(inline : str, verbose=False):
     """[summary]
@@ -151,4 +156,11 @@ def main(inline: Inline) -> int:
     return classes
     # return get_feedback(classes)
 
-print(main("classA(bisk), classB, classC : attr1, attr2 / attr3, attr4 / attr5, attr6 : method1 / method2 / method3 : -t / -e / -t -e"))
+# print(main("classA(bisk), classB, classC : attr1, attr2 / attr3, attr4 / attr5, attr6 : method1 / method2 / method3 : -t / -e / -t -e"))
+
+
+# what if the inlines passed in don't have extensions? be warry of bugs caused by this..!
+# test = multiple_inline_handler("classA(bisk)/ classB (chalp)/ classC(cyclone,asparagus) (dirty): attr1, attr2 / attr3, attr4 / attr5, attr6 : method1 / method2 / method3 : -t / -e / -t -e")
+
+# for i in test:
+#     print(i.parents)

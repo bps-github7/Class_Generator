@@ -142,7 +142,6 @@ options: {}".format(self.classes, self.attributes,
             [type]: [description]
         """
         items = clean_list(args)
-        print(items)
         if ignore_extensions:
             class_names = []
             if items[0].count("),"):
@@ -150,7 +149,7 @@ options: {}".format(self.classes, self.attributes,
                 for item in classes:
                     if item.count("("):
                         class_names.append(item.split("(")[0])
-        items[0] = ",".join(class_names)
+                        items[0] = ",".join(class_names)
         if len(items) == 1:
             return Inline(items[0], verbose=verbose)
         elif len(items) == 2:
@@ -165,9 +164,11 @@ arguments\nRefer to the README file for instructions on proper inline format")
             return 0
 
 if __name__ == "__main__":
-    first = Inline.from_individual_arguments("ClassA(aloha, doorknob-grenade) (biscuits, chalpskone, arf), ClassB(A1,A2) (PA,PB)", ['attr1', 'attr2'], ['method1', 'method2'], "-t -e", ignore_extensions=True)
+
+    # the Inline class cant handle a multiple on its own. we need to validate them as a string then parse into multiple seperate inlines
+    first = Inline.from_individual_arguments("ClassA(aloha, doorknob-grenade) (biscuits, chalpskone, arf)", ['attr1', 'attr2'], ['method1', 'method2'], "-t -e")
     # second = Inline.from_details("ClassA", ['attr1', 'attr2'], ['method1', 'method2'], "funky, bisk, capitler", "Hi Moofa, Chalpskone", "-t -e")
-    print(first.classes)
+    print(first.parents)
     # new = [first, second]
 
     # print(new)

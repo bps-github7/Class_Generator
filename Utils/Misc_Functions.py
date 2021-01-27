@@ -3,6 +3,7 @@
 # Software: Python class Generator
 # Date: 1/21/2020
 
+import re
 import sys
 import os
 import errno
@@ -12,6 +13,39 @@ sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 
 
 """Module defines miscellaneous functions used for the class generator"""
+
+def get_extension(cls):
+    """
+takes class string and gets parent and packaging out of it
+    """
+
+    ### NOTE: args must be passed in like they appear in the string
+    ### ie. finished = ['class_name', 'parents', 'packages']
+    finished = []
+    ### example(parents) (packages)
+    if cls.count(") ("):
+        classes = cls.split(") (")
+        finished.append(classes[0].split("(")[0].strip())
+        finished.append(classes[0].split("(")[1].strip())
+        finished.append(classes[1].strip(")"))
+    ### Only the packaging - example (packages)
+    elif cls.count(" ("):
+        classes = cls.split(" (")
+        finished.append(classes[0].strip())
+        finished.append(object)
+        finished.append(classes[1].strip(")").strip())
+    ### only the parent - example(parents)
+    elif re.match(r"(\w)*[(]", cls):
+        classes = cls.split("(")
+        finished.append(classes[0].strip())
+        finished.append(classes[1].strip(")").strip())
+        finished.append("root")
+    else:
+        finished.append(cls.strip())
+        finished.append(object)
+        finished.append("root")
+    return finished
+
 
 def cleanse(items: any):
         """format properties by strip and lowercase of each elements.
