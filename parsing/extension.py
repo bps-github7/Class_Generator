@@ -42,18 +42,22 @@ either, niether or both argument parts of the extension are provided.
             self.parents = object
             self.packages = "root"
 
-    def __str__(self, show_defaults=False):
-        if show_defaults:
-            return f"{self.class_name}({self.parents}) ({self.packages})" 
-        if self.parents == object:
-            if self.packages == 'root':
-                return f"{self.class_name}"
+    def __str__(self, show_defaults=False, show_extension=True):
+        if show_extension:
+            if show_defaults:
+                return f"{self.class_name}({self.parents}) ({self.packages})" 
+            if self.parents == object:
+                if self.packages == 'root':
+                    return f"{self.class_name}"
+                else:
+                    return f"{self.class_name} ({self.packages})"
             else:
-                return f"{self.class_name} ({self.packages})"
+                if self.packages == 'root':
+                    return f"{self.class_name}({self.parents})"
+                return f"{self.class_name}({self.parents}) ({self.packages})"
         else:
-            if self.packages == 'root':
-                return f"{self.class_name}({self.parents})"
-            return f"{self.class_name}({self.parents}) ({self.packages})"
+            return f"{self.class_name}"
+
 
     def __repr__(self):
         return repr({"classname": self.class_name, "parents" : self.parents, "packages" : self.packages})

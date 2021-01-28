@@ -47,15 +47,17 @@ takes class string and gets parent and packaging out of it
     return finished
 
 
-def cleanse(items: any):
-        """format properties by strip and lowercase of each elements.
-        side-effect: coerces ',' delimited string to formatted list.
-        """
-        if isinstance(items, list):
-            return list(map(
-                lambda item: item.strip().lower(), items))
+def cleanse(items: any, item_type="field"):
+    """format properties by strip and lowercase of each elements.
+    side-effect: coerces ',' delimited string to formatted list.
+    """
+    # if item_type == "class":
+    #     my_little_lamb = lambda.strip().
+    if isinstance(items, list):
         return list(map(
-            lambda item: item.strip().lower(), items.split(",")))
+            lambda item: item.strip().lower(), items))
+    return list(map(
+        lambda item: item.strip().lower(), items.split(",")))
 
 
 def clean_list(args):

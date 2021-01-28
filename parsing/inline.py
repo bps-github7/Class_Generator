@@ -9,8 +9,8 @@ Module level docstring: implements the Inline class
 import sys
 import re
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
-from utils.misc_functions import clean_list
-
+from utils.misc_functions import clean_list, cleanse
+from parsing.extension import Extension
 
 class Inline:
     '''
@@ -29,80 +29,122 @@ Exceptions: Unknown at this point.
     version = 4.0
 
     def __init__(self, inline : str, verbose = False):
+
+        ### lets do essential validation
         self.inline = inline.split(":")
         # gives progress tracking output text when set to True. 
         self.verbose = verbose
         ### Initializing these in advance to avoid not defined errors
         self.attributes = None
         self.methods = None
-        self.options = None
-        self.defensive_initialize()
-
-    def defensive_initialize(self):
-        """Keeps the Inline from being
-        Initialized with incorrect or badly
-        formated values.
-
-        Returns:
-            [type]: [description]
-        """
-        #### cant make class with no name
+        self.options = {"testing" : False, "exporting" : False, "module" : False, "abc" : False}
         if self.inline[0] is None:
             print("Inline cannot be parsed if no class identifier is provided")
             return None
         else:
-            self.classes = self.inline[0].strip()
-            self.get_extension()
+            # get an extension out of class name, 
+            # if none is provided then sets to defaults
+            self.extension = Extension(self.inline[0].strip())
+            self.class_name = self.extension.class_name
+            self.parents = self.extension.parents
+            self.packages = self.extension.packages
             if self.verbose:
-                print(f"creating inline (human readable representation) for class {self.classes}")
+                print(f"creating inline (human readable representation) for class {self.class_name}")
         # defensive prograamming to avoid IndexError
         # in cases where no colons are provided or attr was skipped.
         if len(self.inline) > 1:
             if len(self.inline) >= 2 and self.inline[1] in ('', ' ', None):
                 pass
             else:
-                self.attributes = self.inline[1].strip()
+                # trying to get rid of whitespace between commas
+                self.attributes = cleanse(self.inline[1].strip())
         if len(self.inline) > 2:
             if len(self.inline) >= 3 and self.inline[2] in ('',' ',None):
                 pass
             else:
-                self.methods = self.inline[2].strip()
+                self.methods = cleanse(self.inline[2].strip())
         if len(self.inline) > 3:
             if len(self.inline) == 4:
-                self.options = self.inline[3].strip()
+                self.parse_options(self.inline[3].strip())
 
-    def get_extension(self):
-        """Handles any case where class meta data
-        is passed in when Inline is initialized.
+    ### getters / setters because accessing options kind of wierd with a dict
+    @property
+    def testing(self):
+        return self.options["testing"]
+
+    @property
+    def exporting(self):
+        return self.options["exporting"]
+
+    @property
+    def module(self):
+        return self.options["module"]
+
+    @property
+    def abc(self):
+        return self.options["abc"]
+
+
+    def parse_options(self, arg):
+        """[summary]
+
+        Args:
+            arg ([type]): [description]
         """
-        ### example(parents) (packages)
-        if self.classes.count(") ("):
-            classes = self.classes.split(") (")
-            self.classes = classes[0].split("(")[0].strip()
-            self.parents = classes[0].split("(")[1].strip()
-            self.packages = classes[1].strip(")")
-        ### Only the packaging - example (packages)
-        elif self.classes.count(" ("):
-            classes = self.classes.split(" (")
-            self.classes = classes[0].strip()
-            self.parents = object
-            self.packages = classes[1].strip(")").strip()
-        ### only the parent - example(parents)
-        elif re.match(r"(\w)*[()]", self.classes):
-            # the python equivalent of above expression
-            # will snag on undesired tokens, resulting in wrong values.
-            classes = self.classes.split("(")
-            self.classes = classes[0].strip()
-            self.parents = classes[1].strip(")").strip()
-            self.packages = "root"
+        options = arg.split("-")
+        for items in options:
+            if len(items) > 1:
+                # for collapsable args
+                for i in items:
+                    self.switch_flipper(i)
+            # for traditional args
+            else:
+                self.switch_flipper(items)
+        if self.module and self.abc:
+            print("Error: You cannot make an abstract base class a module.")
+            return 0
+
+
+    def switch_flipper(self, arg):
+        """Tests the options one at a time
+        to flip any switch to True if provided.
+
+        Args:
+            arg (str - technically its a chr): single character flag/switch
+
+        Returns:
+            [int]: will return 0 for errors, 1 for success
+        """
+        if arg in (" ",""):
+            return 1
+        if arg == "t":
+            self.options["testing"] = True
+        elif arg == "e":
+            self.options["exporting"] = True
+        elif arg == "m":
+            self.options["module"] = True
+        elif arg == "a":
+            self.options["abc"] = True
         else:
-            self.classes = self.classes.strip()
-            self.parents = object
-            self.packages = "root"
+            print(f"Error: {arg} option provided is not recognized (See README)")
+            return 0
+
+
+    ## facilitate adding parents/ packages
+    ## by making the nested objects' interface more public
+    def add_parents(self, new_parents):
+        self.extension.add_parents(new_parents)
+        self.parents = cleanse(self.extension.parents)
+
+    def add_packages(self, new_packages):
+        self.extension.add_packages(new_packages)
+        self.packages = cleanse(self.extension.packages)
+
+
 
     def __eq__(self, other):
         if isinstance(other, self.__class__) and \
-        self.classes == other.classes and \
+        self.class_name == other.class_name and \
         self.attributes == other.attributes and \
         self.methods == other.methods and \
         self.options == other.options:
@@ -115,20 +157,24 @@ Exceptions: Unknown at this point.
 
     def __repr__(self):
         # not safe but what can we do?
-        return self.__str__()
+        return repr({"classname" : self.class_name, "attributes" : self.attributes , "methods" :  self.methods, "options" : self.options})
 
-    def __str__(self, single_line=True, simple_print=False):
+    def __str__(self, single_line=True, show_extension=False, show_defaults=False):
         if single_line:
-            if simple_print:
-                return "{} : {} : {} : {}".format(self.classes, self.attributes, self.methods, self.options)
-            classes = f"{self.classes}({self.parents}) ({self.packages})"
-            return "{} : {} : {} : {}".format(classes, self.attributes, self.methods, self.options)
+            if show_extension:
+                if show_defaults:
+                    return "{} : {} : {} : {}".format(self.extension.__str__(show_defaults-True), self.attributes, self.methods, self.options)    
+                return "{} : {} : {} : {}".format(self.extension, self.attributes, self.methods, self.options)    
+            return "{} : {} : {} : {}".format(self.class_name, self.attributes, self.methods, self.options)
         else:
-            return "class(es): {}\n\
-attributes: {}\n\
-methods: {}\n\
-options: {}".format(self.classes, self.attributes,
-                      self.methods, self.options)
+            return \
+f"Class name: {self.class_name}\n\
+Attributes: {self.attributes}\n\
+Methods: {self.methods}\n\
+Options: {self.options}\n\
+Parents: {self.parents}\n\
+Packages: {self.packages}\n"
+
 
     @classmethod
     def from_details(cls, classname, attr, method, parents, packages, opts):
@@ -139,7 +185,11 @@ options: {}".format(self.classes, self.attributes,
         """
         Builds an inline object from the component parts.
         Returns:
-            [type]: [description]
+            [Inline] : the Inline created out of the args provided
+        
+        I'd like to get rid of this method at some point.
+        berry bulky and easily relied upon, rather than
+        a more rigerous method of validation
         """
         items = clean_list(args)
         if ignore_extensions:
@@ -164,19 +214,15 @@ arguments\nRefer to the README file for instructions on proper inline format")
             return 0
 
 if __name__ == "__main__":
+    first = Inline("ClassA(barn,house) (pillow) : attr1, attr2, attr3, attr4\
+: method1, method2, method3 : -tem")
 
-    # the Inline class cant handle a multiple on its own. we need to validate them as a string then parse into multiple seperate inlines
-    first = Inline.from_individual_arguments("ClassA(aloha, doorknob-grenade) (biscuits, chalpskone, arf)", ['attr1', 'attr2'], ['method1', 'method2'], "-t -e")
-    # second = Inline.from_details("ClassA", ['attr1', 'attr2'], ['method1', 'method2'], "funky, bisk, capitler", "Hi Moofa, Chalpskone", "-t -e")
-    print(first.parents)
-    # new = [first, second]
+    # print(first.exporting)
 
-    # print(new)
-    # for i in new:
-    #     print(i.classes)
-    #     print(i.attributes)
-    #     print(i.methods)
-    #     print(i.parents)
-    #     print(i.packages)
-    #     print(i.options)
-    #     print("\n\n")
+    # Default arg setting seems to be working nicely
+    second = Inline("ClassB")
+    # print(second.exporting)
+
+    new = [first, second]
+    for items in new:
+        print(items.packages)
