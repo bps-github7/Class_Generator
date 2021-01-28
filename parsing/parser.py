@@ -16,80 +16,9 @@ from parsing.validation import validate_inheritance,\
 validate_inline, validate_multiple, validate_packaging
 # validate_file,
 from parsing.inheritance_builder import main as inheritance_main
+from parsing.multiple import main as multiple_main
 # from parsing.packaging import main as packaging_main
 # from utils.editing_menu import get_feedback
-
-### Maybe should make a seperate file for multiple inlines?
-
-def four_piece_multiple(inline : list):
-    specs = []
-    for i, value in enumerate(inline):
-        inline[i] = value.split("/")
-    for cls,attr,method,option in zip(inline[0], inline[1], inline[2], inline[3]):
-        specs.append(Inline.from_individual_arguments(cls,attr,method,option))
-    return specs
-
-
-
-def three_piece_multiple(inline : list):
-    specs = []
-    for i, value in enumerate(inline):
-        inline[i] = value.split("/")
-    for cls,attr,method in zip(inline[0], inline[1], inline[2]):
-        specs.append(Inline.from_individual_arguments(cls,attr,method))
-    return specs
-
-# what about missing attributes
-
-# what about missing methods
-
-# what about missing options
-
-
-
-def two_piece_multiple(inline : list):
-    specs = []
-    for i, value in enumerate(inline):
-        inline[i] = value.split("/")
-    for cls,attr in zip(inline[0], inline[1]):
-        specs.append(Inline.from_individual_arguments(cls,attr))
-    return specs
-
-# what about missing attr and methods
-
-# what about missing attr and opt
-
-def one_piece_multiple(inline : list):
-    specs = []
-    inline = inline.split("/")
-    specs.append(Inline.from_individual_arguments(inline))
-    return specs
-
-
-
-
-def multiple_inline_handler(inline : str):
-    """Takes a string containing a multi file inline.
-    turns it into an array of inlines 
-    by following the mini language syntax rules.
-
-    Args:
-        inline (str): A multi family inline containing string.
-    """
-    inline = inline.split(":")
-    if len(inline) == 4:
-        return four_piece_multiple(inline)
-    elif len(inline) == 3:
-        return three_piece_multiple(inline)
-    elif len(inline) == 2:
-        return two_piece_multiple(inline)
-    elif len(inline) == 1:
-        return one_piece_multiple(inline)
-    else:
-        print("Cannot parse this thing. sorry.")
-        return 0
-
-
 
 def parse_inline(inline : str, verbose=False):
     """[summary]
@@ -134,7 +63,7 @@ See README.md for more details. Inline specs must have at least one : (colon")
             if validate_multiple(inline):
                 # this would earase already parsed stuff if you had different types in a session
                 # ie a normal inline and a multiple inline.
-                parsed_classes.append(multiple_inline_handler(Inline(inline)))
+                parsed_classes.append(multiple_main(Inline(inline)))
                 if verbose:
                     print("parsing non inheritance inline w multiple classes")
     else:
