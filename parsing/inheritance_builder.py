@@ -21,9 +21,15 @@ class InheritanceBuilder:
 
     def __init__(self, inline : str):
         """
-        At this point, the inline will be validated.
-        So we dont have to worry about attr, method, option being
-        null or unequal.
+        Taking in a string of the `Inheritance Inline` format (see README.md)
+        does two jobs in succession:
+            -validate the inline and the inheritances
+            -parse the validated inheritance inline 
+            into an array of regular inlines
+        
+        AKA parses into an array of inlines that match the specs
+        given in the inheritance inlines (sets parents based on
+        placement of '>' tokens and their operators.)
 
         Args:
             inline ([type]): [description]
@@ -68,9 +74,8 @@ class InheritanceBuilder:
         for cls, attr, method, opts in zip(classes, attributes, methods, options):
             # insert the parents into the extension if the class name has one.
             if parent != "<class 'object'>" and re.match(r"(\w)*[(]", cls):
-                class_name, rest = cls.split("(")[0], cls.split("(")[1]
-                print(rest.split(")")[0])
-                # print(f"class name : {class_name} rest : {rest}")
+                class_name, parents, rest = cls.split("(")[0], (cls.split("(")[1]).split(")")[0], "fart-bean"
+                print(f"class name : {class_name} rest : {parents}")
                 # cls = f"{class_name}({parent},{rest}"
             else:
                 parent = cls
