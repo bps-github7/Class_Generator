@@ -145,6 +145,25 @@ Otherwise, type names for your attribute, one per line, and type <enter> to move
     #kill the program if the loop was exited. user wants to quit.
     sys.exit(1)
 
+
+def get_attributes(cls):
+    """A very slimmed versiion of the above get_members."""
+    # should we validate? check if commas delimit it?
+    return input("enter new attributes, seperated by commas,\n\
+(type 'enter' when done)\n")
+
+
+def get_methods(cls):
+    # should we validate? check if commas delimit it?
+    return input("enter new methods, seperated by commas,\n\
+(type 'enter' when done)\n")
+
+
+def get_options(cls):
+    # should we validate? check if commas delimit it?
+    return input("enter new options, seperated by whitespace if needed,\n\
+(type 'enter' when done)\n")
+
 def get_confirmation(items, member=None):
     """Asks user if they are satisfied with current list"""
     print("\n")

@@ -214,15 +214,17 @@ arguments\nRefer to the README file for instructions on proper inline format")
             return 0
 
 if __name__ == "__main__":
-    first = Inline("ClassA(barn,house) (pillow) : attr1, attr2, attr3, attr4\
-: method1, method2, method3 : -tem")
+#     first = Inline("ClassA(barn,house) (pillow) : attr1, attr2, attr3, attr4\
+# : method1, method2, method3 : -tem")
 
-    # print(first.exporting)
+#     # print(first.exporting)
 
-    # Default arg setting seems to be working nicely
-    second = Inline("ClassB")
-    # print(second.exporting)
+#     # Default arg setting seems to be working nicely
+#     second = Inline("ClassB")
+#     # print(second.exporting)
 
-    new = [first, second]
-    for items in new:
-        print(items.packages)
+#     new = [first, second]
+#     for items in new:
+#         print(items.packages)
+
+    print(Inline("hello"))
