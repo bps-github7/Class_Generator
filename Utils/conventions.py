@@ -88,6 +88,13 @@ def ask_case(item, item_type="class"):
                 return coerce_case(item)
             return item.strip()
         return item.strip()
+    elif item_type == "parent":
+        if item[0].islower() or item.count(" ") or item.count("_"):
+            if case_prompt(item):
+                return coerce_case(item)
+            return item.strip()
+        return item.strip()
+    
     # need to distingush between attributes and methods!
     # methods can and should have _ between words.
     elif item_type == "field":
@@ -134,7 +141,7 @@ This violates PEP8 best practices- should this be corrected (y/n)?\n")
             response = input(f"your field name {item} violates naming\
 conventions\nsuch as improper capitalization or incorrect use of whitespace\
 (attributes and methods should be all uppercase and have no whitespace\
-between words)\n\ This violates PEP8 best \
+between words)\nThis violates PEP8 best \
 practices- should this be corrected (y/n)?\n")
         elif item_type == "package":
             response = input(f"your package name {item} violates naming\

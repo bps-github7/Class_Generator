@@ -51,8 +51,6 @@ def cleanse(items: any, item_type="field"):
     """format properties by strip and lowercase of each elements.
     side-effect: coerces ',' delimited string to formatted list.
     """
-    # if item_type == "class":
-    #     my_little_lamb = lambda.strip().
     if isinstance(items, list):
         return list(map(
             lambda item: item.strip().lower(), items))

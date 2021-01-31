@@ -130,25 +130,22 @@ def continue_prompt(field_type="attributes"):
             return 0
         else:
             print("sorry, didnt understand your response. valid: y or n")
- 
-
-
-def validate_parents(item):
-    """Like the one for class names but these can be multiple and comma seperated.
-
-    Args:
-        item ([type]): [description]
+              
+def validate_class_name(cls):
     """
-    item = item.split(",")
-    for x,y in enumerate(item):
-        if is_identifier(y):
-            if corrected := class_correct_convention(x):
-                item[x] = corrected
+Validation lives within the inline constructor
+now, so these need to return the validated argument or
+"" if validation failed.
+    
+    """
+    if is_identifier(cls):
+        if corrected := class_correct_convention(cls):
+            return corrected
         else:
-            print(f"Cannot name a parent {y}- violates identifier naming restrictions")
-            return 0
-    return ",".join(item)
-             
+            return cls
+    else:
+        print("invalid identifier: ", cls)
+        return ""
 
 def validate_members(items, item_type="class"):
     """does basic validation for a standard inlines' members
@@ -163,19 +160,10 @@ def validate_members(items, item_type="class"):
     """
     if item_type == "class":
         return class_correct_convention(items)
-    elif item_type == "parent":
-        return validate_parents(items)
-    elif item_type == "option":
-        return validate_options(items)
     elif item_type in ("attribute","method"):
         # This is a lil weird.
         item_type = "field"
-    elif item_type == "package":
-        return validate_package_name(items)
-    elif item_type == "module":
-        return validate_module_name(items)
     container = []
-    #type is not iterable- 
     for item in items:
         item = item.strip()
         if is_identifier(item):
@@ -463,7 +451,21 @@ def validate_module_name(title):
         else:
             return title
     print(f"Error: invalid module called '{title}'\nModule name must\
- conform to python identifier naming rules:\nno numbers, whitespace\
+conform to python identifier naming rules:\nno numbers, whitespace\
+or special chars except for underscores.")
+    return 0
+
+
+def validate_parent_name(title):
+    """Need a special fn for this
+    because classes are auto coerced to uppercase by default."""
+    if is_identifier(title):
+        if corrected := case_check(title, item_type="class"):
+            return corrected
+        else:
+            return title
+    print(f"Error: invalid parent called '{title}'\nClasses name must\
+conform to python identifier naming rules:\nno numbers, whitespace\
 or special chars except for underscores.")
     return 0
 
@@ -471,6 +473,8 @@ or special chars except for underscores.")
 if __name__ == "__main__":
     # case correction does not work if whitespace convention is initailly correct.
     # validate_options("-tma")
+
+    print(validate_members(['',' '],item_type="field"))
 
 
 
@@ -502,4 +506,3 @@ if __name__ == "__main__":
     #     # seems the test works. consider further nuances.
     #     print(validate_packaging("<p:(skone : nard, moofy : mofty, shitpike : w90easel, monkey : orangutang)>"))
     # validate_multiple_packaging_inline({'skone' : 'nard', 'moofy' : 'mofty', 'shitpike' : 'weasel', 'monkey' : 'orangutang'})
-    pass
