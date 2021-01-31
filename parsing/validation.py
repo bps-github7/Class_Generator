@@ -168,7 +168,10 @@ def validate_members(items, item_type="class"):
         item = item.strip()
         if is_identifier(item):
             container.append(case_check(item, item_type=item_type))
-    return container
+    if len(container):
+        return container
+    return None
+
 
 # def validate_two_piece_inline(inline : list):
 #     """[summary]
