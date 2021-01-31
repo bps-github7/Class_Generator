@@ -34,11 +34,15 @@ def validate_multiple(inline: str):
             inline[1] = inline[1] + ("/" * slashes_needed)
             # At the end, we need to join all the inline fields together with colon.
         elif response in ("y", "yes"):
+            # print("sweaty fox")
             starting, needed = classes.count("/"), classes.count("/") - attributes.count("/")
-            attributes = inline[1].split("/")
+            classes = inline[0].split("/")
+            print(starting, needed)
+            for i in range(needed, starting):
+                # print(i)
+                print(classes[i])
 
-            for i in range(starting,needed):
-                inline[1] += interactive_mode.get_attributes(attributes[i]) + "/"
+                # inline[1] += interactive_mode.get_attributes(attributes[i]) + "/"
         print(inline)
 
     # if classes.count("/") < attributes.count("/"):

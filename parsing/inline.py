@@ -11,6 +11,7 @@ import re
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 from utils.misc_functions import clean_list, cleanse
 from parsing.extension import Extension
+from parsing.validation import validate_members
 
 class Inline:
     '''
@@ -45,9 +46,10 @@ Exceptions: Unknown at this point.
             # get an extension out of class name, 
             # if none is provided then sets to defaults
             self.extension = Extension(self.inline[0].strip())
-            self.class_name = self.extension.class_name
-            self.parents = self.extension.parents
-            self.packages = self.extension.packages
+            self.class_name = validate_members(self.extension.class_name, item_type="class")
+            # works because parents are classes.
+            self.parents = validate_members(self.extension.parents, item_type="parents")
+            self.packages = validate_members(self.extension.packages, item_type="package")
             if self.verbose:
                 print(f"creating inline (human readable representation) for class {self.class_name}")
         # defensive prograamming to avoid IndexError
@@ -57,15 +59,15 @@ Exceptions: Unknown at this point.
                 pass
             else:
                 # trying to get rid of whitespace between commas
-                self.attributes = cleanse(self.inline[1].strip())
+                self.attributes = cleanse(validate_members(self.inline[1].strip(), item_type="attribute"))
         if len(self.inline) > 2:
             if len(self.inline) >= 3 and self.inline[2] in ('',' ',None):
                 pass
             else:
-                self.methods = cleanse(self.inline[2].strip())
+                self.methods = cleanse(validate_members(self.inline[2].strip(), item_type="method"))
         if len(self.inline) > 3:
             if len(self.inline) == 4:
-                self.parse_options(self.inline[3].strip())
+                self.parse_options(validate_members(self.inline[3].strip(), item_type="option"))
 
     ### getters / setters because accessing options kind of wierd with a dict
     @property
