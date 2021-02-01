@@ -9,9 +9,9 @@ Module level docstring: implements the Inline class
 import sys
 import re
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
-from utils.misc_functions import clean_list, cleanse
+from utils.misc_functions import clean_list, cleanse, cleanse_regular_methods, cleanse_with_signitures
 from parsing.extension import Extension
-from parsing.validation import validate_class_name, validate_members
+from parsing.validation import validate_class_name, validate_field, validate_members, validate_signiture
 
 class Inline:
     '''
@@ -62,8 +62,12 @@ Exceptions: Unknown at this point.
         # in cases where no colons are provided or attr was skipped.
         if len(self.inline) > 1:
             self.attributes = validate_members(cleanse(self.inline[1].strip()), item_type="field")
-        if len(self.inline) > 2:
-            self.methods = validate_members(cleanse(self.inline[2].strip()), item_type="field")
+        if len(self.inline) > 2:   
+            regular_methods = validate_members(cleanse_regular_methods(self.inline[2].strip()), item_type="field")
+            signitures = ""
+            if self.inline[2].count("("):
+                signitures = cleanse_with_signitures(self.inline[2].strip())
+            self.methods = self.parse_methods(regular_methods, signitures)
         if len(self.inline) > 3:
             if len(self.inline) == 4:
                 self.parse_options(self.inline[3].strip())
@@ -104,6 +108,43 @@ Exceptions: Unknown at this point.
         if self.module and self.abc:
             print("Error: You cannot make an abstract base class a module.")
             return 0
+
+    def parse_methods(self, regular_methods : list[str], signitures = []):
+        """Determines the type of each method/function passed in
+
+        Args:
+            methods ([list]): list of methods to be parsed.
+
+        Returns:
+            method_dict ([dict]) : {'instance_methods' : ([names], [signitures]),
+            'static_methods' : (...), 'class_methods' : (...), 'functions' : (...)}
+        """
+        method_dict = {
+            'instance_methods' : {'names' : [], 'signitures' : []},
+            'static_methods' : {'names' : [], 'signitures' : []},
+            'class_methods' : {'names' : [], 'signitures' : []},
+            'functions' : {'names' : [], 'signitures' : []}}
+        if regular_methods in (None, '',' ', [], ['']):
+            return None
+        for method, sig in zip(regular_methods, signitures):
+            if method.startswith("sm"):
+                method_dict["static_methods"]["names"].append(method[2:])
+            elif sig.startswith("sm"):
+                method_dict["static_methods"]["signitures"].append(sig[2:])
+            elif method.startswith("cm"):
+                method_dict["class_methods"]["names"].append(method[2:])
+            elif sig.startswith("cm"):
+                method_dict["class_methods"]["signitures"].append(sig[2:])
+            elif method.count("-f"):
+                method_dict["functions"]["names"].append(method.strip("-f").strip())
+            elif sig.count("-f"):
+                method_dict["functions"]["signitures"].append(sig.strip("-f").strip())
+            # shitty conditional but it should work in concept
+            elif method:
+                method_dict["instance_methods"]["names"].append(method)
+            elif sig:
+                method_dict["instance_methods"]["signitures"].append(sig)
+        return method_dict
 
 
     def switch_flipper(self, arg):
@@ -228,4 +269,4 @@ if __name__ == "__main__":
 #     for items in new:
 #         print(items.packages)
 
-    print(Inline("!ello(Hi): :: -te").__repr__())
+    print(Inline("Hello(Hi,Bisk,Chalp) (reindeer,penis): attr1, attr2 : shitcone(x,y,z) : -tem").__repr__())

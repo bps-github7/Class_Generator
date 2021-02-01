@@ -172,6 +172,31 @@ def validate_members(items, item_type="class"):
         return container
     return None
 
+def validate_signiture(signiture : str):
+    """unimplemented- checks that the name part of a signiture
+    is a valid identifier and has the correct naming conventions
+    lowercase, underscores seperating words.
+
+    Args:
+        signiture (str): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    return signiture.lower()
+
+def validate_field(field : str):
+    """Unimplemented- check that a class field identifier
+    is valid- lowercase with underscores seperating words.
+
+    Args:
+        field (str): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    return field.lower()
+
 
 # def validate_two_piece_inline(inline : list):
 #     """[summary]
