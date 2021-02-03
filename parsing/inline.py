@@ -7,7 +7,6 @@ Module level docstring: implements the Inline class
 
 
 import sys
-import re
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 from utils.misc_functions import clean_list, cleanse, cleanse_regular_methods, cleanse_with_signitures
 from parsing.extension import Extension
@@ -62,9 +61,9 @@ Exceptions: Unknown at this point.
         # in cases where no colons are provided or attr was skipped.
         if len(self.inline) > 1:
             self.attributes = validate_members(cleanse(self.inline[1].strip()), item_type="field")
-        if len(self.inline) > 2:   
-            regular_methods = validate_members(cleanse_regular_methods(self.inline[2].strip()), item_type="field")
-            signitures = ""
+        if len(self.inline) > 2:
+            regular_methods = validate_members((self.inline[2].strip()), item_type="field")
+            signitures = None
             if self.inline[2].count("("):
                 signitures = cleanse_with_signitures(self.inline[2].strip())
             self.methods = self.parse_methods(regular_methods, signitures)
@@ -109,42 +108,38 @@ Exceptions: Unknown at this point.
             print("Error: You cannot make an abstract base class a module.")
             return 0
 
-    def parse_methods(self, regular_methods : list[str], signitures = []):
+    def parse_methods(self, names : list[str], signitures = None):
         """Determines the type of each method/function passed in
 
         Args:
             methods ([list]): list of methods to be parsed.
 
         Returns:
-            method_dict ([dict]) : {'instance_methods' : ([names], [signitures]),
-            'static_methods' : (...), 'class_methods' : (...), 'functions' : (...)}
+            all_methods ([{names} {signitures}])
         """
-        method_dict = {
-            'instance_methods' : {'names' : [], 'signitures' : []},
-            'static_methods' : {'names' : [], 'signitures' : []},
-            'class_methods' : {'names' : [], 'signitures' : []},
-            'functions' : {'names' : [], 'signitures' : []}}
-        if regular_methods in (None, '',' ', [], ['']):
-            return None
-        for method, sig in zip(regular_methods, signitures):
-            if method.startswith("sm"):
-                method_dict["static_methods"]["names"].append(method[2:])
-            elif sig.startswith("sm"):
-                method_dict["static_methods"]["signitures"].append(sig[2:])
-            elif method.startswith("cm"):
-                method_dict["class_methods"]["names"].append(method[2:])
-            elif sig.startswith("cm"):
-                method_dict["class_methods"]["signitures"].append(sig[2:])
-            elif method.count("-f"):
-                method_dict["functions"]["names"].append(method.strip("-f").strip())
-            elif sig.count("-f"):
-                method_dict["functions"]["signitures"].append(sig.strip("-f").strip())
-            # shitty conditional but it should work in concept
-            elif method:
-                method_dict["instance_methods"]["names"].append(method)
-            elif sig:
-                method_dict["instance_methods"]["signitures"].append(sig)
-        return method_dict
+        all_methods = [
+            {"static" : [], "class" : [], "instance" : [], "functions" : []},
+            {"static" : [], "class" : [], "instance" : [], "functions" : []}]
+        for items in names:
+            if items.startswith("sm"):
+                all_methods[0]["static"].append(items[2:])
+            elif items.startswith("cm"):
+                all_methods[0]["class"].append(items[2:])
+            elif items.count("-f"):
+                all_methods[0]["functions"].append(items.strip("-f"))
+            else:
+                all_methods[0]["instance"].append(items)
+        if signitures:
+            for items in signitures:
+                if items.startswith("sm"):
+                    all_methods[1]["static"].append(items[2:])
+                elif items.startswith("cm"):
+                    all_methods[1]["class"].append(items[2:])
+                elif items.count("-f"):
+                    all_methods[1]["functions"].append(items.strip("-f"))
+                else:
+                    all_methods[1]["instance"].append(items)
+        return all_methods
 
 
     def switch_flipper(self, arg):
@@ -269,4 +264,4 @@ if __name__ == "__main__":
 #     for items in new:
 #         print(items.packages)
 
-    print(Inline("Hello(Hi,Bisk,Chalp) (reindeer,penis): attr1, attr2 : shitcone(x,y,z) : -tem").__repr__())
+    print(Inline("Hello(Hi,Bisk,Chalp) (reindeer,penis): attr1, attr2 : SMname, shitcone(x,y,z) : -tem").__repr__())
