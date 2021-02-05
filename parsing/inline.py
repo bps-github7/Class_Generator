@@ -62,7 +62,8 @@ Exceptions: Unknown at this point.
         if len(self.inline) > 1:
             self.attributes = validate_members(cleanse(self.inline[1].strip()), item_type="field")
         if len(self.inline) > 2:
-            regular_methods = validate_members((self.inline[2].strip()), item_type="field")
+            self.methods = self.inline[2].strip()
+            regular_methods = validate_members(cleanse_regular_methods(self.inline[2].strip()), item_type="field")
             signitures = None
             if self.inline[2].count("("):
                 signitures = cleanse_with_signitures(self.inline[2].strip())
@@ -117,28 +118,29 @@ Exceptions: Unknown at this point.
         Returns:
             all_methods ([{names} {signitures}])
         """
-        all_methods = [
-            {"static" : [], "class" : [], "instance" : [], "functions" : []},
-            {"static" : [], "class" : [], "instance" : [], "functions" : []}]
+        all_methods = {"names" : 
+                {"static" : [], "class" : [], "instance" : [], "functions" : []},
+                "signitures" : 
+                {"static" : [], "class" : [], "instance" : [], "functions" : []}}
         for items in names:
             if items.startswith("sm"):
-                all_methods[0]["static"].append(items[2:])
+                all_methods["names"]["static"].append(items[2:])
             elif items.startswith("cm"):
-                all_methods[0]["class"].append(items[2:])
+                all_methods["names"]["class"].append(items[2:])
             elif items.count("-f"):
-                all_methods[0]["functions"].append(items.strip("-f"))
+                all_methods["names"]["functions"].append(items.strip("-f"))
             else:
-                all_methods[0]["instance"].append(items)
+                all_methods["names"]["instance"].append(items)
         if signitures:
             for items in signitures:
                 if items.startswith("sm"):
-                    all_methods[1]["static"].append(items[2:])
+                    all_methods["signitures"]["static"].append(items[2:])
                 elif items.startswith("cm"):
-                    all_methods[1]["class"].append(items[2:])
+                    all_methods["signitures"]["class"].append(items[2:])
                 elif items.count("-f"):
-                    all_methods[1]["functions"].append(items.strip("-f"))
+                    all_methods["signitures"]["functions"].append(items.strip("-f"))
                 else:
-                    all_methods[1]["instance"].append(items)
+                    all_methods["signitures"]["instance"].append(items)
         return all_methods
 
 
@@ -264,4 +266,4 @@ if __name__ == "__main__":
 #     for items in new:
 #         print(items.packages)
 
-    print(Inline("Hello(Hi,Bisk,Chalp) (reindeer,penis): attr1, attr2 : SMname, shitcone(x,y,z) : -tem").__repr__())
+    print(Inline("Hello(Hi,Bisk,Chalp) (reindeer,penis): attr1, attr2 : SMname, CMcone, arffff, noodle -f, basket(p) -f, CMshitbasket(x) shitcone(x,y,z), SMmotherfuck(y) : -tem").__repr__())

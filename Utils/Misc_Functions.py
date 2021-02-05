@@ -108,8 +108,8 @@ def cleanse_with_signitures(items):
     # rest = items[1].split(")")[0]
     # return f"{name.strip()}({rest})"
 
-regular = cleanse_regular_methods("SMshite(m,x,y,z), weasel(moist,sailor), SMcones, shitr, bag, weasels, example(cones,poades,skones)")
-signitures = cleanse_with_signitures("shite(m,x,y,z), weasel(moist,sailor), cones, shitr, bag, weasels, example(cones,poades,skones)")
+regular = cleanse_regular_methods("SMname, shitcone(x,y,z) -f, SMmotherfuck(y)")
+signitures = cleanse_with_signitures("SMname, shitcone(x,y,z), SMmotherfuck(y)")
 
 print(f"regular methods we got are : {regular}\nand signitures: {signitures}")
 
