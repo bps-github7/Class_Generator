@@ -8,7 +8,7 @@ Module level docstring: implements the Inline class
 
 import sys
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
-from utils.misc_functions import clean_list, cleanse, cleanse_regular_methods, cleanse_with_signitures
+from parsing.cleaning import clean_list, cleanse, cleanse_regular_methods, cleanse_with_signitures
 from parsing.extension import Extension
 from parsing.validation import validate_class_name, validate_field, validate_members, validate_signiture
 

@@ -131,21 +131,84 @@ def continue_prompt(field_type="attributes"):
         else:
             print("sorry, didnt understand your response. valid: y or n")
               
-def validate_class_name(cls):
+def validate_class_name(cls, ):
     """
-Validation lives within the inline constructor
-now, so these need to return the validated argument or
-"" if validation failed.
-    
+Sub function for coercing class names to proper state.
+
+cls : the class name identifier
+
+get_valid=False : the default coerces cls to validity.
+flipping this makes the fn ask user for replacement value
+until a correct one is provided.
     """
+    # whitespace makes identifiers invalid
+    cls = cls.replace(" ","_")
     if is_identifier(cls):
         if corrected := class_correct_convention(cls):
             return corrected
         else:
             return cls
     else:
-        print("invalid identifier: ", cls)
-        return ""
+        print("invalid identifier:", cls)
+        return 0
+
+
+def class_name_main(cls, get_valid=False):
+    """
+overseer function for validating class names
+
+cls : the class name identifier to validate
+
+get_valid : default arg makes the fn
+return 0 if the identifier is invalid.
+
+Flipping this switch makes the fn
+loop until we get a correct class name.
+    """
+    if get_valid:
+        if validated := validate_class_name(cls):
+            return validated
+        else:
+            while True:
+                new = input("enter new class name for replacing \
+    invalid identifier {}\n".format(cls))
+                if validated := validate_class_name(new):
+                    break
+        return validated
+    else:
+        if validated := validate_class_name(cls):
+            return validated
+        else:
+            return 0
+
+def attributes_main(attr):
+    """
+    overseer fn for ensuring validity of each attr.
+    
+    
+    question: should this deal with a single attr,
+    or the group? leaning towards the first
+
+    Args:
+        attr ([type]): [description]
+    """
+    return attr.lower
+
+
+def methods_main(method):
+    """
+    overseer fn for ensuring the validity of each method.
+
+    question: should this deal with a single method,
+    or the group? leaning towards the first
+
+    Args:
+        method ([type]): [description]
+    """
+    return method.lower
+
+
+### and so on....?
 
 def validate_members(items, item_type="class"):
     """does basic validation for a standard inlines' members
@@ -158,6 +221,8 @@ def validate_members(items, item_type="class"):
     returns:
 
     """
+
+    # this ibnky=
     if item_type == "class":
         return class_correct_convention(items)
     elif item_type in ("attribute","method"):
@@ -499,38 +564,4 @@ or special chars except for underscores.")
 
 
 if __name__ == "__main__":
-    # case correction does not work if whitespace convention is initailly correct.
-    # validate_options("-tma")
-
-    print(validate_members(['',' '],item_type="field"))
-
-
-
-    #Inline works as expected:
-    # testing = Inline("ClassA : attr1, attr2 : method1 : -t")
-    # print(testing)
-
-    # print(validate_two_piece_inline("ClassA : skone, dalone"))
-
-    # validate_four_piece_inline("ClassA : attr1, attr2 : method1 : -t")
-
-    # testing multiple_validate:
-    # TESTING = validate_mulitple("classA, classB : attr1, attr2 / attr3, attr4 : methodA / methodB : -e{vsc} / -e -t{ut,cc}")
-    # print(TESTING)
-
-    # validate_multiple("classA(hello) (cog, weasel), classB(bran,oats) (bisk): attr1, attr2 / attr3, attr4 : methodA / methodB : -e{vsc} / -e -t{ut,cc}")
-
-    # # are these values case corrected and indeed identifiers?
-    # print(validate_members(['  attr1', ' attr2 '], item_type="field"))
-
-    # # does validate_packaging work for a single package spec
-    # if valid := validate_packaging("<p:(skone : nard)>"):
-    #     print(f"validated package: {valid}")
-    
-    # # # what about a multiple package spec?
-    # if validate_packaging("<p:(skone : !nard, moofy : mofty, shitpike : w90easel, monkey : orangutang)>"):
-    #     print("we did it\n"*2)
-    # else:
-    #     # seems the test works. consider further nuances.
-    #     print(validate_packaging("<p:(skone : nard, moofy : mofty, shitpike : w90easel, monkey : orangutang)>"))
-    # validate_multiple_packaging_inline({'skone' : 'nard', 'moofy' : 'mofty', 'shitpike' : 'weasel', 'monkey' : 'orangutang'})
+    print(class_name_main("skone nard pumpkins"))

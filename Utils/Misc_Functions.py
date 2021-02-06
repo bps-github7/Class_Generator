@@ -10,6 +10,7 @@ import errno
 import tempfile
 
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
+from parsing.inline import Inline
 
 
 """Module defines miscellaneous functions used for the class generator"""
@@ -45,95 +46,6 @@ takes class string and gets parent and packaging out of it
         finished.append(object)
         finished.append("root")
     return finished
-
-
-def cleanse(items: any, item_type="field"):
-    """format properties by strip and lowercase of each elements.
-    side-effect: coerces ',' delimited string to formatted list.
-    """
-    if isinstance(items, list):
-        return list(map(
-            lambda item: item.strip().lower(), items))
-    return list(map(
-        lambda item: item.strip().lower(), items.split(",")))
-
-def cleanse_regular_methods(items):
-    """[summary]
-
-    Args:
-        items ([type]): [description]
-    """
-    regular = []
-    if items.count(")"):
-        for item in items.split(")"):
-            if item.count("("):
-                regular.append((item.split("(")[0]).split(",")[:-1])
-        for x,y in enumerate(regular):
-            # wut is this? what does it do?
-            if len(y):
-                if y[0] == '':
-                    del y[0]
-            else:
-                # remove empty lists
-                del regular[x]
-        regular = [item for item in regular if item != ['']] 
-        regular = regular[0]
-        return list(map(lambda x: x.strip().lower(), regular))
-    else:
-        return cleanse(items)
-
-
-def cleanse_with_signitures(items):
-    """Modified version of cleanse that deals
-    with the fact that method signitures have ','
-    when there are multiple parameters
-
-    Args:
-        items ([type]): [description]
-    """
-    sigs, signitures = [],[]
-    items = items.split(")")
-    for item in items:
-        if item.count("("):
-            params = item[item.find("("):]
-            name = (item.split("(")[0]).split(",")[-1]
-            sigs.append(f"{name}{params})")
-
-    for sig in sigs:
-        name = sig.split("(")[0]
-        rest = (sig.split("(")[1]).split(")")[0]
-        signitures.append(f"{name.lower().strip()}({rest})")
-    return signitures
-    # items = items.split("(")
-    # name = items[0].split(",")[-1]
-    # rest = items[1].split(")")[0]
-    # return f"{name.strip()}({rest})"
-
-regular = cleanse_regular_methods("SMname, shitcone(x,y,z) -f, SMmotherfuck(y)")
-signitures = cleanse_with_signitures("SMname, shitcone(x,y,z), SMmotherfuck(y)")
-
-print(f"regular methods we got are : {regular}\nand signitures: {signitures}")
-
-def clean_list(args):
-    """Turns a list of arguments into a clean list of string arguments.
-    This makes it possible to take a machine readable class spec and pass it
-    to Inline alternative constructor
-
-    Arguments:
-        *args [string []] : up to four pieces of Inline.
-
-    Returns:
-        item [list]: A list of comma seperated values
-    """
-    items = [*args]
-    for i, value in enumerate(items):
-        if value is None:
-            continue
-        if isinstance(value, list):
-            items[i] = ",".join(value)
-    return items
-
-
 
 def get_confirmation(opt_code, line):
     """Asks user if they are satisfied with their choice"""
@@ -247,7 +159,5 @@ containing class dict specifications inline format.
             copy = line.strip("\n")
             ### need to enforce validation here- reject or correct
             ### lines that dont conform to inline standards.
-            results.append(line)
+            results.append(Inline(line))
         return results
-
-# print(from_file("classes.txt"))

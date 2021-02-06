@@ -205,14 +205,12 @@ def class_correct_convention(item):
     Returns:
         [type]: [description]
     """
-    if item.count(" ") or item.count("_"):
-        # checking whether space or underscore was used as word delimiter.
-        if item.count(" ") > item.count("_"):
-            item = item.split(" ")
-        elif item.count(" ") < item.count("_"):
-            item = item.split("_")
+    if item.count("_"):
+        # white space makes identifiers invalid
+        item = item.split("_")
+        # title case each indiviaul delimited word in an identifier
         item = list(map(lambda x: x.title(), item))
-        return ("".join(item)).replace("_", "").replace(" ","")
+        return ("".join(item).replace("_", "").replace(" ",""))
     # if there is no white space, best we can do it capitalize first letter 
     return item[0].upper() + item[1:]
 
