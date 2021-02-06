@@ -192,7 +192,7 @@ def attributes_main(attr):
     Args:
         attr ([type]): [description]
     """
-    return attr.lower
+    return attr.lower()
 
 
 def methods_main(method):
@@ -205,7 +205,7 @@ def methods_main(method):
     Args:
         method ([type]): [description]
     """
-    return method.lower
+    return method.lower()
 
 
 ### and so on....?
