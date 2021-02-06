@@ -66,11 +66,18 @@ These are small phrases you prepend to attributes or methods to declare them as 
 * 'CV' class variable
 * 'SM' static method
 * 'CM' class method
+* 'FN' function**
 * '_' makes a field private
 * '__' name mangles a field
 
 The default behaivor (no prepend arguments) generates instance 
 variables and methods for classes and variables and functions for modules.
+
+**NOTE: you can coerce a method to a function with 'FN' prepend method.
+For example, to generate a main method for your class
+
+`ClassA : attr1, attr2 : method1, method2, FNmain`
+
 
 ### A note on methods and functions
 Because of the limited nature of a utility command line tool, we cannot provide any implementation of methods or functions. However, two things can be done to help:

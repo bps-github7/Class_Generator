@@ -69,6 +69,7 @@ def cleanse_regular_methods(items):
             if item.count("("):
                 regular.append((item.split("(")[0]).split(",")[:-1])
         for x,y in enumerate(regular):
+            # wut is this? what does it do?
             if len(y):
                 if y[0] == '':
                     del y[0]

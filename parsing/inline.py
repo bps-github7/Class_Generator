@@ -127,8 +127,8 @@ Exceptions: Unknown at this point.
                 all_methods["names"]["static"].append(items[2:])
             elif items.startswith("cm"):
                 all_methods["names"]["class"].append(items[2:])
-            elif items.count("-f"):
-                all_methods["names"]["functions"].append(items.strip("-f"))
+            elif items.startswith("fn"):
+                all_methods["names"]["functions"].append(items[2:])
             else:
                 all_methods["names"]["instance"].append(items)
         if signitures:
@@ -137,8 +137,8 @@ Exceptions: Unknown at this point.
                     all_methods["signitures"]["static"].append(items[2:])
                 elif items.startswith("cm"):
                     all_methods["signitures"]["class"].append(items[2:])
-                elif items.count("-f"):
-                    all_methods["signitures"]["functions"].append(items.strip("-f"))
+                elif items.startswith("fn"):
+                    all_methods["signitures"]["functions"].append(items[2:])
                 else:
                     all_methods["signitures"]["instance"].append(items)
         return all_methods
@@ -266,4 +266,4 @@ if __name__ == "__main__":
 #     for items in new:
 #         print(items.packages)
 
-    print(Inline("Hello(Hi,Bisk,Chalp) (reindeer,penis): attr1, attr2 : SMname, CMcone, arffff, noodle -f, basket(p) -f, CMshitbasket(x) shitcone(x,y,z), SMmotherfuck(y) : -tem").__repr__())
+    print(Inline("Hello(Hi,Bisk,Chalp) (reindeer,penis): attr1, attr2 : SMname, CMcone, arffff, FNnoodle, FNbasket(p, ending='cones'), CMshitbasket(x) shitcone(x,y,z), SMmotherfuck(y) : -tem").__repr__())
