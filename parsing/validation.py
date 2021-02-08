@@ -185,22 +185,21 @@ def attributes_main(attr):
     """
     overseer fn for ensuring validity of each attr.
     
-    
-    question: should this deal with a single attr,
-    or the group? leaning towards the first
-
     Args:
         attr ([type]): [description]
     """
-    return attr.lower()
+    # y is the actual value
+    for x,y in enumerate(attr.split(",")):
+        if is_identifier(y):
+            if case_check(y):
+
 
 
 def methods_main(method):
     """
     overseer fn for ensuring the validity of each method.
 
-    question: should this deal with a single method,
-    or the group? leaning towards the first
+    
 
     Args:
         method ([type]): [description]
