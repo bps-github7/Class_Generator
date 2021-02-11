@@ -268,6 +268,9 @@ delete {y} from method set {methods} (y/n)?")
     if len(methods):
         return methods
     return None
+    # i suspect youll need to loop thru the string manually. join with ','
+    # then loop over each character and split manuyally ONLY if coma is 
+    # not surrounded by parens. cooool.
 
 
 ### and so on....?
