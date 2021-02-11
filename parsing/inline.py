@@ -10,7 +10,7 @@ import sys
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 from parsing.cleaning import clean_list, cleanse, cleanse_regular_methods, cleanse_with_signitures
 from parsing.extension import Extension
-from parsing.validation import validate_class_name, validate_field, validate_members, validate_signiture
+from parsing.validation import attributes_main, methods_main, validate_class_name, validate_field, validate_members, validate_signiture
 
 class Inline:
     '''
@@ -60,10 +60,10 @@ Exceptions: Unknown at this point.
         # defensive prograamming to avoid IndexError
         # in cases where no colons are provided or attr was skipped.
         if len(self.inline) > 1:
-            self.attributes = validate_members(cleanse(self.inline[1].strip()), item_type="field")
+            self.attributes = attributes_main(cleanse(self.inline[1].strip()))
         if len(self.inline) > 2:
             self.methods = self.inline[2].strip()
-            regular_methods = validate_members(cleanse_regular_methods(self.inline[2].strip()), item_type="field")
+            regular_methods = methods_main(cleanse_regular_methods(self.inline[2].strip()))
             signitures = None
             if self.inline[2].count("("):
                 signitures = cleanse_with_signitures(self.inline[2].strip())
@@ -266,4 +266,4 @@ if __name__ == "__main__":
 #     for items in new:
 #         print(items.packages)
 
-    print(Inline("Hello(Hi,Bisk,Chalp) (reindeer,penis): attr1, attr2 : SMname, CMcone, arffff, FNnoodle, FNbasket(p, ending='cones'), CMshitbasket(x) shitcone(x,y,z), SMmotherfuck(y) : -tem").__repr__())
+    print(Inline("Hello(Hi,Bisk,Chalp) (reindeer,penis): attr1, $EX, attr2 : SMname, CMcone, arffff, FNnoodle, FNbasket(p, ending='cones'), CMshitbasket(x) shitcone(x,y,z), SMmotherfuck(y) : -tem").__repr__())

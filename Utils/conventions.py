@@ -94,7 +94,6 @@ def ask_case(item, item_type="class"):
                 return coerce_case(item)
             return item.strip()
         return item.strip()
-    
     # need to distingush between attributes and methods!
     # methods can and should have _ between words.
     elif item_type == "field":

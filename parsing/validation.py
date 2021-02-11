@@ -181,7 +181,7 @@ loop until we get a correct class name.
         else:
             return 0
 
-def attributes_main(attr):
+def attributes_main(attr : list):
     """
     overseer fn for ensuring validity of each attr.
     
@@ -189,13 +189,24 @@ def attributes_main(attr):
         attr ([type]): [description]
     """
     # y is the actual value
-    for x,y in enumerate(attr.split(",")):
+    for x,y in enumerate(attr):
         if is_identifier(y):
-            if case_check(y):
+            # heres where you would override the default
+            # arg if you wanted to coerce the case
+            if returned := case_check(y, item_type="field"):
+                attr[x] = returned
+            # dont think we need an else block because ^^ always return truthy
+        else:
+            response = input(f"the attribute {y} is not a valid identifier\n\
+delete {y} from attribute set {attr} (y/n)?")
+            if response in ("y","yes"):
+                del attr[x]
+    if len(attr):
+        return attr
+    return None
 
 
-
-def methods_main(method):
+def methods_main(methods : list):
     """
     overseer fn for ensuring the validity of each method.
 
@@ -204,7 +215,23 @@ def methods_main(method):
     Args:
         method ([type]): [description]
     """
-    return method.lower()
+    # y is the actual value
+    for x,y in enumerate(methods):
+        if is_identifier(y):
+            # heres where you would override the default
+            # arg if you wanted to coerce the case
+            if returned := case_check(y, item_type="field"):
+                methods[x] = returned
+            # dont think we need an else block because ^^ always return truthy
+        else:
+            response = input(f"the method {y} is not a valid identifier\n\
+delete {y} from method set {methods} (y/n)?")
+            if response in ("y","yes"):
+                del methods[x]
+    if len(methods):
+        return methods
+    return None
+
 
 
 ### and so on....?
@@ -564,3 +591,4 @@ or special chars except for underscores.")
 
 if __name__ == "__main__":
     print(class_name_main("skone nard pumpkins"))
+    print(attributes_main("skone,nard,pumplins, %$!I@(KD(@"))
