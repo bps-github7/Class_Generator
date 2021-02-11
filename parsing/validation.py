@@ -234,6 +234,42 @@ delete {y} from method set {methods} (y/n)?")
 
 
 
+def simple_method_main(methods : list):
+    """
+    simplified version of the above function.
+    gets rid of the need for inline objects' parse_methods method.
+
+    we will just validate and then deal with deal
+    with parsing during or before generation
+
+    
+
+    Args:
+        method ([type]): [description]
+    """
+    # y is the actual value
+    for x,y in enumerate(methods):
+        if y.count("("):
+            if corrected := validate_signiture(y):
+                methods[x] = corrected
+                # avoids parsing y as a regular identifier
+                continue
+        if is_identifier(y):
+            # heres where you would override the default
+            # arg if you wanted to coerce the case
+            if returned := case_check(y, item_type="field"):
+                methods[x] = returned
+            # dont think we need an else block because ^^ always return truthy
+        else:
+            response = input(f"the method {y} is not a valid identifier\n\
+delete {y} from method set {methods} (y/n)?")
+            if response in ("y","yes"):
+                del methods[x]
+    if len(methods):
+        return methods
+    return None
+
+
 ### and so on....?
 
 def validate_members(items, item_type="class"):
@@ -274,7 +310,42 @@ def validate_signiture(signiture : str):
     Returns:
         [type]: [description]
     """
-    return signiture.lower()
+    if signiture.count("("):
+        signiture = signiture.split("(")
+        name = signiture[0].strip()
+        params = signiture[1].strip(")").split(",")
+        for x,y in enumerate(params):
+            # deals w default args
+            if y.count("="):
+                parameter = y.split("=")[0]
+                default = y.split("=")[1]
+                if is_identifier(parameter):
+                    pass
+                else:
+                    response = input(f"the default parameter {y} is invalid. remove (y/n) ?")
+                    if response in ("yes", "y"):
+                        del params[x]
+                # need to check both sides of the expression.
+                if is_identifier(default):
+                    pass
+                else:
+                    response = input(f"the default {default} in default arg: '{y}' is invalid. remove this parameter (y/n) ?")
+                    if response in ("yes", "y"):
+                        del params[x]
+                    else:
+                        pass    
+            else:
+                if is_identifier(y):
+                    pass
+                else:
+                    response = input(f"the parameter {y} is invalid. remove (y/n) ?")
+                    if response in ("yes", "y"):
+                        del params[x]
+                    else:
+                        continue
+    params = ",".join(params)
+    return f"{name}({params})"
+
 
 def validate_field(field : str):
     """Unimplemented- check that a class field identifier
@@ -287,198 +358,6 @@ def validate_field(field : str):
         [type]: [description]
     """
     return field.lower()
-
-
-# def validate_two_piece_inline(inline : list):
-#     """[summary]
-
-#     Args:
-#         inline (str): [description]
-#     """
-#     inline = inline.split(":")
-#     classes = validate_members(inline[0].strip(), item_type="class")
-#     if inline[1].strip():
-#         attributes = validate_members(
-#         (inline[1].strip()).split(","), item_type="attribute")
-#         return Inline.from_individual_arguments(classes,
-#         attributes, None, None)
-#     else:
-#         if missing_field("attributes"):
-#             return Inline.from_individual_arguments(classes)
-
-# def validate_three_piece_inline(inline : list):
-#     """[summary]
-
-#     Args:
-#         inline ([type]): [description]
-#     """
-#     inline = inline.split(":")
-#     classes = validate_members(inline[0].strip(), item_type="class")
-#     # class + attributes + methods
-#     if inline[1].strip() and inline[2].strip():
-#         attributes = validate_members(
-#             (inline[1].strip()).split(","), item_type="attribute")
-#         methods = validate_members(
-#             (inline[2].strip()).split(","), item_type="method")
-#         return Inline.from_individual_arguments(classes,
-#         attributes, methods, None)
-#     # class and attribute provided but no methods
-#     elif inline[1].strip() and not inline[2].strip():
-#         attributes = validate_members(
-#         (inline[1].strip()).split(","), item_type="attribute")
-#         if missing_field("methods"):
-#             return Inline.from_individual_arguments(classes,
-#             attributes, None, None)
-#     # class + methods
-#     elif inline[2].strip() and not inline[1].strip():
-#         methods = validate_members(
-#             (inline[2].strip()).split(","), item_type="method")
-#         if missing_field("attributes"):
-#             return Inline.from_individual_arguments(classes,
-#             None, methods, None)
-#     else:
-#         if missing_field("attributes or methods"):
-#             return Inline.from_individual_arguments(classes, None,
-#             None, None)
-
-# def validate_four_piece_inline(inline : list):
-#     """[summary]
-
-#     Args:
-#         inline ([type]): [description]
-#     """
-#     inline = inline.split(":")
-#     classes = validate_members(inline[0].strip(), item_type="class")
-#     if isinstance(classes, list):
-#         print("youre a dumbass")
-#     # class + attributes + methods + options
-#     if inline[1].strip() and inline[2].strip() and inline[3].strip():
-#         attributes = validate_members(
-#             (inline[1].strip()).split(","), item_type="field")
-#         methods = validate_members(
-#             (inline[2].strip()).split(","), item_type="field")
-#         options = validate_members(
-#             (inline[3].strip()), item_type="options")
-#         return Inline.from_individual_arguments(classes,
-#         attributes, methods, options)
-#     # class + attributes + methods but no options
-#     elif inline[1].strip() and inline[2].strip() and not\
-#     inline[3].strip():
-#         attributes = validate_members(
-#             (inline[1].strip()).split(","), item_type="field")
-#         methods = validate_members(
-#             (inline[2].strip()).split(","), item_type="field")
-#         if missing_field("options"):
-#             return Inline.from_individual_arguments(classes,
-#             attributes, methods, None)
-#     # class + attributes + options but no methods
-#     elif inline[1].strip() and inline[3].strip() and\
-#     not inline[2].strip():
-#         attributes = validate_members(
-#             (inline[1].strip()).split(","), item_type="attribute")
-#         options = validate_members(
-#             (inline[3].strip()), item_type="options")
-#         if missing_field("methods"):
-#             return Inline.from_individual_arguments(classes,
-#             attributes, None, options)
-#     # class + attributes but no methods or options
-#     elif inline[1].strip() and not inline[2].strip()\
-#     and not inline[3].strip():
-#         attributes = validate_members(
-#             (inline[1].strip()).split(","), item_type="attribute")
-#         if missing_field("methods or options"):
-#             return Inline.from_individual_arguments(classes, attributes, None,)
-#     # class + methods + options but no attributes
-#     elif inline[2].strip() and inline[3].strip() and not\
-#     inline[1].strip():
-#         # # # problem area- this triggers unexpectedly
-#         methods = validate_members(
-#             (inline[2].strip()).split(","), item_type="field")
-#         options = validate_members(
-#             (inline[3].strip()), item_type="options")
-#         if missing_field("attributes"):
-#             return Inline.from_individual_arguments(classes, None,
-#             methods, options)
-#     # class + methods, no attributes or options
-#     elif inline[2].strip() and not \
-#     (inline[1].strip() or inline[3].strip()):
-#         print("santucci")
-#         methods = validate_members(
-#             (inline[2].strip()).split(","), item_type="field")
-#         if missing_field("attributes or options"):
-#             return Inline.from_individual_arguments(classes, None,
-#             methods, None)
-#     # class + options no attributes or methods
-#     elif inline[3].strip() and not\
-#     (inline[1].strip() or inline[2].strip()):
-#         options = validate_members(
-#             (inline[3].strip()), item_type="options")
-#         if missing_field("attributes or methods"):
-#             return Inline.from_individual_arguments(classes, None,
-#             None, options)
-#     else:
-#         if missing_field("attributes, methods or options"):
-#             return Inline.from_individual_arguments(classes, None,
-#             None, None)
-
-
-
-# def validate_inline(inline : str, verbose=False):
-#     """ needs revision- only return 0 or 1 based on whether the tests succeeded
-
-#     unlike typical validation functions in the module, revises inline
-#     correcting for incorrect case.
-
-#     returns:
-#     1. inline [Inline] - generates an inline w/ one to all arguments included.
-
-#     """
-#     # Pass by reference BRUH. the inline variable 
-#     # you pass to functions in here does not persist
-#     # the changes!
-#     inline = inline.split(":")
-#     #fall through test - cant generate class if no class names are provided
-#     classes = validate_members(inline[0].strip(), item_type="class")
-#     if inline[0].strip():
-#         # need to figure out which arguments are provided
-#         if len(inline) > 1:
-#             if len(inline) == 2:
-#                 return validate_two_piece_inline(inline)
-#             elif len(inline) == 3:
-#                 return validate_three_piece_inline(inline)
-#             elif len(inline) == 4:
-#                 return validate_four_piece_inline(inline)
-#     else:
-#         return missing_field()
-
-# def validate_multiple(inline: str):
-#     """
-#     """
-#     # need to ignore extension to prevent snagging on the parenthesized arguments in class name.
-#     inline = Inline.from_individual_arguments(*inline.split(":"), ignore_extensions=True)
-#     print(inline)
-#     if inline.classes.count(",") < inline.attributes.count("/"):
-#         print("Error: too many attributes.\n\
-# make sure the number of ',' in classes is equal to num of '/' in attributes.")
-#         return 0
-#     if inline.classes.count(",") > inline.attributes.count("/"):
-#         print("Error: not enough attributes.\n\
-# make sure the number of ',' in classes is equal to num of '/' in attributes.")
-#         return 0
-#     if inline.classes.count(",") < inline.methods.count("/"):
-#         print("Error: too many methods.\n\
-# make sure the number of ',' in classes is equal to num of '/' in methods.")
-#         return 0
-#     if inline.classes.count(",") > inline.methods.count("/"):
-#         print("Error: not enough methods.\n\
-# make sure the number of ',' in classes is equal to num of '/' in methods.")
-#         return 0
-#     if inline.classes.count(",") < inline.options.count("/"):
-#         print("Too many options.\n\
-# make sure the number of ',' in classes is equal to num of '/' in options.")
-#         return 0
-#     ### What else could go wrong with multiple class inline spec?
-#     return 1
 
 def validate_inheritance(inline: str):
     """[summary]
@@ -590,5 +469,7 @@ or special chars except for underscores.")
 
 
 if __name__ == "__main__":
-    print(class_name_main("skone nard pumpkins"))
-    print(attributes_main("skone,nard,pumplins, %$!I@(KD(@"))
+    # print(class_name_main("skone nard pumpkins"))
+    # print(attributes_main("skone,nard,pumplins, %$!I@(KD(@"))
+    # print(validate_signiture("badger(monkey,mole='!!!!$#')"))
+    print(simple_method_main("skone(x,y,z), flan(x), cucumber".split(",")))

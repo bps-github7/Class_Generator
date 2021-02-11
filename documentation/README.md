@@ -40,11 +40,11 @@ In order of appearance, the following three inlines will create the following fi
 
 2. A module called 'my_cool_module' with two variables and two functions, generated with a testing suite. The '-m' flag declares a module. Note that you can pass in either function names alone or their signatures.
 
-3. an abscract base class called 'undefined_mess' with no attributes or methods. The '-a' flag declares an abstract base class
+3. An abstract base class called 'undefined_mess' with no attributes or methods. The '-a' flag declares an abstract base class
 
 ## Output 
 Generates a directory, or series of directories of files, unit tests,
-documentation structuring that matches the specification provided through input.
+documentation and package structuring that matches the specification provided through input.
 
 ### Details 
 * Defaults to creating a [default package](##Default-package): a new directory, 
@@ -104,11 +104,11 @@ Rules:
 
     `ClassA::`                                      
 
-    This creates a classA with no methods or fields       
+    This creates a classA with no attributes or methods.
 
     `ClassA : : : -t -e`                            
 
-    This creates a ClassA with only testing and exporting (no attributes or methods)
+    This creates a ClassA with methods and options but no attributes
 
 
 To learn more about the syntax and see examples, see the [inline specification](inline_specification.md)
@@ -161,15 +161,18 @@ customize the following:
 
 # Command-line-mode:
 
-To use the command line, interpret the main file 'filegenerator.py' as a module. __Note:__ the first argument 'name', the name of the default package is mandatory:
+To use the command line, interpret the main file 'filegenerator.py' as a module. __Note:__ the first argument 'name', the name of the default package, is mandatory:
 
--name: pass it in as a positional argument
+-name: The only positional argument
+
 `python -m filegenerator.py 'my_cool_project'`
 
---path: its an optional argument
+--path: 'C://path//to//directory'
+
 `python -m filegenerator.py 'my_cool_project' --path 'C://some//path'`
 
---inline: its an optional argument
+--inline 'some : inline : goes : -here'
+
 `python -m filegenerator.py 'my_cool_project' --path 'C://some//path' --inline 'ClassA : attr1, attr2 : method1 : -t'`
 
 additional optional arguments can be passed in as switches/flags
