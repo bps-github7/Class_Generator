@@ -107,12 +107,12 @@ either, niether or both argument parts of the extension are provided.
         
 
 def main():
-    # test = Extension("ClassA")
+    test = Extension("ClassA(cones,chalpo,poades) (neckmaster,neckattendant)")
     # test.add_parents("bisk, chalp, neckbro")
     # print(test.__str__(show_defaults=True))
-    test = Extension.from_individual_arguments("ClassA", packages='gorge, fist')
+    # test = Extension.from_individual_arguments("ClassA", packages='gorge, fist')
     test.add_packages("bisk, chalp, neckbro")
-    print(test.__str__(show_defaults=True))
+    print(test.parents.split(","))
 
 
 if __name__ == "__main__":

@@ -26,7 +26,7 @@ the object is in use.
 Exceptions: Unknown at this point.
     '''
 
-    version = 4.0
+    version = 4.1
 
     def __init__(self, inline : str, verbose = False):
 
@@ -62,12 +62,13 @@ Exceptions: Unknown at this point.
         if len(self.inline) > 1:
             self.attributes = attributes_main(cleanse(self.inline[1].strip()))
         if len(self.inline) > 2:
-            self.methods = self.inline[2].strip()
-            regular_methods = methods_main(cleanse_regular_methods(self.inline[2].strip()))
-            signitures = None
-            if self.inline[2].count("("):
-                signitures = cleanse_with_signitures(self.inline[2].strip())
-            self.methods = self.parse_methods(regular_methods, signitures)
+            self.methods = cleanse(self.inline[2].strip())
+            
+            # regular_methods = methods_main(cleanse_regular_methods(self.inline[2].strip()))
+            # signitures = None
+            # if self.inline[2].count("("):
+            #     signitures = cleanse_with_signitures(self.inline[2].strip())
+            # self.methods = self.parse_methods(regular_methods, signitures)
         if len(self.inline) > 3:
             if len(self.inline) == 4:
                 self.parse_options(self.inline[3].strip())
@@ -266,4 +267,4 @@ if __name__ == "__main__":
 #     for items in new:
 #         print(items.packages)
 
-    print(Inline("Hello(Hi,Bisk,Chalp) (reindeer,penis): attr1, $EX, attr2 : SMname, CMcone, arffff, FNnoodle, FNbasket(p, ending='cones'), CMshitbasket(x) shitcone(x,y,z), SMmotherfuck(y) : -tem").__repr__())
+    print(Inline("Hello(Hi,Bisk,Chalp) (reindeer,dolphin): attr1, sandman, CVattr2 : SMname, CM*&**cone, arffff, FNnoodle, FNbasket(p, ending='cones'), CMshitbasket(x) shitcone(x,y,z), SMmotherfuck(y) : -tem").__repr__())
