@@ -247,27 +247,37 @@ def simple_method_main(methods : list):
     Args:
         method ([type]): [description]
     """
+    # 
+    methods = ",".join(methods)
+    # if methods has parentheseis (signitures)
+    for char in methods:
+        pass
+
+
+
+
     # y is the actual value
-    for x,y in enumerate(methods):
-        if y.count("("):
-            if corrected := validate_signiture(y):
-                methods[x] = corrected
-                # avoids parsing y as a regular identifier
-                continue
-        if is_identifier(y):
-            # heres where you would override the default
-            # arg if you wanted to coerce the case
-            if returned := case_check(y, item_type="field"):
-                methods[x] = returned
-            # dont think we need an else block because ^^ always return truthy
-        else:
-            response = input(f"the method {y} is not a valid identifier\n\
-delete {y} from method set {methods} (y/n)?")
-            if response in ("y","yes"):
-                del methods[x]
-    if len(methods):
-        return methods
-    return None
+#     for x,y in enumerate(methods):
+#         if y.count("("):
+#             if corrected := validate_signiture(y):
+#                 methods[x] = corrected
+#                 # avoids parsing y as a regular identifier
+#                 continue
+#         #     
+#         if is_identifier(y):
+#             # heres where you would override the default
+#             # arg if you wanted to coerce the case
+#             if returned := case_check(y, item_type="field"):
+#                 methods[x] = returned
+#             # dont think we need an else block because ^^ always return truthy
+#         else:
+#             response = input(f"the method {y} is not a valid identifier\n\
+# delete {y} from method set {methods} (y/n)?")
+#             if response in ("y","yes"):
+#                 del methods[x]
+#     if len(methods):
+#         return methods
+#     return None
     # i suspect youll need to loop thru the string manually. join with ','
     # then loop over each character and split manuyally ONLY if coma is 
     # not surrounded by parens. cooool.
