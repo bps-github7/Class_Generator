@@ -209,28 +209,81 @@ delete {y} from attribute set {attr} (y/n)?")
 def methods_main(methods : list):
     """
     overseer fn for ensuring the validity of each method.
+
+    
+
     Args:
         method ([type]): [description]
     """
+    # y is the actual value
+    for x,y in enumerate(methods):
+        if is_identifier(y):
+            # heres where you would override the default
+            # arg if you wanted to coerce the case
+            if returned := case_check(y, item_type="field"):
+                methods[x] = returned
+            # dont think we need an else block because ^^ always return truthy
+        else:
+            response = input(f"the method {y} is not a valid identifier\n\
+delete {y} from method set {methods} (y/n)?")
+            if response in ("y","yes"):
+                del methods[x]
+    if len(methods):
+        return methods
+    return None
+
+
+
+def simple_method_main(methods : list):
+    """
+    simplified version of the above function.
+    gets rid of the need for inline objects' parse_methods method.
+
+    we will just validate and then deal with deal
+    with parsing during or before generation
+
+    
+
+    Args:
+        method ([type]): [description]
+    """
+    # 
     methods = ",".join(methods)
-    names, signitures = [], []
-    if methods.count("("):
-        for char, count in enumerate(methods):
-            if char == "(":
-                before, after = methods[:count], methods[count:]
-                if before.count(","):
-                    before = before.split(",")
-                    sig_name = before.pop()
-                    if after.count(")"):
-                        params = after.split(")")[0]
-                        # you will need to validate each param and default arg.
-                        signitures.append(f"{sig_name}({params}")
-    return signitures                   
+    # if methods has parentheseis (signitures)
+    for char in methods:
+        pass
 
 
-            
 
 
+    # y is the actual value
+#     for x,y in enumerate(methods):
+#         if y.count("("):
+#             if corrected := validate_signiture(y):
+#                 methods[x] = corrected
+#                 # avoids parsing y as a regular identifier
+#                 continue
+#         #     
+#         if is_identifier(y):
+#             # heres where you would override the default
+#             # arg if you wanted to coerce the case
+#             if returned := case_check(y, item_type="field"):
+#                 methods[x] = returned
+#             # dont think we need an else block because ^^ always return truthy
+#         else:
+#             response = input(f"the method {y} is not a valid identifier\n\
+# delete {y} from method set {methods} (y/n)?")
+#             if response in ("y","yes"):
+#                 del methods[x]
+#     if len(methods):
+#         return methods
+#     return None
+    # i suspect youll need to loop thru the string manually. join with ','
+    # then loop over each character and split manuyally ONLY if coma is 
+    # not surrounded by parens. cooool.
+
+
+### and so on....?
 
 def validate_members(items, item_type="class"):
     """does basic validation for a standard inlines' members
@@ -432,4 +485,4 @@ if __name__ == "__main__":
     # print(class_name_main("skone nard pumpkins"))
     # print(attributes_main("skone,nard,pumplins, %$!I@(KD(@"))
     # print(validate_signiture("badger(monkey,mole='!!!!$#')"))
-    print(methods_main("skone(x,y,z), flan(x), cucumber".split(",")))
+    print(simple_method_main("skone(x,y,z), flan(x), cucumber".split(",")))
