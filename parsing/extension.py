@@ -18,6 +18,8 @@ provides dynamic utility, in cases where
 either, niether or both argument parts of the extension are provided.
     """
     def __init__(self, ext):
+        #TODO: is this really the best way to do this? what if user accidentally puts ) ( in their class name?
+        
         if ext.count(") ("):
             classes = ext.split(") (")
             self.class_name = classes[0].split("(")[0].strip()
@@ -111,7 +113,7 @@ def main():
     # test.add_parents("bisk, chalp, neckbro")
     # print(test.__str__(show_defaults=True))
     # test = Extension.from_individual_arguments("ClassA", packages='gorge, fist')
-    test.add_packages("bisk, chalp, neckbro")
+    test.add_parents("bisk, chalp, neckbro")
     print(test.parents.split(","))
 
 
