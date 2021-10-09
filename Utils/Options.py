@@ -90,10 +90,22 @@ def main():
 
     args : None
 
-    returns A class_dict or list of class_dicts built out of input specifications.
+    returns:
+
+        0 - indicates an error in parsing the arguments
+        such as there was no project name provided.
+
     """
     ### should probably check here if .rc file is provided.
-    #  set the defaults if so
+    
+    if not args.name:
+        print("Name Error: You must provide a project name.")
+        return 0
+    
+    if not args.path:
+        print("files will be generated in the current working directory")
+
+
     project_name = args.name
     project_path = args.path
     print(f"proposed project path: {project_path}/{project_name}")
