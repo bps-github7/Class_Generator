@@ -149,19 +149,19 @@ the semi colons are fundemental to coherent inlines.
 
 They are needed to designate where one field begins and the other ends.
 
-`BiscuitFrontier` 
+`sailor` 
 
-This creates an empty class called 'BiscuitFrontier'
+This creates an empty class called 'Sailor'
 
 However, to designate it as an abscract base class:
 
-`BiscuitFrontier:::-a` 
+`sailor:::-a` 
 
 To include only methods or only options, you must
 provide the right amount of colons, so that the parser can
 identify the correct arguments based on their position in the inline.
 
-`BiscuitFrontier : attr1, attr2` 
+`sailor : attr1, attr2` 
 
 Good. This works.
 
@@ -171,9 +171,7 @@ Good. This works.
 
 `BiscuitFrontier : -a`
 
-Both wrong.
-
-Instead do this:
+both examples above are wrong. Instead do this:
 
 `BiscuitFrontier : : method1, method2`
 
@@ -194,7 +192,8 @@ When nessecary, use the basic inline grouping syntax to specify multiple inherit
 
 `classA, classB, classC > classD : A1, A2, A3 / B1, B2,B3 / C1, C2, C3 > D1, D2, D3 : Amethod / Bmethod / Cmethod > Dmethod : -t/-e/-t > -e`
 
-__Note:__ the '>' in arguments other than the class identifier are merely required for organizational reasons, it does NOT mean that, in the case of `attr1 > attr2` that 'attr1' inherits from 'attr2'.
+__Note:__ the '>' in arguments other than the class identifier are merely required for organizational reasons, it does NOT mean that, in the case of `attr1 > attr2` that 'attr1' inherits a default value (or anything else) from 'attr2'. However, if Classes A, B and C respectivley define unique attributes or methods, these will be
+present in ClassD attributes.
 
 # Packaging-Inline-Syntax
 
@@ -211,18 +210,19 @@ in practice, you will have to append an '-m' to files you want to designate as m
 This generates file2 and file4 as a module. (this switch attached to identifiers is unique to packaging syntax)
 
 __Note these important guidelines:__
-1. If you are providing packaging inlines  and regular inlines in the same session, then generate the packaging first
-(failure to do so may result in duplicate files).
-2. Using the full extension for regular inlines is reccomended for seamless coordination of these two types
+
+1. Using the full extension for regular inlines is reccomended for seamless coordination of these two types
 of inlines (this way, the two inlines can work together to create the packaging and files as specificed, while avoiding duplicate file generation)
+2. In the cases where the full extension is not provided for a file to be generated, interactive mode will begin and allow you to fill in where
+each file should be generated in the packaging structure.
+
 
 `<p:(package1 / package2 > package3 (package1) : module1 (package1) / module2 (package2) , ...)>`
 
 The extension is required to tell the parser where each file goes in the packaging hierarchy.
 
 In either case (packaging or regular inlines) the extensions are simply reccomended for seamless generating, when needed.
-Withholding that, the program must ask during runtime where each nested package and or file is placed
-in the case of a complex packaging structure.
+otherwise, the program will need to ask you for additional input in order to determine where files should be generated.
 
 __NOTE__ that there is not an argument (or functionality) provided for nesting upwards (towards the file system root), or creating a multi package root package (the root of your project having multiple directories- instead, call the program multiple times and generate individual packages in the same directory).
 
