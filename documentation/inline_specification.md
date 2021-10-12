@@ -22,18 +22,18 @@ A more complex spec that generates a class and a module.
 
 In all cases:
 
-* ':' colons seperates classname, attributes, methods and optional arguments.
+* `:` colons seperates classname, attributes, methods and optional arguments.
 
-* ',' commas seperates the members of an individual files' fields.
+* `,` commas seperates the members of an individual files' fields.
 
-* '/' forward slashes in all cases reperesents the borders between one file to the next in a inline describing more than one file- Seperates the different 'families' of members: delimiting one files attributes, methods or options from the next files' attributes, methods or options.
+* `/` forward slashes in all cases reperesents the borders between one file to the next in a inline describing more than one file- Seperates the different 'families' of members: delimiting one files attributes, methods or options from the next files' attributes, methods or options.
 
-* '>' a rightwards-angle-bracket denotes an inheritance relationship between the
+* `>` a rightwards-angle-bracket denotes an inheritance relationship between the
         first operand and the second. For example, in
         `ClassA > ClassB`
         ClassB is ClassA's descendent and inherits its attributes and methods. In the context of packaging inlines, `package1 > package2` means that package2 is contained by package1
 
-* '<p:()>' this packaging syntax this is how we differentiate file inlines from packaging inlines. learn about the packaging inline [here](##Packaging-Inline-Syntax)
+* `<p:()>` this packaging syntax this is how we differentiate file inlines from packaging inlines. learn about the packaging inline [here](##Packaging-Inline-Syntax)
 
 # Extensions
 You can elaborate your inline by providing parent and package with an 'extension'

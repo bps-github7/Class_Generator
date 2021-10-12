@@ -7,10 +7,13 @@ date: 1/28/2021
 About: Houses all validation, parsing and general utilities
 pertinent to multiple inlines, that is, inlines which contain 
 specs for building more than onr inline.
+
+
+??? this whole module ???
+just do this recursively classes.split('/') for each create a file to be generated.
 """
 import sys
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
-from utils.interactive import interactive_mode
 
 from parsing.inline import Inline
 
@@ -18,7 +21,8 @@ from parsing.inline import Inline
 def test():
     """[summary]
     """
-    print(validate_multiple("classA / ClassB / ClassC / classD / ClassE / ClassF: attr1, attr2 / attr3, attr4"))
+    print(validate_multiple("classA / ClassB / ClassC / classD /\
+     ClassE / ClassF: attr1, attr2 / attr3, attr4"))
 
 def validate_multiple(inline: str):
     """

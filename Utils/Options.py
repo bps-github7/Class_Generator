@@ -99,11 +99,10 @@ def main():
     ### should probably check here if .rc file is provided.
     
     if not args.name:
-        print("Name Error: You must provide a project name.")
-        return 0
+        raise NameError("Name Error: You must provide a project name.")
     
-    if not args.path:
-        print("files will be generated in the current working directory")
+    # if not args.path:
+    #     print("files will be generated in the current working directory")
 
 
     project_name = args.name
@@ -113,9 +112,7 @@ def main():
     if args.verbose:
         print("determining source of input... (cmd line arg, file or interactive mode)")
     if args.inline:
-        ### be v. careful to note- here inline is str
-        #  after validation its type == Inline
-        ### do not treat them as the same.
+        # this returns the Inline object as it was just parsed
         return parse_inline(args.inline)
     elif args.file:
         if args.verbose:

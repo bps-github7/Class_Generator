@@ -18,8 +18,15 @@ provides dynamic utility, in cases where
 either, niether or both argument parts of the extension are provided.
     """
     def __init__(self, ext):
-        #TODO: is this really the best way to do this? what if user accidentally puts ) ( in their class name?
-        
+        """Constructs an extension based off a plain string
+        containing the correct extension syntax
+
+        Args:
+            ext (string): plain string which contains the extension syntax.
+            this may define the parent, package or both, but will always associate
+            these values with a class name, which inherits from these parents and
+            is located in the list of directories named in the packages.
+        """
         if ext.count(") ("):
             classes = ext.split(") (")
             self.class_name = classes[0].split("(")[0].strip()
@@ -98,17 +105,30 @@ either, niether or both argument parts of the extension are provided.
 
 
     @classmethod
-    def from_individual_arguments(cls, class_name, parents = object, packages = "root"):
+    def from_individual_arguments(cls, class_name : str, parents = object, packages = "root"):
+        """Creates an extension based on the three components in the syntax
+            classA(parentA,parentB) (package1, package2)
+
+        Args:
+            class_name (str): the name of class being defined with this extension.
+            parents (str or object, optional): the parent or parents who this class
+             inherits from. Defaults to object.
+            packages (str, optional): comma delimited string of names of directories
+             that should contain the file. Defaults to "root".
+
+        Returns:
+            Extension: [description]
+        """
         if 'object' in str(parents):
             if 'root' in str(packages):
                 return Extension(f"{class_name}")
             else:
                 return Extension(f"{class_name} ({packages})")
         return Extension(f"{class_name}({parents}) ({packages})")
-        
-        
 
 def main():
+    """Running some tests to ensure constructors work as expected.
+    """
     test = Extension("ClassA(cones,chalpo,poades) (neckmaster,neckattendant)")
     # test.add_parents("bisk, chalp, neckbro")
     # print(test.__str__(show_defaults=True))
