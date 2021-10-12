@@ -7,9 +7,9 @@ Software: Python class generator
 
 Defining various methods that facilitate cmd line execution of class generator"""
 import argparse
-from parsing.inline import Inline
-from parsing.parser import parse_inline
-from utils.interactive import interactive_mode
+# from parsing.inline import Inline
+# from parsing.parser import parse_inline
+# from utils.interactive import interactive_mode
 
 
 parser = argparse.ArgumentParser(
@@ -83,7 +83,6 @@ args = parser.parse_args()
 
 # switches("classA : attr1, attr2 : method")
 
-# This could be the main function in utils.options.py  
 def main():
     """Using args passed in from the cmd line
     further delegates the tasks of the program
@@ -97,23 +96,44 @@ def main():
 
     """
     ### should probably check here if .rc file is provided.
-    
+
+
+    """
+    TODO: going to make this object the returned value from this main function
+    it provides information which guides the program run time-
+        1) complete path : 'project/path' + 'project_name'
+        2) inlines : [list, of, inlines]
+        3) statusReport : [list of all work that needs to be done, includes work status, sucess / fail code, errors encountered]
+        4) options : global options for the program - ie should we export the finished project and how? verbose mode: true
+        5) configs : is there an rc file present? if not, use default settings: 
+
+    """
+    # options = {
+    #     "name" : args.name,
+    #     "path" : args.path,
+    #     "verbose" : args.verbose,
+    # }
+
     if not args.name:
         raise NameError("Name Error: You must provide a project name.")
     
-    # if not args.path:
-    #     print("files will be generated in the current working directory")
+    if not args.path:
+
 
 
     project_name = args.name
     project_path = args.path
     print(f"proposed project path: {project_path}/{project_name}")
-    # make dir / file with this ^^^ and change to that directory.
+
+
+
     if args.verbose:
         print("determining source of input... (cmd line arg, file or interactive mode)")
     if args.inline:
+      print("making an inline")
         # this returns the Inline object as it was just parsed
-        return parse_inline(args.inline)
+      
+       # return parse_inline(args.inline)
     elif args.file:
         if args.verbose:
             print("reading classes from a file...")
@@ -127,3 +147,5 @@ def main():
     # Reaching here means the parsing was unsuccessful
     # and class will not be generated
     return 0
+
+main()
