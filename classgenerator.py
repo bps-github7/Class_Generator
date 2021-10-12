@@ -1,6 +1,7 @@
 """main function for class generator, called at begining of program runtime.
 """
-
+import sys
+sys.path.insert(0,"C:\\Users\\Ben\\VsCode\\python")
 # from parsing.inline import Inline
 from utils.options import main as options_main
 from generation.generator import class_generator

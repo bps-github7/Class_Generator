@@ -16,7 +16,6 @@ Input can be provided through three different methods:
 2. [input file(s)](#File-as-input)
 3. [interactive mode](#Interactive-mode)
 
- 
 
 ```
 List all arguments below vvv 

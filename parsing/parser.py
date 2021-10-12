@@ -78,7 +78,8 @@ See README.md for more details. Inline specs must have at least one : (colon")
                 print("parsed a single inline specification.")
     return parsed_classes
 
-
+# todo: this would be your main problemo area- 
+# validate inline is not defined, 
 
 def main(inline: Inline) -> int:
     classes = parse_inline(inline)
