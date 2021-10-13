@@ -7,6 +7,8 @@ Software: Python class generator
 
 Defining various methods that facilitate cmd line execution of class generator"""
 import argparse
+import os
+from utils.misc_functions import test_path
 # from parsing.inline import Inline
 # from parsing.parser import parse_inline
 # from utils.interactive import interactive_mode
@@ -108,16 +110,23 @@ def main():
         5) configs : is there an rc file present? if not, use default settings: 
 
     """
-    # options = {
-    #     "name" : args.name,
-    #     "path" : args.path,
-    #     "verbose" : args.verbose,
-    # }
-
-    if not args.name:
-        raise NameError("Name Error: You must provide a project name.")
+    workflow = {
+        "name" : "",
+        "path" : "",
+        "verbos" : False,
+        "configs" : {},
+        "files" : []
+    }   
     
+    if not args.name:
+        raise NameError("You must provide a project name.")
+    # if all tests pass (the path is writable, exists), change_path()
+
     if not args.path:
+        if test_path(os.getcwd):
+            workflow.path = os.getcwd()
+        else:
+            raise OSError("there is a problem with the path you provided")
 
 
 
