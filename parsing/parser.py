@@ -7,10 +7,10 @@ Software: Python Class Generator
 About: handles the parsing of Inlines of various forms.
 
 """
+import os
 import sys
 sys.path.insert(0,"C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 
-# from utils.misc_functions import get_extension
 from parsing.inline import Inline
 from parsing.validation import validate_inheritance,\
 validate_inline, validate_multiple, validate_packaging
@@ -78,8 +78,30 @@ See README.md for more details. Inline specs must have at least one : (colon")
                 print("parsed a single inline specification.")
     return parsed_classes
 
-# todo: this would be your main problemo area- 
-# validate inline is not defined, 
+def from_file(f, results=[]):
+    """
+builds a container out of text file
+containing class dict specifications inline format.
+    """
+    # accounting for need for FTYPE extension in windows
+    # if OS is windows and .txt is not provided, add it.
+    if os.name == 'nt':
+        if not f.endswith('.txt'):
+            f += '.txt'  
+    with open("{}".format(f), "r") as file:
+        for num, line in enumerate(file):
+            # enables the user to 'comment out' lines with both JS and python style of commenting
+            if line.startswith("#") or line.startswith("//"):
+                continue
+            # ignore lines that are just a new line or whitespace
+            if line.strip() in  ("\n", "", " "):
+                continue
+            copy = line.strip("\n")
+            ### need to enforce validation here- reject or correct
+            ### lines that dont conform to inline standards.
+            results.append(Inline(line))
+        return results
+
 
 def main(inline: Inline) -> int:
     classes = parse_inline(inline)

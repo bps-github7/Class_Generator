@@ -9,7 +9,6 @@ import re
 import sys
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 from parsing.inline import Inline
-from utils.misc_functions import get_extension
 # print(sys.path)
 
 class InheritanceBuilder:
