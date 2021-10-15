@@ -1,5 +1,5 @@
 # Programmer: Ben Sehnert
-# Program: Misc_Functions Module
+# Program: path testing module 
 # Software: Python class Generator
 # Date: 1/21/2020
 
@@ -10,6 +10,16 @@ import tempfile
 
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 
+def main(project_name, path):
+    """coordinates validation of user provided path 
+    and movement of runtime to this location
+
+    Args:
+        project_name (str): the name of directory to house files generated in the session
+        path (str): the path to files to generate
+    """
+    path = path_main(path)
+    make_new_folder(path, project_name)
 
 def path_main(path = "root"):
     """Main function for validation of path user provided for a session.
@@ -31,21 +41,20 @@ def path_main(path = "root"):
         if validate_path(os.getcwd()):
             return os.getcwd()
         raise OSError("there is a problem with the path you provided")
-    elif path != os.getcwd():
 
-        if not os.path.isabs('.'):
-            path = fix_relative_path(path)
+    while True:
+        if validate_path(path):
+            return validate_path(path)
+        else:
+            while True:
+                print("provide a new, valid path to proceed with generation, or type q to quit:")
+                path = input()
+                if os.path.exists(path):
+                    break
+                else:
+                    print("Try again: your input is not a valid path. you can enter absolute or relative path.")
 
-        
-        while not validate_path(path):
 
-            if os.path.exists(path):
-                path = input("provide a new, valid path to proceed with generation, or type q to quit:\n")
-                if path.lower() == "q":
-                    return 0
-            else:
-                break
-        return path
         
 def validate_path(path):
     """Ensures the path a user provided is valid.
@@ -60,9 +69,11 @@ def validate_path(path):
         os.path.exists(path)
         os.path.isdir(path)
         isWritable(path)
-        return path
+        if not os.path.isabs('.'):
+            return fix_relative_path(path)
+        else:
+            return path
     except (OSError, NotADirectoryError):
-        print("the path you provided is not valid")
         return 0
 
 
@@ -79,6 +90,15 @@ def isWritable(path):
 
 
 def make_new_folder(path, project_name):
+    """using project name and path, change path to project home. path/directory
+
+    Args:
+        path ([type]): [description]
+        project_name ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     os.chdir(path)
     new = os.path.join(path, project_name)
     if not os.path.exists(new):
@@ -86,9 +106,9 @@ def make_new_folder(path, project_name):
         os.chdir(new)
         return 1
     else:
-        ### why not just change dir to this existing one?
-        print("Error: a folder already exists with this name.")
-        return 0
+        os.chdir(new)
+        return 1
+
 
 def fix_relative_path(path) :
     """Automatically cleans and concatenates relative paths 
@@ -143,24 +163,22 @@ def fix_relative_path(path) :
 
 if __name__ == "__main__":
 
-    print(fix_relative_path("../../something"))
-    print(fix_relative_path("something"))
-    print(fix_relative_path("./something"))
+    # print(fix_relative_path("../../something"))
+    # print(fix_relative_path("something"))
+    # print(fix_relative_path("./something"))
 
-    # handles both of these happily
-    print(fix_relative_path("\\taco\\burrito"))
-    print(fix_relative_path("taco\\burrito"))
-
-
-    # except compatability testing with unix (ie does this function work the same with / facing slashes)
-    # this is the only use case that fix_relative_path isnt working with
-    print(fix_relative_path("/taco"))
+    # # handles both of these happily
+    # print(fix_relative_path("\\taco\\burrito"))
+    # print(fix_relative_path("taco\\burrito"))
+    
+    # # TODO: we need a testing environment for POSIX use case handling code!
+    # print(fix_relative_path("/taco"))
 
 
 
-    # try:
-    #     returned = path_main("C:\caluga")
-    # except OSError as e:
-    #     print(e)
+    try:
+        returned = path_main("C:\caluga")
+    except OSError as e:
+        print(e)
 
-    # print(returned)
+    print(returned)

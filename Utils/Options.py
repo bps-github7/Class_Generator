@@ -8,7 +8,6 @@ Software: Python class generator
 Defining various methods that facilitate cmd line execution of class generator"""
 import argparse
 import os
-from utils.misc_functions import test_path
 # from parsing.inline import Inline
 # from parsing.parser import parse_inline
 # from utils.interactive import interactive_mode
@@ -123,10 +122,10 @@ def main():
     # if all tests pass (the path is writable, exists), change_path()
 
     if not args.path:
-        if test_path(os.getcwd):
-            workflow.path = os.getcwd()
-        else:
-            raise OSError("there is a problem with the path you provided")
+        # if test_path(os.getcwd):
+        #     workflow.path = os.getcwd()
+        # else:
+        #     raise OSError("there is a problem with the path you provided")
 
 
 

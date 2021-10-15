@@ -4,8 +4,6 @@
 
 """Defines the functions used for writing regular class files."""
 
-from utils.misc_functions import test_path
-
 def make_imports(file, parents, path_to_parents="./"):
     '''
 Writes the import statements so that a child class
