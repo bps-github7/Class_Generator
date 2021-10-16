@@ -10,6 +10,35 @@ import argparse
 import sys
 import os
 
+
+def confirm_prompt(prompt : str):
+    """A helper method with interactive flavor,
+    it simply asks user for a yes no response, where they have
+    option to quit as well
+
+    Returns:
+        1 - confirm
+        0 - reject
+        { err : false } - user wants to quit
+        { err : true, response = "..."}
+    """
+    print(prompt)
+    print("choose one of the following:")
+    print("c - to confirm")
+    print("r - to reject")
+    print("q - to exit this prompt")
+    response = input().lower()
+    if response in ("c","confirm", "continue"):
+        return 1
+    elif response in ("r", "reject", "no"):
+        return 0
+    elif response in ("q", "quit"):
+        return { "error" : False }
+    else:
+        return { "error" : True, "response" : response }
+
+
+
 #Global that holds all classes parsed via application use.
 container = {}
 
@@ -44,6 +73,7 @@ Type d for default mode or p for Prompt mode, h repeats these instructions."
             #     container.update(answer)
         else:
             response = input("Did not recoginize your input. Please try again: ")
+            
 
 def default_mode():
     """

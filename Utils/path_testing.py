@@ -8,7 +8,11 @@ import os
 import errno
 import tempfile
 
+
+
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
+
+from utils.interactive import confirm_prompt
 
 def main(project_name, path):
     """coordinates validation of user provided path 
@@ -18,8 +22,28 @@ def main(project_name, path):
         project_name (str): the name of directory to house files generated in the session
         path (str): the path to files to generate
     """
-    path = path_main(path)
-    make_new_folder(path, project_name)
+    # path = path_main(path)
+    while True:
+        path = path_main(path)
+        prompt = f"Please confirm: files will be created in the following directory {path}.{project_name}"
+        response = confirm_prompt()
+        if response == 1:
+            make_new_folder(path, project_name)
+            return f"{path}/{project_name}"
+        elif response == 0:
+            # In the case user is not happy, try to
+            # get a satisfactory response on next iteration
+            continue
+        else:
+            try:
+                if not response["error"]:
+                    return 0
+                else:
+                    print(f"sorry, we don't understand this response: {response['error']['response']}")
+            except AttributeError:
+                continue
+
+
 
 def path_main(path = "root"):
     """Main function for validation of path user provided for a session.
