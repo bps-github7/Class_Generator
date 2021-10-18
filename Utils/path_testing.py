@@ -15,7 +15,7 @@ sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 from utils.interactive import confirm_prompt
 
 def main(project_name, path):
-    """coordinates validation of user provided path 
+    """coordinates validation of user provided path
     and movement of runtime to this location
 
     Args:
@@ -24,15 +24,18 @@ def main(project_name, path):
     """
     # path = path_main(path)
     while True:
-        path = path_main(path)
-        prompt = f"Please confirm: files will be created in the following directory {path}.{project_name}"
-        response = confirm_prompt()
+        path = validate_path(path)
+        
+        prompt = f"Please confirm: files will be created in\
+        the following directory {path}.{project_name}"
+        
+        response = confirm_prompt(prompt)
+        
         if response == 1:
             make_new_folder(path, project_name)
             return f"{path}/{project_name}"
         elif response == 0:
-            # In the case user is not happy, try to
-            # get a satisfactory response on next iteration
+            # then try to get satisfactory path on next pass...
             continue
         else:
             try:
@@ -45,9 +48,8 @@ def main(project_name, path):
 
 
 
-def path_main(path = "root"):
-    """Main function for validation of path user provided for a session.
-    The path tells the program where to generate the files, and when a path
+def validate_path(path = "root"):
+    """The path tells the program where to generate the files, and when a path
     isn't provided during a session, the program will default on either a custom
     configuration provided in .rc file, else the CWD. in either case, we need
     to ensure that this path exists on the system and is writable to the current user.
@@ -62,13 +64,13 @@ def path_main(path = "root"):
         validated_path [str]: in the case validation tests passed, a usable path for generation. 
     """
     if path == "root":
-        if validate_path(os.getcwd()):
+        if is_valid_path(os.getcwd()):
             return os.getcwd()
         raise OSError("there is a problem with the path you provided")
 
     while True:
-        if validate_path(path):
-            return validate_path(path)
+        if is_valid_path(path):
+            return is_valid_path(path)
         else:
             while True:
                 print("provide a new, valid path to proceed with generation, or type q to quit:")
@@ -80,7 +82,7 @@ def path_main(path = "root"):
 
 
         
-def validate_path(path):
+def is_valid_path(path):
     """Ensures the path a user provided is valid.
 
     Args:
@@ -92,7 +94,7 @@ def validate_path(path):
     try:
         os.path.exists(path)
         os.path.isdir(path)
-        isWritable(path)
+        is_writable(path)
         if not os.path.isabs('.'):
             return fix_relative_path(path)
         else:
@@ -101,7 +103,14 @@ def validate_path(path):
         return 0
 
 
-def isWritable(path):
+def is_writable(path):
+    """Checks if we can write to the folder pointed to by users path
+
+    Args:
+        path (str): the path to check
+    Returns:
+        boolean: true if we can write a file, false otherwise
+    """
     try:
         testfile = tempfile.TemporaryFile(dir=path)
         testfile.close()
@@ -114,7 +123,9 @@ def isWritable(path):
 
 
 def make_new_folder(path, project_name):
-    """using project name and path, change path to project home. path/directory
+    """using project name and path, change path
+    to project home. path/directory if it exists
+    else first create folder then change to it.
 
     Args:
         path ([type]): [description]
@@ -135,7 +146,7 @@ def make_new_folder(path, project_name):
 
 
 def fix_relative_path(path) :
-    """Automatically cleans and concatenates relative paths 
+    """Automatically cleans and concatenates relative paths
     so it refers to absolute location in system instead.
     meant to robustly handle nuances of unix vs windows paths.
 
@@ -161,22 +172,18 @@ def fix_relative_path(path) :
     # if user provides rel path with ./ infront, clean that up.
     if path.startswith("./"):
         path = path[2:]
-
     # if user wanted to go up file sys tree, truncate abs path to match.
     elif path.startswith("../"):
         base = delimiter.join(base_tolkens[:len(base_tolkens) - path.count("../")])
         path = path[(path.count("../")*3):]
-           
     # a final alternative is '/some/path', clean that up as well
     elif path.startswith(delimiter):
         path = path[1:]
-
     # finally, if windows is OS, and user used unix style path delimiter, swap these out.
     if os.name == "nt" and (path.count("/")):
         path = path.replace("/","\\")
     elif os.name == "nt" and path.count("//"):
         path = path.replace("//","\\")
-
     # ensure that the relative addition to the base is in format "something/something"
     # to avoid duplicate delimiter in the return value.
     if path.startswith("//") or path.startswith("\\"):
@@ -201,7 +208,7 @@ if __name__ == "__main__":
 
 
     try:
-        returned = path_main("C:\caluga")
+        returned = validate_path("C:\caluga")
     except OSError as e:
         print(e)
 

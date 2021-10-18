@@ -37,7 +37,6 @@ class TestPathTesting(unittest.TestCase):
         """[summary]
         """
 
-    # TODO: what is right case for python fns names? i think isWritable is wrong should be is_writable
     def test_is_writable(self):
         """[summary]
         """
