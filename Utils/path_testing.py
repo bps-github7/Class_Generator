@@ -1,21 +1,25 @@
-# Programmer: Ben Sehnert
-# Program: path testing module 
-# Software: Python class Generator
-# Date: 1/21/2020
-
-import sys
+"""Dedicated to path related functions. If all tests are passed,
+main fn will create a directory with project name, in location pointed to by user's path.
+"""
 import os
 import errno
 import tempfile
+from interactive import confirm_prompt
 
-
-
-sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
-
-from utils.interactive import confirm_prompt
+class NoPathError(Exception):
+    """Base class for this module.
+    will be raised if user bails out of the path validation
+    process before we have a validated path.
+    ~
+    NOTE: Think ive been getting way side tracked with this module-
+    we can just hault the program run time when parsing arguments,
+    if the user didnt pass in a valid path, then we cannot continue.
+    """
+    def __init__(self, message):
+        self.message = message
 
 def main(project_name, path):
-    """coordinates validation of user provided path
+    """Coordinates validation of user provided path
     and movement of runtime to this location
 
     Args:
@@ -24,13 +28,12 @@ def main(project_name, path):
     """
     # path = path_main(path)
     while True:
-        path = validate_path(path)
-        
-        prompt = f"Please confirm: files will be created in\
-        the following directory {path}.{project_name}"
-        
-        response = confirm_prompt(prompt)
-        
+        try:
+            path = validate_path(path)
+        except NoPathError:
+            print("cannot generate your files without a valid location to generate them in.")
+        response = confirm_prompt(f"Please confirm: files will be created in\
+        the following directory {path}.{project_name}")
         if response == 1:
             make_new_folder(path, project_name)
             return f"{path}/{project_name}"
@@ -67,7 +70,6 @@ def validate_path(path = "root"):
         if is_valid_path(os.getcwd()):
             return os.getcwd()
         raise OSError("there is a problem with the path you provided")
-
     while True:
         if is_valid_path(path):
             return is_valid_path(path)
@@ -77,11 +79,12 @@ def validate_path(path = "root"):
                 path = input()
                 if os.path.exists(path):
                     break
+                elif path == "q":
+                    raise NoPathError("user chose to not validate a path")
                 else:
                     print("Try again: your input is not a valid path. you can enter absolute or relative path.")
 
 
-        
 def is_valid_path(path):
     """Ensures the path a user provided is valid.
 
@@ -91,15 +94,18 @@ def is_valid_path(path):
     Returns:
         validated_path (str | 0): returns path if tests pass, else failure signal.
     """
+    if not os.path.isabs('.'):
+        path = fix_relative_path(path)
     try:
         os.path.exists(path)
         os.path.isdir(path)
         is_writable(path)
-        if not os.path.isabs('.'):
-            return fix_relative_path(path)
-        else:
-            return path
+        
     except (OSError, NotADirectoryError):
+        print("an error occured while trying to validate your path. consider the following:")
+        print("1) does you path point to an existing directory?")
+        print("2) does your path point to a directory? (cannot point to a file)")
+        print("3) do you currently have needed permissions to write to the directory?")
         return 0
 
 

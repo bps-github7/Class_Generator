@@ -8,6 +8,8 @@ Software: Python class generator
 Defining various methods that facilitate cmd line execution of class generator"""
 import argparse
 import os
+
+from path_testing import NoPathError
 # from parsing.inline import Inline
 # from parsing.parser import parse_inline
 # from utils.interactive import interactive_mode
@@ -119,9 +121,16 @@ def main():
     
     if not args.name:
         raise NameError("You must provide a project name.")
+    else:
+        workflow['name'] = args.name
     # if all tests pass (the path is writable, exists), change_path()
 
     if not args.path:
+        raise NoPathError("You must provide a path")
+    else:
+        if os.path.exists(args.path):
+            workflow["path"] = args.path
+
         # if test_path(os.getcwd):
         #     workflow.path = os.getcwd()
         # else:
@@ -129,9 +138,7 @@ def main():
 
 
 
-    project_name = args.name
-    project_path = args.path
-    print(f"proposed project path: {project_path}/{project_name}")
+    print(f"proposed project path: {workflow['path']}/{workflow['name']}")
 
 
 
