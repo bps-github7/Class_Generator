@@ -1,15 +1,13 @@
+"""Option
+
+Raises:
+    NameError: [description]
+
 """
-Programmer: Ben Sehnert
-Program: Options module- deals with parts of the command that are optional - switches, default args etc...
-Date: 12/27/2020
-Software: Python class generator
-
-
-Defining various methods that facilitate cmd line execution of class generator"""
 import argparse
 import os
-
 from path_testing import NoPathError
+from path_testing import fix_relative_path, is_valid_path
 # from parsing.inline import Inline
 # from parsing.parser import parse_inline
 # from utils.interactive import interactive_mode
@@ -62,11 +60,12 @@ parser.add_argument("-abc", "--abstract_base_class",
 
 # this should be a mutually exclusive group- can be -sa, -sm or -sb
 group.add_argument("-sa", "--skip_attributes",
-                   help="Use this short option to skip defining instance variables for your class", action="store_true", required=False)
+                    help="Use this short option to skip defining instance variables for your\
+                    class", action="store_true", required=False)
 group.add_argument("-sm", "--skip_methods",
-                   help="Use this short option ", action="store_true", required=False)
-group.add_argument("-sb",  "--skip_both", help="Use this short option to skip defining both attributes and methods",
-                   action="store_true", required=False)
+                    help="Use this short option ", action="store_true", required=False)
+group.add_argument("-sb",  "--skip_both", help="Use this short option to skip defining both\
+                    attributes and methods", action="store_true", required=False)
 
 # -t, -e are keyword switches- have a default, but can take {args = 'choice'} too
 parser.add_argument("-t", "--testing", help="generate tests to your class(es)",
@@ -101,53 +100,53 @@ def main():
     ### should probably check here if .rc file is provided.
 
 
-    """
-    TODO: going to make this object the returned value from this main function
-    it provides information which guides the program run time-
-        1) complete path : 'project/path' + 'project_name'
-        2) inlines : [list, of, inlines]
-        3) statusReport : [list of all work that needs to be done, includes work status, sucess / fail code, errors encountered]
-        4) options : global options for the program - ie should we export the finished project and how? verbose mode: true
-        5) configs : is there an rc file present? if not, use default settings: 
-
-    """
+    #     1) complete path : 'project/path' + 'project_name'
+    #     2) inlines : [list, of, inlines]
+    #     3) statusReport : summary of workflow progress, errors, notes etc
+    #     4) options : should we export the finished project and how? verbose mode, etc
+    #     5) configs : is there an rc file present? if not, use default settings 
     workflow = {
+        "completePath" : "",
         "name" : "",
         "path" : "",
-        "verbos" : False,
+        "verbose" : False,
         "configs" : {},
         "files" : []
     }   
     
-    if not args.name:
-        raise NameError("You must provide a project name.")
-    else:
+    if args.name:
         workflow['name'] = args.name
-    # if all tests pass (the path is writable, exists), change_path()
-
-    if not args.path:
-        raise NoPathError("You must provide a path")
+        if args.path:
+            if os.path.isabs(args.path):
+                try:
+                    if is_valid_path(args.path):
+                        workflow['path'] = args.path
+                except NoPathError as error:
+                    print(error)
+            else:
+                path = fix_relative_path(args.path)
+                try:
+                    if is_valid_path(path):
+                        workflow['path'] = path
+                except NoPathError as error:
+                    print(error)
+        else:
+            print("then check if we have configuration set for default path. else use CWD")
     else:
-        if os.path.exists(args.path):
-            workflow["path"] = args.path
-
-        # if test_path(os.getcwd):
-        #     workflow.path = os.getcwd()
-        # else:
-        #     raise OSError("there is a problem with the path you provided")
-
-
-
-    print(f"proposed project path: {workflow['path']}/{workflow['name']}")
-
+        raise NameError("You must provide a project name. (cannot generate a nameless folder.")
+    tolken = "\\" if (os.name == "nt")  else "/"
+    workflow['completePath'] = rf"{workflow['path']}{tolken}{workflow['name']}"
+    print(f"proposed project path: {workflow['completePath']}")
+    # TODO: everything looks good here, except:
+    # 1) error handling could be more robust 
+    # 2) doesnt handle / (one backslash) before the directory name.
 
 
     if args.verbose:
         print("determining source of input... (cmd line arg, file or interactive mode)")
     if args.inline:
-      print("making an inline")
+        print("making an inline")
         # this returns the Inline object as it was just parsed
-      
        # return parse_inline(args.inline)
     elif args.file:
         if args.verbose:

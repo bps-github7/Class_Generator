@@ -7,16 +7,9 @@ import tempfile
 from interactive import confirm_prompt
 
 class NoPathError(Exception):
-    """Base class for this module.
-    will be raised if user bails out of the path validation
-    process before we have a validated path.
-    ~
-    NOTE: Think ive been getting way side tracked with this module-
-    we can just hault the program run time when parsing arguments,
-    if the user didnt pass in a valid path, then we cannot continue.
-    """
     def __init__(self, message):
         self.message = message
+
 
 def main(project_name, path):
     """Coordinates validation of user provided path
@@ -94,20 +87,14 @@ def is_valid_path(path):
     Returns:
         validated_path (str | 0): returns path if tests pass, else failure signal.
     """
-    if not os.path.isabs('.'):
-        path = fix_relative_path(path)
-    try:
-        os.path.exists(path)
-        os.path.isdir(path)
-        is_writable(path)
-        
-    except (OSError, NotADirectoryError):
-        print("an error occured while trying to validate your path. consider the following:")
-        print("1) does you path point to an existing directory?")
-        print("2) does your path point to a directory? (cannot point to a file)")
-        print("3) do you currently have needed permissions to write to the directory?")
-        return 0
-
+    if os.path.exists(path) and os.path.isdir(path):
+        if is_writable(path):
+            return 1
+        else:
+            msg = "We do not have sufficient privalleges to generate files here."
+    else:
+        msg = "path provided does not exist or does not point to a directory."
+    raise NoPathError(msg)
 
 def is_writable(path):
     """Checks if we can write to the folder pointed to by users path
