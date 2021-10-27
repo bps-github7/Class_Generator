@@ -4,43 +4,46 @@ main fn will create a directory with project name, in location pointed to by use
 import os
 import errno
 import tempfile
-from interactive import confirm_prompt
+# from interactive import confirm_prompt
 
 class NoPathError(Exception):
     def __init__(self, message):
         self.message = message
 
 
-def main(project_name, path):
-    """Coordinates validation of user provided path
-    and movement of runtime to this location
+# def confirm_prompt(something):
+#     return
 
-    Args:
-        project_name (str): the name of directory to house files generated in the session
-        path (str): the path to files to generate
-    """
-    # path = path_main(path)
-    while True:
-        try:
-            path = validate_path(path)
-        except NoPathError:
-            print("cannot generate your files without a valid location to generate them in.")
-        response = confirm_prompt(f"Please confirm: files will be created in\
-        the following directory {path}.{project_name}")
-        if response == 1:
-            make_new_folder(path, project_name)
-            return f"{path}/{project_name}"
-        elif response == 0:
-            # then try to get satisfactory path on next pass...
-            continue
-        else:
-            try:
-                if not response["error"]:
-                    return 0
-                else:
-                    print(f"sorry, we don't understand this response: {response['error']['response']}")
-            except AttributeError:
-                continue
+# def main(project_name, path):
+#     """Coordinates validation of user provided path
+#     and movement of runtime to this location
+
+#     Args:
+#         project_name (str): the name of directory to house files generated in the session
+#         path (str): the path to files to generate
+#     """
+#     # path = path_main(path)
+#     while True:
+#         try:
+#             path = validate_path(path)
+#         except NoPathError:
+#             print("cannot generate your files without a valid location to generate them in.")
+#         response = confirm_prompt(f"Please confirm: files will be created in\
+#         the following directory {path}.{project_name}")
+#         if response == 1:
+#             make_new_folder(path, project_name)
+#             return f"{path}/{project_name}"
+#         elif response == 0:
+#             # then try to get satisfactory path on next pass...
+#             continue
+#         else:
+#             try:
+#                 if not response["error"]:
+#                     return 0
+#                 else:
+#                     print(f"sorry, we don't understand this response: {response['error']['response']}")
+#             except AttributeError:
+#                 continue
 
 
 
@@ -93,7 +96,7 @@ def is_valid_path(path):
         else:
             msg = "We do not have sufficient privalleges to generate files here."
     else:
-        msg = "path provided does not exist or does not point to a directory."
+        msg = f"path- {path} does not exist or does not point to a directory."
     raise NoPathError(msg)
 
 def is_writable(path):
@@ -187,22 +190,12 @@ def fix_relative_path(path) :
 
 if __name__ == "__main__":
 
-    # print(fix_relative_path("../../something"))
+    print(fix_relative_path("/something"))
     # print(fix_relative_path("something"))
     # print(fix_relative_path("./something"))
 
     # # handles both of these happily
     # print(fix_relative_path("\\taco\\burrito"))
     # print(fix_relative_path("taco\\burrito"))
-    
     # # TODO: we need a testing environment for POSIX use case handling code!
     # print(fix_relative_path("/taco"))
-
-
-
-    try:
-        returned = validate_path("C:\caluga")
-    except OSError as e:
-        print(e)
-
-    print(returned)

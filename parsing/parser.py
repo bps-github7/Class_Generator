@@ -9,7 +9,6 @@ About: handles the parsing of Inlines of various forms.
 """
 import os
 import sys
-sys.path.insert(0,"C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 
 from parsing.inline import Inline
 from parsing.validation import validate_inheritance,\

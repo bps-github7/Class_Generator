@@ -23,7 +23,7 @@ def main() -> int:
     try:
         generate_workflow()
     except Exception:
-        print("something bad happened while you were doing the thing")
+        print("Errpr while trying to generate workflow for your project")
 
 
 

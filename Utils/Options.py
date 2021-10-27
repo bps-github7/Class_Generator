@@ -4,12 +4,13 @@ Raises:
     NameError: [description]
 
 """
-import argparse
-import os
-from path_testing import NoPathError
-from path_testing import fix_relative_path, is_valid_path
+# import argparse
+import os, sys, argparse
+from utils.path_testing import NoPathError, fix_relative_path, is_valid_path
+from utils.path_testing import make_new_folder
+
 # from parsing.inline import Inline
-# from parsing.parser import parse_inline
+from parsing.parser import parse_inline
 # from utils.interactive import interactive_mode
 
 
@@ -112,12 +113,11 @@ def main():
         "verbose" : False,
         "configs" : {},
         "files" : []
-    }   
-    
+    }
     if args.name:
         workflow['name'] = args.name
         if args.path:
-            if os.path.isabs(args.path):
+            if not args.path.startswith("\\") and os.path.isabs(args.path):
                 try:
                     if is_valid_path(args.path):
                         workflow['path'] = args.path
@@ -134,20 +134,33 @@ def main():
             print("then check if we have configuration set for default path. else use CWD")
     else:
         raise NameError("You must provide a project name. (cannot generate a nameless folder.")
-    tolken = "\\" if (os.name == "nt")  else "/"
-    workflow['completePath'] = rf"{workflow['path']}{tolken}{workflow['name']}"
-    print(f"proposed project path: {workflow['completePath']}")
-    # TODO: everything looks good here, except:
-    # 1) error handling could be more robust 
-    # 2) doesnt handle / (one backslash) before the directory name.
-
+    if workflow["name"] and workflow["path"]:    
+        tolken = "\\" if (os.name == "nt")  else "/"
+        workflow['completePath'] = rf"{workflow['path']}{tolken}{workflow['name']}"
+        print(f"proposed project path: {workflow['completePath']}")
+        if input("looks good? (y/n)") in ("y", "yes"):
+            make_new_folder(workflow["path"], workflow["name"])
+        else:
+            while True:
+                print("ok. how would you like to proceed?")
+                print("1) enter a new path")
+                print("2) quit the program")
+                response = int(input())
+                if response == 1:
+                    # fix this at some point- user should be able to re enter path, but its a bit of a mess to implement
+                    sys.exit("user needs to enter a new path next run time")
+                elif response == 2:
+                    sys.exit("user wanted to quit the current run time")
+    else:
+        # shortcut- in reality we can just do that in cwd or config default path
+        sys.exit("cannot build your project without a name and path")
 
     if args.verbose:
         print("determining source of input... (cmd line arg, file or interactive mode)")
     if args.inline:
         print("making an inline")
         # this returns the Inline object as it was just parsed
-       # return parse_inline(args.inline)
+        return parse_inline(args.inline)
     elif args.file:
         if args.verbose:
             print("reading classes from a file...")
