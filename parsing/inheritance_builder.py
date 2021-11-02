@@ -124,16 +124,16 @@ def main(inline : Inline):
     """
     return InheritanceBuilder(inline).classes
 
-item = "classA (banana) > classB(weasel) (wombat, purse) : attr1, attr2, attr3 > mastadon,\
-bucket, shallot: method1 > method2 : -t -e > -t -e"
+# item = "classA (banana) > classB(weasel) (wombat, purse) : attr1, attr2, attr3 > mastadon,\
+# bucket, shallot: method1 > method2 : -t -e > -t -e"
 # multi_item = Inline("Person1, Person2 > Employee > Dish_washer,\
 # Short_Order_Cook, Sous_Chef : P1A, P1B / P2A, P2B > E1, E2, E3 >\
 # D1, D2 / S1, S2 / SC1, SC2 : P1method / P2method > SMmethod\
 # > CMmethod / SMmethod / method : -t / -e > -t -e > -t / -e{vsc,send} / -t")
 
-processed = InheritanceBuilder(item)
+# processed = InheritanceBuilder(item)
 # processed = InheritanceBuilder(multi_item)
-print(processed.classes)
+# print(processed.classes)
 # result = main(multi_item)
 
 # for i in result:

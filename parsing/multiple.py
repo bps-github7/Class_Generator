@@ -168,6 +168,6 @@ def main(inline : str):
         print("Cannot parse this thing. sorry.")
         return 0
 
-
-test()
-# print(main("classA / ClassB / ClassC : attr1, attr2 / attr3, attr4 /: method1 / method2 /: -t / -m/"))
+if __name__ == '__main__':
+    test()
+    print(main("classA / ClassB / ClassC : attr1, attr2 / attr3, attr4 /: method1 / method2 /: -t / -m/"))
