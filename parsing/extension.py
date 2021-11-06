@@ -75,8 +75,8 @@ either, niether or both argument parts of the extension are provided.
         ### we are going to add stuff to parents, we
         ### need to get rid of object (the default)
         if 'object' in str(self.parents):
-            # careful with this- what if object is accidentally 
-            # in self.parents but not the only parent 
+            # careful with this- what if object is accidentally
+            # in self.parents but not the only parent
             self.parents = ''
         else:
             self.parents = f", {self.parents}"
@@ -133,8 +133,8 @@ def main():
     # test.add_parents("bisk, chalp, neckbro")
     # print(test.__str__(show_defaults=True))
     # test = Extension.from_individual_arguments("ClassA", packages='gorge, fist')
-    test.add_parents("bisk, chalp, neckbro")
-    print(test.parents.split(","))
+    test.add_packages("bisk, chalp, neckbro")
+    print(test.packages.split(","))
 
 
 if __name__ == "__main__":

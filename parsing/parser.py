@@ -123,12 +123,12 @@ def main(inline: Inline) -> int:
 if __name__ == '__main__':
 
     # extension syntax doesnt work in this simplified example...
-    # print(parse_inline("classA(parent1, parent2) (packageA) : attr1, attr2 : method1"))
+    print(parse_inline("classA(parent1, parent2) (packageA) : attr1, attr2 : method1"))
 
     # parsing extension still isnt great, 'parents' : 'bisk), classB, classC'
 
     # would seem the multiple main fn needs some work.
-    print(parse_inline("classA(bisk), classB, classC : attr1, attr2 / attr3, attr4 / attr5, attr6 : method1 / method2 / method3 : -t / -e / -t -e"))
+#    print(parse_inline("classA, classB, classC : attr1, attr2 / attr3, attr4 / attr5, attr6 : method1 / method2 / method3 : -t / -e / -t -e"))
 
 
 # what if the inlines passed in don't have extensions? be warry of bugs caused by this..!

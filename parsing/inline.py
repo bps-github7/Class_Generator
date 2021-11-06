@@ -42,6 +42,8 @@ Exceptions: Unknown at this point.
             print("Inline cannot be parsed if no class identifier is provided")
             return None
         else:
+            # TODO: not sure where the problem is, but here would be good place to start looking
+            # for the extension not being tied to inline, also make note packages is list, parents is not...
             # get an extension out of class name, 
             # if none is provided then sets to defaults
             self.extension = Extension(self.inline[0].strip())
