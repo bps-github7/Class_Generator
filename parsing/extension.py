@@ -65,29 +65,29 @@ either, niether or both argument parts of the extension are provided.
             these values with a class name, which inherits from these parents and
             is located in the list of directories named in the packages.
         """
+        cls_name = (ext.split("(")[0]).strip()
         self.class_name = None
         self.parents = None
         self.packages = 'root'
-        if ext.count("("):
-            if is_identifier(ext.split("(")[0].strip()):
-                self.class_name = ext.split("(")[0].strip()
-                if (" (") in ext:
-                    self.packaging = ext[ext.find(" ("):]
-                    rest = ext[:ext.find(" (")]
-                    if ("(") in rest:
-                        self.parents = rest.split("(")[1].strip(")")
-                        del rest
-                else:
-                    if ("(") in ext:
-                        self.parents = ext.split("(")[1].strip(")")
-            else:
-                # no point generating extension if we cant generate a file
-                invalid = ext.split('(')[0].strip()
-                
-                print(f"Cannot produce a file with name {invalid}.\n\
+        if is_identifier(cls_name):
+            self.class_name = ext.split("(")[0].strip()
+        else:
+            # no point generating extension if we cant generate a file
+            # strip the parens if invalid class name has them
+            invalid = ext.split('(')[0].strip() if ext.count("(") else ext            
+            print(f"Cannot produce a file with name {invalid}.\n\
 Not a valid identifier")
-                raise NoFileNameError("Invalid Identifier", invalid)
-          
+            raise NoFileNameError("Invalid Identifier", invalid)    
+        if ext.count("("):
+            if (" (") in ext:
+                self.packages = ext[ext.find(" ("):].strip(" (").strip(")")
+                rest = ext[:ext.find(" (")]
+                if ("(") in rest:
+                    self.parents = rest.split("(")[1].strip(")")
+                    del rest
+            else:
+                if ("(") in ext:
+                    self.parents = ext.split("(")[1].strip(")")
 
     def __str__(self, show_defaults=False, show_extension=True):
         if show_extension:
@@ -107,38 +107,50 @@ Not a valid identifier")
 
 
     def __repr__(self):
-        return repr({"classname": self.class_name, "parents" : self.parents, "packages" : self.packages})
+        return repr({"classname": self.class_name, "parents" : self.parents,
+"packages" : self.packages})
 
     def add_parents(self, new_parents):
-        ### we are going to add stuff to parents, we
-        ### need to get rid of object (the default)
-        if 'object' in str(self.parents):
-            # careful with this- what if object is accidentally
-            # in self.parents but not the only parent
-            self.parents = ''
-        else:
-            self.parents = f", {self.parents}"
+        """[summary]
+
+        Args:
+            new_parents ([type]): [description]
+        """
+        # ### we are going to add stuff to parents, we
+        # ### need to get rid of object (the default)
+        # if 'object' in str(self.parents):
+        #     # careful with this- what if object is accidentally
+        #     # in self.parents but not the only parent
+        #     self.parents = ''
+        # else:
+        #     self.parents = f",{self.parents}"
         if isinstance(new_parents, list):
             if len(new_parents) > 1:
                 new_parents = ",".join(new_parents)
             else:
                 new_parents = new_parents[0]
-        self.parents = f"{new_parents}{self.parents}"
+        self.parents = f"{self.parents},{new_parents}"
 
     def add_packages(self, new_packages):
+        """[summary]
+
+        Args:
+            new_packages ([type]): [description]
+        """
         ### we are going to add stuff to packages, we
         ### need to get rid of root (the default)
         if 'root' in self.packages:
             self.packages = ''
         else:
-            self.packages = f", {self.packages}"
+            #TODO problem spot...
+            self.packages = f",{self.packages}"
 
         if isinstance(new_packages, list):
             if len(new_packages) > 1:
                 new_packages = ",".join(new_packages)
             else:
                 new_packages = new_packages[0]
-        self.packages = f"{new_packages}{self.packages}"
+        self.packages = f"{self.packages},{new_packages}"
 
 
 
@@ -168,15 +180,13 @@ def main():
     """Running some tests to ensure constructors work as expected.
     """
     # # no bueno- confused parents for packaging
-    # test = Extension("ClassA(neckmaster,neckattendant)")
+    # test = Extension("ClassA")
 
     # # throws an error, tried to test whole thing as class ident
     test = Extension("ClassA(hi,kids) (neckmaster,neckattendant)")
 
     # # same as above here. doesnt like " (" i think
     # test = Extension("ClassA(blah,bleh) (neckmaster,neckattendant)")
-
-    
 
     # really the only one that works for now
     # test = Extension("ClassA")
@@ -187,8 +197,8 @@ def main():
     # test = Extension.from_individual_arguments("ClassA", packages='gorge, fist')
 
     # fortunately, this works fine
-    test.add_parents("bisk, chalp, neckbro")
-    print(test.parents)
+    test.add_packages("bisk,chalp")
+    print(test.packages)
 
 
 if __name__ == "__main__":
