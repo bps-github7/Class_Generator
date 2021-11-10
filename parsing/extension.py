@@ -69,44 +69,25 @@ either, niether or both argument parts of the extension are provided.
         self.parents = None
         self.packages = 'root'
         if ext.count("("):
-            if is_identifier(ext.split("(")[0]):
+            if is_identifier(ext.split("(")[0].strip()):
                 self.class_name = ext.split("(")[0].strip()
-                
-                
-                rest = ext.split("(")
-                
-                # remove the class name
-                del rest[0]
-
-                # get the parents and packages as two comma delimted strings.
-                remove_parens = lambda token : token.strip().strip(")")
-                rest = list(map(remove_parens, rest))
-                if len(rest) == 2:
-                    self.parents = rest[0]
-                    self.packages = rest[1]
+                if (" (") in ext:
+                    self.packaging = ext[ext.find(" ("):]
+                    rest = ext[:ext.find(" (")]
+                    if ("(") in rest:
+                        self.parents = rest.split("(")[1].strip(")")
+                        del rest
                 else:
-                    #TODO: how do we know which is which?
-                    self.packages = rest[0]
-                
-
-                print("this too shall pass and rest is", rest)
+                    if ("(") in ext:
+                        self.parents = ext.split("(")[1].strip(")")
             else:
                 # no point generating extension if we cant generate a file
-                print(f"Cannot produce a file with name {ext.split('(')[0]}.\n\
+                invalid = ext.split('(')[0].strip()
+                
+                print(f"Cannot produce a file with name {invalid}.\n\
 Not a valid identifier")
-                raise NoFileNameError("Invalid Identifier", ext.split('(')[0])
-            # have parents been defined?
-            # if rest[0] == "(" and rest.count(")"):
-            #     #get the parents, strip parenthesis and make it a list
-            #     self.parents = (rest.split(")")[0].strip("(")).split(",")
-            #     rest = rest.split(")")[1]
-            #     # have packages been defined?
-            #     if rest[0] == " " and rest.count(")"):
-            #         self.packages = (rest.split("(")[1].strip(")")).split(",")
-            #         del rest
-            # # have packages been defined, but not parents?
-            # elif rest[0] == " " and rest.count(")"):
-            #     self.packages = (rest.split("(")[1].strip(")")).split(",")
+                raise NoFileNameError("Invalid Identifier", invalid)
+          
 
     def __str__(self, show_defaults=False, show_extension=True):
         if show_extension:
@@ -190,7 +171,7 @@ def main():
     # test = Extension("ClassA(neckmaster,neckattendant)")
 
     # # throws an error, tried to test whole thing as class ident
-    # test = Extension("ClassA (neckmaster,neckattendant)")
+    test = Extension("ClassA(hi,kids) (neckmaster,neckattendant)")
 
     # # same as above here. doesnt like " (" i think
     # test = Extension("ClassA(blah,bleh) (neckmaster,neckattendant)")
@@ -206,8 +187,8 @@ def main():
     # test = Extension.from_individual_arguments("ClassA", packages='gorge, fist')
 
     # fortunately, this works fine
-    test.add_packages("bisk, chalp, neckbro")
-    print(test.packages)
+    test.add_parents("bisk, chalp, neckbro")
+    print(test.parents)
 
 
 if __name__ == "__main__":
