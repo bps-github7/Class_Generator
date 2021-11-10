@@ -47,16 +47,21 @@ Exceptions: Unknown at this point.
             # get an extension out of class name, 
             # if none is provided then sets to defaults
             self.extension = Extension(self.inline[0].strip())
-            self.class_name = validate_class_name(self.extension.class_name)
+            self.class_name = self.extension.class_name
+            
 
-            # need a seperate thing to validate these
-            if isinstance(self.extension.parents, object ):
-                self.parents = self.extension.parents
-            else:
-                self.parents = validate_members(cleanse(self.extension.parents), item_type="parent")
-            self.packages = validate_members(cleanse(self.extension.packages), item_type="package")
-            if self.verbose:
-                print(f"creating inline (human readable representation) for class {self.class_name}")
+            
+            # switching off validation in efforts to get this prog running - been in the boiler for too long
+            # self.class_name = validate_class_name(self.extension.class_name)
+
+            # ???? can just leave parents blank if its object- default value
+            # if isinstance(self.extension.parents, object ):
+            #     self.parents = self.extension.parents
+            # else:
+            #     self.parents = validate_members(cleanse(self.extension.parents), item_type="parent")
+            # self.packages = validate_members(cleanse(self.extension.packages), item_type="package")
+            # if self.verbose:
+            #     print(f"creating inline (human readable representation) for class {self.class_name}")
         
         
         # defensive prograamming to avoid IndexError
@@ -202,6 +207,7 @@ Exceptions: Unknown at this point.
         return repr({"classname" : self.class_name, "attributes" : self.attributes , "methods" :  self.methods, "options" : self.options, 'parents' : self.parents, "packages" : self.packages})
 
     def __str__(self, single_line=True, show_extension=False, show_defaults=False):
+        # perhaps this is needlessly complex... always outputs 4 items, just include the ones we have in order of precedence!
         if single_line:
             if show_extension:
                 if show_defaults:

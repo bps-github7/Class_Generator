@@ -10,6 +10,44 @@ Date: 1/29/2021
 import re
 
 
+
+# from utils.conventions import is_identifier
+
+# grabbed this from conventions because... language server in vscode needs configuring, cant find imports clearly in sys path
+import keyword
+
+def is_identifier(ident: str) -> bool:
+    """Determines if string is valid Python identifier.
+
+    ident [str] - the real time value of identifier
+
+    returns [bool]- True or False based on whether
+    the ident argument is an identifier.
+    """
+
+    if not isinstance(ident, str):
+        raise TypeError("expected str, but got {!r}".format(type(ident)))
+
+    if not ident.isidentifier():
+        return False
+
+    if keyword.iskeyword(ident):
+        return False
+
+    return True
+
+class NoFileNameError(Exception):
+    '''
+exception for cases where user is trying
+to generate a file but
+1) did not provide file name
+2) did not provide a valid file name (invalid idenfier)
+    '''
+    def __init__(self, error, value):
+        self.error = error
+        self.value = value
+
+
 class Extension:
 
     """
@@ -27,29 +65,48 @@ either, niether or both argument parts of the extension are provided.
             these values with a class name, which inherits from these parents and
             is located in the list of directories named in the packages.
         """
-        if ext.count(") ("):
-            classes = ext.split(") (")
-            self.class_name = classes[0].split("(")[0].strip()
-            self.parents = classes[0].split("(")[1].strip()
-            self.packages = classes[1].strip(")")
-        ### Only the packaging - example (packages)
-        elif ext.count(" ("):
-            classes = ext.split(" (")
-            self.class_name = classes[0].strip()
-            self.parents = object
-            self.packages = classes[1].strip(")").strip()
-        ### only the parent - example(parents)
-        elif re.match(r"(\w)*[()]", ext):
-            # the python equivalent of above expression
-            # will snag on undesired tokens, resulting in wrong values.
-            classes = ext.split("(")
-            self.class_name = classes[0].strip()
-            self.parents = classes[1].strip(")").strip()
-            self.packages = "root"
-        else:
-            self.class_name = ext.strip()
-            self.parents = object
-            self.packages = "root"
+        self.class_name = None
+        self.parents = None
+        self.packages = 'root'
+        if ext.count("("):
+            if is_identifier(ext.split("(")[0]):
+                self.class_name = ext.split("(")[0].strip()
+                
+                
+                rest = ext.split("(")
+                
+                # remove the class name
+                del rest[0]
+
+                # get the parents and packages as two comma delimted strings.
+                remove_parens = lambda token : token.strip().strip(")")
+                rest = list(map(remove_parens, rest))
+                if len(rest) == 2:
+                    self.parents = rest[0]
+                    self.packages = rest[1]
+                else:
+                    #TODO: how do we know which is which?
+                    self.packages = rest[0]
+                
+
+                print("this too shall pass and rest is", rest)
+            else:
+                # no point generating extension if we cant generate a file
+                print(f"Cannot produce a file with name {ext.split('(')[0]}.\n\
+Not a valid identifier")
+                raise NoFileNameError("Invalid Identifier", ext.split('(')[0])
+            # have parents been defined?
+            # if rest[0] == "(" and rest.count(")"):
+            #     #get the parents, strip parenthesis and make it a list
+            #     self.parents = (rest.split(")")[0].strip("(")).split(",")
+            #     rest = rest.split(")")[1]
+            #     # have packages been defined?
+            #     if rest[0] == " " and rest.count(")"):
+            #         self.packages = (rest.split("(")[1].strip(")")).split(",")
+            #         del rest
+            # # have packages been defined, but not parents?
+            # elif rest[0] == " " and rest.count(")"):
+            #     self.packages = (rest.split("(")[1].strip(")")).split(",")
 
     def __str__(self, show_defaults=False, show_extension=True):
         if show_extension:
@@ -129,12 +186,28 @@ either, niether or both argument parts of the extension are provided.
 def main():
     """Running some tests to ensure constructors work as expected.
     """
-    test = Extension("ClassA(cones,chalpo,poades) (neckmaster,neckattendant)")
+    # # no bueno- confused parents for packaging
+    # test = Extension("ClassA(neckmaster,neckattendant)")
+
+    # # throws an error, tried to test whole thing as class ident
+    # test = Extension("ClassA (neckmaster,neckattendant)")
+
+    # # same as above here. doesnt like " (" i think
+    # test = Extension("ClassA(blah,bleh) (neckmaster,neckattendant)")
+
+    
+
+    # really the only one that works for now
+    # test = Extension("ClassA")
+
+
     # test.add_parents("bisk, chalp, neckbro")
     # print(test.__str__(show_defaults=True))
     # test = Extension.from_individual_arguments("ClassA", packages='gorge, fist')
+
+    # fortunately, this works fine
     test.add_packages("bisk, chalp, neckbro")
-    print(test.packages.split(","))
+    print(test.packages)
 
 
 if __name__ == "__main__":
