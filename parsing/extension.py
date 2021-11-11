@@ -5,15 +5,11 @@ Software: python file generator
 Date: 1/29/2021
 
 """
-
-
-import re
-
-
-
 # from utils.conventions import is_identifier
 
 # grabbed this from conventions because... language server in vscode needs configuring, cant find imports clearly in sys path
+# TODO: get it back
+# TODO: resolve above mentioned language server config issues.
 import keyword
 
 def is_identifier(ident: str) -> bool:
@@ -36,6 +32,7 @@ def is_identifier(ident: str) -> bool:
 
     return True
 
+# this also could live in utils somewhere. path testing probably
 class NoFileNameError(Exception):
     '''
 exception for cases where user is trying
@@ -46,13 +43,13 @@ to generate a file but
     def __init__(self, error, value):
         self.error = error
         self.value = value
-
+# need to make sure you try catch where the extension integrates with inline for this to be useful.
 
 class Extension:
 
     """
 implements the first part of the Inline
-provides dynamic utility, in cases where
+provides resilencey, in cases where
 either, niether or both argument parts of the extension are provided.
     """
     def __init__(self, ext):
@@ -91,6 +88,7 @@ Not a valid identifier")
                     self.parents = ext.split("(")[1].strip(")")
 
     def __str__(self, show_defaults=False, show_extension=True):
+        # TODO: this is also a mess. why?
         if show_extension:
             if show_defaults:
                 return f"{self.class_name}({self.parents}) ({self.packages})" 
@@ -108,69 +106,62 @@ Not a valid identifier")
 
 
     def __repr__(self):
-        return repr({"classname": self.class_name, "parents" : self.parents,
-"packages" : self.packages})
-
-
-    def replace_parents(self, replacement):
-        """[summary]
-
-        Args:
-            replacement ([type]): [description]
-        """
-        if self.parents == "<class 'object'>":
-            self.parents = ''
-        else:
-            self.parents = f"{self.parents}"
-
-    def replace_package(self, replacement):
-        """[summary]
-
-        Args:
-            replacement ([type]): [description]
-        """
-        self.packages = f"{self.packages}{','}"
+        return repr({
+            "classname": self.class_name,
+            "parents" : self.parents,
+            "packages" : self.packages})
 
     def add_parents(self, new_parents):
-        """remove existing parents entry and provide a new one.
-
-        Args:
-            new_parents (str): the parent or comma delimited str of parents to replace. 
         """
-        # double quotes are required for truthful test of whether something is an object
-        isObject = lambda obj : isinstance(obj,object)
+    Appends new parents to existing parent(s).
+    Overwrites the existing parents if
+    parents is empty or default value.
 
-        if self.parents and isinstance(self.parents,object):
-
-        # without the lambda, double quotes inside f-str...
-        # self.parents =f"{f'{self.parents},' if not isObject(self.parents) and self.parents else ''}{new_parents}"
+    Args:
+        new_parents (str): the parent or comma delimited str of parents to add.
+        """
+        if self.parents and self.parents != "<class 'object'>":
+            self.parents = ",".join([self.parents, new_parents])
+        else:
+            self.parents = new_parents
 
     def add_packages(self, new_packages):
-        """[summary]
-
-        Args:
-            new_packages ([type]): [description]
         """
-        # dont forget your ,
-        self.packages = f"{self.packages}{new_packages}"
+    Appends new packages to existing package(s).
+    Overwrites the existing packages if
+    parents is empty or default value.
 
-
+    Args:
+        new_parents (str): the parent or comma delimited str of parents to add.
+        """
+        if self.packages and self.packages != 'root':
+            self.packages = ",".join([self.packages, new_packages])
+        else:
+            self.packages = new_packages
 
     @classmethod
     def from_individual_arguments(cls, class_name : str, parents = object, packages = "root"):
-        """Creates an extension based on the three components in the syntax
-            classA(parentA,parentB) (package1, package2)
-
-        Args:
-            class_name (str): the name of class being defined with this extension.
-            parents (str or object, optional): the parent or parents who this class
-             inherits from. Defaults to object.
-            packages (str, optional): comma delimited string of names of directories
-             that should contain the file. Defaults to "root".
-
-        Returns:
-            Extension: [description]
         """
+    Creates an extension based on the three components in the syntax
+            
+        classA(parentA,parentB) (package1, package2)
+
+    Args:
+        class_name (str): the name of class being defined with this extension.
+
+        parents (str, default=object) *optional:
+            comma seperated string listing the
+            parent or parents who this class
+            inherits from.
+        
+        packages (str, default="root" ) *optional:
+            comma delimited string listing
+            names of directories that contain the file.
+
+    Returns:
+        Extension: an object of the extension class, built from the arguments passed in.
+        """
+        # these arent great tests... user could name their parent object or package root mistakenly.
         if 'object' in str(parents):
             if 'root' in str(packages):
                 return Extension(f"{class_name}")
@@ -184,14 +175,13 @@ def main():
     test = Extension("ClassA(file1,file2) (package1,package2)")
 
 
-    # test.add_parents("bisk, chalp, neckbro")
+    test.add_parents("bisk,chalp,neckbro")
+    test.add_packages("horse,goat,brain")
     # print(test.__str__(show_defaults=True))
     # test = Extension.from_individual_arguments("ClassA", packages='gorge, fist')
 
-    # fortunately, this works fine
-    test.add_parents("bisk,chalp")
-    print(test.parents)
-
+    print("parents: ",test.parents)
+    print("packages:",test.packages)
 
 if __name__ == "__main__":
     main()
