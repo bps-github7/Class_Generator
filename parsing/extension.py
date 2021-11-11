@@ -67,7 +67,7 @@ either, niether or both argument parts of the extension are provided.
         """
         cls_name = (ext.split("(")[0]).strip()
         self.class_name = None
-        self.parents = None
+        self.parents = object
         self.packages = 'root'
         if is_identifier(cls_name):
             self.class_name = ext.split("(")[0].strip()
@@ -79,14 +79,15 @@ either, niether or both argument parts of the extension are provided.
 Not a valid identifier")
             raise NoFileNameError("Invalid Identifier", invalid)    
         if ext.count("("):
-            if (" (") in ext:
+            if " (" in ext:
+                # take the packages portion of ext and strip all parens
                 self.packages = ext[ext.find(" ("):].strip(" (").strip(")")
                 rest = ext[:ext.find(" (")]
-                if ("(") in rest:
+                if "(" in rest:
                     self.parents = rest.split("(")[1].strip(")")
                     del rest
             else:
-                if ("(") in ext:
+                if "(" in ext:
                     self.parents = ext.split("(")[1].strip(")")
 
     def __str__(self, show_defaults=False, show_extension=True):
@@ -110,26 +111,39 @@ Not a valid identifier")
         return repr({"classname": self.class_name, "parents" : self.parents,
 "packages" : self.packages})
 
-    def add_parents(self, new_parents):
+
+    def replace_parents(self, replacement):
         """[summary]
 
         Args:
-            new_parents ([type]): [description]
+            replacement ([type]): [description]
         """
-        # ### we are going to add stuff to parents, we
-        # ### need to get rid of object (the default)
-        # if 'object' in str(self.parents):
-        #     # careful with this- what if object is accidentally
-        #     # in self.parents but not the only parent
-        #     self.parents = ''
-        # else:
-        #     self.parents = f",{self.parents}"
-        if isinstance(new_parents, list):
-            if len(new_parents) > 1:
-                new_parents = ",".join(new_parents)
-            else:
-                new_parents = new_parents[0]
-        self.parents = f"{self.parents},{new_parents}"
+        if self.parents == "<class 'object'>":
+            self.parents = ''
+        else:
+            self.parents = f"{self.parents}"
+
+    def replace_package(self, replacement):
+        """[summary]
+
+        Args:
+            replacement ([type]): [description]
+        """
+        self.packages = f"{self.packages}{','}"
+
+    def add_parents(self, new_parents):
+        """remove existing parents entry and provide a new one.
+
+        Args:
+            new_parents (str): the parent or comma delimited str of parents to replace. 
+        """
+        # double quotes are required for truthful test of whether something is an object
+        isObject = lambda obj : isinstance(obj,object)
+
+        if self.parents and isinstance(self.parents,object):
+
+        # without the lambda, double quotes inside f-str...
+        # self.parents =f"{f'{self.parents},' if not isObject(self.parents) and self.parents else ''}{new_parents}"
 
     def add_packages(self, new_packages):
         """[summary]
@@ -137,20 +151,8 @@ Not a valid identifier")
         Args:
             new_packages ([type]): [description]
         """
-        ### we are going to add stuff to packages, we
-        ### need to get rid of root (the default)
-        if 'root' in self.packages:
-            self.packages = ''
-        else:
-            #TODO problem spot...
-            self.packages = f",{self.packages}"
-
-        if isinstance(new_packages, list):
-            if len(new_packages) > 1:
-                new_packages = ",".join(new_packages)
-            else:
-                new_packages = new_packages[0]
-        self.packages = f"{self.packages},{new_packages}"
+        # dont forget your ,
+        self.packages = f"{self.packages}{new_packages}"
 
 
 
@@ -179,17 +181,7 @@ Not a valid identifier")
 def main():
     """Running some tests to ensure constructors work as expected.
     """
-    # # no bueno- confused parents for packaging
-    # test = Extension("ClassA")
-
-    # # throws an error, tried to test whole thing as class ident
-    test = Extension("ClassA(hi,kids) (neckmaster,neckattendant)")
-
-    # # same as above here. doesnt like " (" i think
-    # test = Extension("ClassA(blah,bleh) (neckmaster,neckattendant)")
-
-    # really the only one that works for now
-    # test = Extension("ClassA")
+    test = Extension("ClassA(file1,file2) (package1,package2)")
 
 
     # test.add_parents("bisk, chalp, neckbro")
@@ -197,8 +189,8 @@ def main():
     # test = Extension.from_individual_arguments("ClassA", packages='gorge, fist')
 
     # fortunately, this works fine
-    test.add_packages("bisk,chalp")
-    print(test.packages)
+    test.add_parents("bisk,chalp")
+    print(test.parents)
 
 
 if __name__ == "__main__":
