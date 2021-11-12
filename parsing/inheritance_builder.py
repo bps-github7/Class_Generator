@@ -23,7 +23,7 @@ class InheritanceBuilder:
         Taking in a string of the `Inheritance Inline` format (see README.md)
         does two jobs in succession:
             -validate the inline and the inheritances
-            -parse the validated inheritance inline 
+            -parse the validated inheritance inline
             into an array of regular inlines
         
         AKA parses into an array of inlines that match the specs

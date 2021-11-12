@@ -46,7 +46,7 @@ either, niether or both argument parts of the extension are provided.
             invalid = ext.split('(')[0].strip() if ext.count("(") else ext            
             print(f"Cannot produce a file with name {invalid}.\n\
 Not a valid identifier")
-            raise NoFileNameError("Invalid Identifier", invalid)    
+            raise NoFileNameError("Invalid Identifier", invalid)
         if ext.count("("):
             if " (" in ext:
                 # take the packages portion of ext and strip all parens
@@ -59,22 +59,26 @@ Not a valid identifier")
                 if "(" in ext:
                     self.parents = ext.split("(")[1].strip(")")
 
-    def __str__(self, show_defaults=False, show_extension=True):
-        # TODO: this is also a mess. why?
-        if show_extension:
-            if show_defaults:
-                return f"{self.class_name}({self.parents}) ({self.packages})" 
-            if self.parents == object:
-                if self.packages == 'root':
-                    return f"{self.class_name}"
-                else:
-                    return f"{self.class_name} ({self.packages})"
-            else:
-                if self.packages == 'root':
-                    return f"{self.class_name}({self.parents})"
-                return f"{self.class_name}({self.parents}) ({self.packages})"
-        else:
-            return f"{self.class_name}"
+    # TODO: see if these arguments are used else where in the program
+    # def __str__(self, show_defaults=False, show_extension=True):
+    def __str__(self):
+        parents = f"({self.parents})" if self.parents != object else ""
+        packages = f" ({self.packages})" if self.packages != 'root' else ""
+        return f"{self.class_name}{parents}{packages}"
+        # if show_extension:
+        #     if show_defaults:
+        #         return f"{self.class_name}({self.parents}) ({self.packages})" 
+        #     if self.parents == object:
+        #         if self.packages == 'root':
+        #             return f"{self.class_name}"
+        #         else:
+        #             return f"{self.class_name} ({self.packages})"
+        #     else:
+        #         if self.packages == 'root':
+        #             return f"{self.class_name}({self.parents})"
+        #         return f"{self.class_name}({self.parents}) ({self.packages})"
+        # else:
+        #     return f"{self.class_name}"
 
 
     def __repr__(self):
@@ -115,26 +119,20 @@ Not a valid identifier")
     def from_individual_arguments(cls, class_name : str, parents = object, packages = "root"):
         """
     Creates an extension based on the three components in the syntax
-            
         classA(parentA,parentB) (package1, package2)
-
     Args:
         class_name (str): the name of class being defined with this extension.
-
         parents (str, default=object) *optional:
             comma seperated string listing the
             parent or parents who this class
             inherits from.
-        
         packages (str, default="root" ) *optional:
             comma delimited string listing
             names of directories that contain the file.
-
     Returns:
         Extension: an object of the extension class, built from the arguments passed in.
         """
-        # these arent great tests... user could name their parent object or package root mistakenly.
-        if 'object' in str(parents):
+        if parents == "<class 'object'>":
             if 'root' in str(packages):
                 return Extension(f"{class_name}")
             else:
@@ -145,13 +143,14 @@ def main():
     """Running some tests to ensure constructors work as expected.
     """
     test = Extension("ClassA(file1,file2) (package1,package2)")
+    # test = Extension.from_individual_arguments("ClassA", parents='eskimo', packages='gorge,fist')
 
 
     test.add_parents("bisk,chalp,neckbro")
     test.add_packages("horse,goat,brain")
-    # print(test.__str__(show_defaults=True))
-    # test = Extension.from_individual_arguments("ClassA", packages='gorge, fist')
 
+    print("str:",test.__str__())
+    print("repr:",test.__repr__())
     print("parents: ",test.parents)
     print("packages:",test.packages)
 

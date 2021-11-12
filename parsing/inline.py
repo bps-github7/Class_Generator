@@ -7,7 +7,9 @@ Module level docstring: implements the Inline class
 
 
 import sys
+
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
+from utils.path_testing import NoFileNameError
 from parsing.cleaning import clean_list, cleanse, cleanse_regular_methods, cleanse_with_signitures
 from parsing.extension import Extension
 from parsing.validation import attributes_main, methods_main, validate_class_name, validate_field, validate_members, validate_signiture
@@ -37,31 +39,30 @@ Exceptions: Unknown at this point.
         ### Initializing these in advance to avoid not defined errors
         self.attributes = None
         self.methods = None
-        self.options = {"testing" : False, "exporting" : False, "module" : False, "abc" : False}
+        self.options = {"testing" : False, "exporting" : False, "module" : False, "abc" : False, "parents" : object, "packages" : 'root'}
         if self.inline[0] is None:
             print("Inline cannot be parsed if no class identifier is provided")
             return None
         else:
-            # TODO: not sure where the problem is, but here would be good place to start looking
-            # for the extension not being tied to inline, also make note packages is list, parents is not...
-            # get an extension out of class name, 
-            # if none is provided then sets to defaults
-            self.extension = Extension(self.inline[0].strip())
-            self.class_name = self.extension.class_name
+            try:
+                self.extension = Extension(self.inline[0].strip())
+                self.class_name = self.extension.class_name
+                self.options['parents'] = self.extension.parents
+                self.options['packages'] = self.extension.packages
+            except NoFileNameError:
+                # in reality, we
+                #  1. will catch a nameless or invalid identifier before this point
+                #  2. if we didn't, we should catch this exception futher up the call stack
+                #  - think options or main
+                print("error while parsing your extension")
             
 
             
             # switching off validation in efforts to get this prog running - been in the boiler for too long
             # self.class_name = validate_class_name(self.extension.class_name)
 
-            # ???? can just leave parents blank if its object- default value
-            # if isinstance(self.extension.parents, object ):
-            #     self.parents = self.extension.parents
-            # else:
-            #     self.parents = validate_members(cleanse(self.extension.parents), item_type="parent")
-            # self.packages = validate_members(cleanse(self.extension.packages), item_type="package")
-            # if self.verbose:
-            #     print(f"creating inline (human readable representation) for class {self.class_name}")
+            if self.verbose:
+                print(f"creating inline (human readable representation) for class {self.class_name}")
         
         
         # defensive prograamming to avoid IndexError
@@ -181,11 +182,11 @@ Exceptions: Unknown at this point.
     ## by making the nested objects' interface more public
     def add_parents(self, new_parents):
         self.extension.add_parents(new_parents)
-        self.parents = cleanse(self.extension.parents)
+        self.options['parents'] = cleanse(self.extension.parents)
 
     def add_packages(self, new_packages):
         self.extension.add_packages(new_packages)
-        self.packages = cleanse(self.extension.packages)
+        self.options['packages'] = cleanse(self.extension.packages)
 
 
 
@@ -204,7 +205,7 @@ Exceptions: Unknown at this point.
 
     def __repr__(self):
         # not safe but what can we do?
-        return repr({"classname" : self.class_name, "attributes" : self.attributes , "methods" :  self.methods, "options" : self.options, 'parents' : self.parents, "packages" : self.packages})
+        return repr({"classname" : self.class_name, "attributes" : self.attributes , "methods" :  self.methods, "options" : self.options})
 
     def __str__(self, single_line=True, show_extension=False, show_defaults=False):
         # perhaps this is needlessly complex... always outputs 4 items, just include the ones we have in order of precedence!
@@ -219,9 +220,7 @@ Exceptions: Unknown at this point.
 f"Class name: {self.class_name}\n\
 Attributes: {self.attributes}\n\
 Methods: {self.methods}\n\
-Options: {self.options}\n\
-Parents: {self.parents}\n\
-Packages: {self.packages}\n"
+Options: {self.options}"
 
 
     @classmethod
