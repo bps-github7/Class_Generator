@@ -5,45 +5,17 @@ Software: python file generator
 Date: 1/29/2021
 
 """
-# from utils.conventions import is_identifier
 
-# grabbed this from conventions because... language server in vscode needs configuring, cant find imports clearly in sys path
-# TODO: get it back
-# TODO: resolve above mentioned language server config issues.
-import keyword
+# TODO: would be nice to automate this somehow. __init__ file doesnt work for that currently. why?
+import sys
+# note in production, this should be something like ${CWD}
+sys.path.append("C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 
-def is_identifier(ident: str) -> bool:
-    """Determines if string is valid Python identifier.
+from utils.conventions import is_identifier
+from utils.path_testing import NoFileNameError
 
-    ident [str] - the real time value of identifier
-
-    returns [bool]- True or False based on whether
-    the ident argument is an identifier.
-    """
-
-    if not isinstance(ident, str):
-        raise TypeError("expected str, but got {!r}".format(type(ident)))
-
-    if not ident.isidentifier():
-        return False
-
-    if keyword.iskeyword(ident):
-        return False
-
-    return True
-
-# this also could live in utils somewhere. path testing probably
-class NoFileNameError(Exception):
-    '''
-exception for cases where user is trying
-to generate a file but
-1) did not provide file name
-2) did not provide a valid file name (invalid idenfier)
-    '''
-    def __init__(self, error, value):
-        self.error = error
-        self.value = value
-# need to make sure you try catch where the extension integrates with inline for this to be useful.
+# TODO: need to make sure you try catch where the extension integrates
+# with inline for this to be useful.
 
 class Extension:
 

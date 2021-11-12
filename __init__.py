@@ -6,8 +6,7 @@ Purpose: initialize environment for program run time, ensures that
 the needed sub modules are appeneded to the syspath.
 """
 import sys
-sys.path.insert(0,"C:\\Users\\Ben\\VsCode\\python")
-
+sys.path.append("C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 
 # from parsing import inline
 

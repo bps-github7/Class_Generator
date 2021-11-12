@@ -10,6 +10,16 @@ class NoPathError(Exception):
     def __init__(self, message):
         self.message = message
 
+class NoFileNameError(Exception):
+    '''
+exception for cases where user is trying
+to generate a file but
+1) did not provide file name
+2) did not provide a valid file name (invalid idenfier)
+    '''
+    def __init__(self, error, value):
+        self.error = error
+        self.value = value
 
 # def confirm_prompt(something):
 #     return

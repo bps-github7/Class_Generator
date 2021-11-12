@@ -6,8 +6,12 @@ Raises:
 """
 # import argparse
 import os, sys, argparse
-from utils.path_testing import NoPathError, fix_relative_path, is_valid_path
-from utils.path_testing import make_new_folder
+sys.path.append("C:\\Users\\Ben\\VsCode\\python\\classgenerator")
+
+# sys.path.append("C:\\Users\\Ben\\VsCode\\python\\classgenerator\\utils")
+# sys.path.append("C:\\Users\\Ben\\VsCode\\python\\classgenerator\\parsing")
+from path_testing import NoPathError, fix_relative_path, is_valid_path
+from path_testing import make_new_folder
 
 # from parsing.inline import Inline
 from parsing.parser import parse_inline
