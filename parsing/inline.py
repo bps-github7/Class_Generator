@@ -118,9 +118,9 @@ Exceptions: Unknown at this point.
         Returns:
             all_methods ([{names} {signitures}])
         """
-        all_methods = {"names" : 
+        all_methods = {"names" :
                 {"static" : [], "class" : [], "instance" : [], "functions" : []},
-                "signitures" : 
+                "signitures" :
                 {"static" : [], "class" : [], "instance" : [], "functions" : []}}
         for items in names:
             if items.startswith("sm"):
@@ -168,9 +168,6 @@ Exceptions: Unknown at this point.
             print(f"Error: {arg} option provided is not recognized (See README)")
             return 0
 
-
-    ## facilitate adding parents/ packages
-    ## by making the nested objects' interface more public
     def add_parents(self, new_parents):
         """Facilitates adding parents
         by making nested object interface more public
@@ -190,8 +187,6 @@ Exceptions: Unknown at this point.
         """
         self.extension.add_packages(new_packages)
         self.options['packages'] = cleanse(self.extension.packages)
-
-
 
     def __eq__(self, other):
         if isinstance(other, self.__class__) and \
@@ -216,7 +211,7 @@ Exceptions: Unknown at this point.
         return "{} : {} : {} : {}".format(
             self.class_name,
             ",".join(self.attributes),
-            ",".join(self.methods), 
+            ",".join(self.methods),
             self.options)
 
 
@@ -242,4 +237,4 @@ if __name__ == "__main__":
     print(Inline("Hello(Hi,Bisk,Chalp) (reindeer,dolphin):\
         attr1, sandman, CVattr2 :\
         SMname, CM*&**cone, arffff, FNnoodle, FNbasket(p, ending='cones'), CMshitbasket(x) shitcone(x,y,z), SMmotherfuck(y) :\
-        -tem").__str__())
+        -tem").__repr__())

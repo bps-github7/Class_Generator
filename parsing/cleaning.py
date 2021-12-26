@@ -10,14 +10,17 @@ the parser is capable of understanding.
 """
 
 
-# just in case:
 import sys
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 
 
-def cleanse(items: any, item_type="field"):
-    """format properties by strip and lowercase of each elements.
+def cleanse(items: any):
+    """format multiple properties, ie:
+    ' somethingA, somethingB, somethingC  '
+    by strip and lowercase of each elements.
     side-effect: coerces ',' delimited string to formatted list.
+    WARNING: properties in camelCase will lose inherent readability.
+    items (str | list) : a set of properties to be cleansed.
     """
     if isinstance(items, list):
         return list(map(
@@ -25,6 +28,23 @@ def cleanse(items: any, item_type="field"):
     return list(map(
         lambda item: item.strip().lower(), items.split(",")))
 
+def cleanse_methods(methods,cleansed):
+    """[summary]
+
+    Args:
+        items (str): comma delimited string listing the methods in a class.
+    """
+    if methods.count(","):
+        new_method = methods.split(",")[0]
+        remaining = ",".join(methods.split(",")[1:])
+        if new_method.count("("):
+            components = new_method.split("(")
+            new_method = { 'name' :components[0], 'args'  : components[1].strip(")")}        
+        cleansed += new_method
+        cleanse_methods(remaining, cleansed)
+    return cleansed
+
+### TODO: think we can nix these when finished above method.
 def cleanse_regular_methods(items):
     """[summary]
 
@@ -32,6 +52,7 @@ def cleanse_regular_methods(items):
         items ([type]): [description]
     """
     regular = []
+    # why is this test needed for regular methods ? (would make an invalid identifier)
     if items.count(")"):
         for item in items.split(")"):
             if item.count("("):
@@ -73,21 +94,4 @@ def cleanse_with_signitures(items):
         signitures.append(f"{name.lower().strip()}({rest})")
     return signitures
 
-def clean_list(args):
-    """Turns a list of arguments into a clean list of string arguments.
-    This makes it possible to take a machine readable class spec and pass it
-    to Inline alternative constructor
-
-    Arguments:
-        *args [string []] : up to four pieces of Inline.
-
-    Returns:
-        item [list]: A list of comma seperated values
-    """
-    items = [*args]
-    for i, value in enumerate(items):
-        if value is None:
-            continue
-        if isinstance(value, list):
-            items[i] = ",".join(value)
-    return items
+print(cleanse_methods("bisk, froggo(tomato, hat, gun), iceage", []))
