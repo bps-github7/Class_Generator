@@ -14,9 +14,6 @@ sys.path.append("C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 from utils.conventions import is_identifier
 from utils.path_testing import NoFileNameError
 
-# TODO: need to make sure you try catch where the extension integrates
-# with inline for this to be useful.
-
 class Extension:
 
     """
@@ -59,26 +56,10 @@ Not a valid identifier")
                 if "(" in ext:
                     self.parents = ext.split("(")[1].strip(")")
 
-    # TODO: see if these arguments are used else where in the program
-    # def __str__(self, show_defaults=False, show_extension=True):
     def __str__(self):
         parents = f"({self.parents})" if self.parents != object else ""
         packages = f" ({self.packages})" if self.packages != 'root' else ""
         return f"{self.class_name}{parents}{packages}"
-        # if show_extension:
-        #     if show_defaults:
-        #         return f"{self.class_name}({self.parents}) ({self.packages})" 
-        #     if self.parents == object:
-        #         if self.packages == 'root':
-        #             return f"{self.class_name}"
-        #         else:
-        #             return f"{self.class_name} ({self.packages})"
-        #     else:
-        #         if self.packages == 'root':
-        #             return f"{self.class_name}({self.parents})"
-        #         return f"{self.class_name}({self.parents}) ({self.packages})"
-        # else:
-        #     return f"{self.class_name}"
 
 
     def __repr__(self):
@@ -114,30 +95,6 @@ Not a valid identifier")
             self.packages = ",".join([self.packages, new_packages])
         else:
             self.packages = new_packages
-
-    @classmethod
-    def from_individual_arguments(cls, class_name : str, parents = object, packages = "root"):
-        """
-    Creates an extension based on the three components in the syntax
-        classA(parentA,parentB) (package1, package2)
-    Args:
-        class_name (str): the name of class being defined with this extension.
-        parents (str, default=object) *optional:
-            comma seperated string listing the
-            parent or parents who this class
-            inherits from.
-        packages (str, default="root" ) *optional:
-            comma delimited string listing
-            names of directories that contain the file.
-    Returns:
-        Extension: an object of the extension class, built from the arguments passed in.
-        """
-        if parents == "<class 'object'>":
-            if 'root' in str(packages):
-                return Extension(f"{class_name}")
-            else:
-                return Extension(f"{class_name} ({packages})")
-        return Extension(f"{class_name}({parents}) ({packages})")
 
 def main():
     """Running some tests to ensure constructors work as expected.

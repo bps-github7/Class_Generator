@@ -25,8 +25,7 @@ class InheritanceBuilder:
             -validate the inline and the inheritances
             -parse the validated inheritance inline
             into an array of regular inlines
-        
-        AKA parses into an array of inlines that match the specs
+        parses into an array of inlines that match the specs
         given in the inheritance inlines (sets parents based on
         placement of '>' tokens and their operators.)
 
@@ -38,18 +37,18 @@ class InheritanceBuilder:
         if not len(inline) == 4:
             print("dont have time for your not full inlines rn sir!")
             return
-        all_classes, all_attributes, all_methods, all_options = inline[0], inline[1], inline[2], inline[3] 
-   
+        all_classes, all_attributes, all_methods, all_options = \
+        inline[0], inline[1], inline[2], inline[3]
         ### splits the parts of the inline into 'families'
         ### (if there are multiple parents/ inheritances)
         ### like so:
         # parent1, parent2 > child1, child2 > sub-child-1 ... sub-child-N
-        for cls, attr, method, opts in zip(
+        for classes, attr, method, opts in zip(
                 all_classes.split(">"),
                 all_attributes.split(">"),
                 all_methods.split(">"),
                 all_options.split(">")):
-            class_fams.append(cls.strip())
+            class_fams.append(classes.strip())
             attr_fams.append(attr.strip())
             method_fams.append(method.strip())
             options_fams.append(opts.strip())
@@ -58,7 +57,7 @@ class InheritanceBuilder:
         ### Make a list of all the classes in the "family"
         ### that need to be generated,
         ###  like so:
-        # [parent1, parent2] > [ child  ,... child-N] 
+        # [parent1, parent2] > [ child  ,... child-n] 
         classes, attributes, methods, options = [], [], [], []
         for cls, attr, method, option in zip(class_fams, attr_fams, method_fams, options_fams):
             # note the singular for looping variables.
@@ -67,19 +66,20 @@ class InheritanceBuilder:
             methods.append(InheritanceBuilder.member_splitter(method, token="/"))
             options.append(InheritanceBuilder.member_splitter(option, token="/"))
         
-        ### generate classes 
+        ### generate classes
         new = []
         parent = 'object'
         for cls, attr, method, opts in zip(classes, attributes, methods, options):
             # insert the parents into the extension if the class name has one.
             if parent != "<class 'object'>" and re.match(r"(\w)*[(]", cls):
                 class_name, parents, rest = cls.split("(")[0], (cls.split("(")[1]).split(")")[0], "fart-bean"
-                print(f"class name : {class_name} rest : {parents}")
+                # print(f"class name : {class_name} rest : {parents}")
                 # cls = f"{class_name}({parent},{rest}"
             else:
                 parent = cls
             # are you sure this is a super effective test? cases you are forgetting about?
-            new.append(Inline.from_individual_arguments(cls, attr, method, opts))
+            new.append(Inline(f"{cls} : {attr} : {method}  : {opts}"))
+            # new.append(Inline.from_individual_arguments(cls, attr, method, opts))
             
         
         # only attribute in this class that matters.
@@ -99,7 +99,7 @@ class InheritanceBuilder:
             [type]: [description]
         """
         if isinstance(container, list):
-            for num, item in enumerate(container):
+            for num,item in enumerate(container):
                 if container[num].count(token):
                     container[num] = container[num].split(token)
             return container
@@ -124,20 +124,8 @@ def main(inline : Inline):
     """
     return InheritanceBuilder(inline).classes
 
-# item = "classA (banana) > classB(weasel) (wombat, purse) : attr1, attr2, attr3 > mastadon,\
-# bucket, shallot: method1 > method2 : -t -e > -t -e"
-# multi_item = Inline("Person1, Person2 > Employee > Dish_washer,\
-# Short_Order_Cook, Sous_Chef : P1A, P1B / P2A, P2B > E1, E2, E3 >\
-# D1, D2 / S1, S2 / SC1, SC2 : P1method / P2method > SMmethod\
-# > CMmethod / SMmethod / method : -t / -e > -t -e > -t / -e{vsc,send} / -t")
+item = "classA (banana) > classB(weasel) (wombat, purse) : attr1, attr2, attr3 > mastadon,\
+bucket, shallot: method1 > method2 : -t -e > -t -e"
 
-# processed = InheritanceBuilder(item)
-# processed = InheritanceBuilder(multi_item)
-# print(processed.classes)
-# result = main(multi_item)
-
-# for i in result:
-#     print(i.classes)
-
-# # print(InheritanceBuilder.member_splitter(['Classa, Classb', 'Classc']))
-# # print(InheritanceBuilder.member_splitter(['A1, A2 / B1, B2', 'C1, C2'], token="/"))
+testcase = InheritanceBuilder(item)
+print(testcase.classes)
