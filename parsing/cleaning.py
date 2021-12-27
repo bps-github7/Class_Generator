@@ -9,7 +9,7 @@ meaning, it takes the users input and coerces / constrains it into a format that
 the parser is capable of understanding.
 """
 
-
+import re
 import sys
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 
@@ -34,68 +34,49 @@ def cleanse_methods(methods, parsed):
     Args:
         items (str): comma delimited string listing the methods in a class.
     """
-    pass
+    # TODO: you should def test this... with unittests son.
+    while methods:
+        # check if the first item in the string is a signiture
 
-def cleanse_a_method(method):
-    """[summary]
+        if re.match(r"(\w+)\s*\((.*?)\)", methods):
 
-    Args:
-        method ([type]): [description]
-    """
-    if method.count("(") and method.count(")"):
-        
-
+            # base case 1. where method sig is last piece of string to parse
+            # ie 'example1, example2, some_fn(param1, param2)'
+            # then we cannot split the string with comma without messing up the signiture       
 
 
 
-### TODO: think we can nix these when finished above method.
-# def cleanse_regular_methods(items):
-#     """[summary]
-#     Args:
-#         items ([type]): [description]
-#     """
-#     regular = []
-#     # why is this test needed for regular methods ? (would make an invalid identifier)
-#     if items.count(")"):
-#         for item in items.split(")"):
-#             if item.count("("):
-#                 regular.append((item.split("(")[0]).split(",")[:-1])
-#         for x,y in enumerate(regular):
-#             # wut is this? what does it do?
-#             if len(y):
-#                 if y[0] == '':
-#                     del y[0]
-#             else:
-#                 # remove empty 
-#                 del regular[x]
-#         regular = [item for item in regular if item != ['']] 
-#         regular = regular[0]
-#         return list(map(lambda x: x.strip().lower(), regular))
-#     else:
-#         return cleanse(items)
+            # isolate the signiture
+            signature = methods.split("),")[0] + ")"
 
+            new_signature = {
+                'name' : signature.split("(")[0],
+                'params' : ",".join(signature.split("(")[1:]).strip(")")
+                }
+            parsed.append(new_signature)
 
-# def cleanse_with_signitures(items):
-#     """Modified version of cleanse that deals
-#     with the fact that method signitures have ','
-#     when there are multiple parameters
+            # TODO: check the fn name and params for validity.
 
-#     Args:
-#         items ([type]): [description]
-#     """
-#     sigs, signitures = [],[]
-#     items = items.split(")")
-#     for item in items:
-#         if item.count("("):
-#             params = item[item.find("("):]
-#             name = (item.split("(")[0]).split(",")[-1]
-#             sigs.append(f"{name}{params})")
+            # Prepare the remaining items in string for next recursion
+            remaining = ",".join(methods.split("),")[1:])
 
-#     for sig in sigs:
-#         name = sig.split("(")[0]
-#         rest = (sig.split("(")[1]).split(")")[0]
-#         signitures.append(f"{name.lower().strip()}({rest})")
-#     return signitures
+        # if the first item isnt a signiture,
+        # we don't care about split denegrating the integrity of it.
+        else:
+            if methods.count(","):
+                head = methods.split(",")[0]
+                remaining = ",".join(methods.split(",")[1:]).strip()
+                parsed.append(head.strip().lower())
+            else:
+                #essentially the base case.
+                parsed.append(methods.strip().lower())
+                remaining = ""
+            cleanse_methods(remaining, parsed)
+
+        # to escape the loop... reconsider where ure placing your recursive calls?
+        break
+   
+    return parsed
 
 # very curious output...
-print(cleanse_methods("bisk, froggo(tomato, hat, gun), iceage",[]))
+print(cleanse_methods("food, tunnel, savage_bisk(a,b,c=8)",[]))
