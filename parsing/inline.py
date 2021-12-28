@@ -11,7 +11,7 @@ import sys
 sys.path.insert(0, "C:\\Users\\Ben\\VsCode\\python\\classgenerator")
 from utils.path_testing import NoFileNameError
 from parsing.extension import Extension
-from parsing.cleaning import cleanse
+from parsing.cleaning import cleanse, cleanse_methods
 from parsing.validation import attributes_main, methods_main, validate_class_name, validate_field, validate_members, validate_signiture
 
 class Inline:
@@ -62,7 +62,7 @@ Exceptions: Unknown at this point.
         if len(self.inline) > 1:
             self.attributes = attributes_main(cleanse(self.inline[1].strip()))
         if len(self.inline) > 2:
-            self.methods = cleanse(self.inline[2].strip())
+            self.methods = cleanse_methods(self.inline[2].strip(),[])
             # regular_methods = methods_main(cleanse_regular_methods(self.inline[2].strip()))
             # signitures = None
             # if self.inline[2].count("("):
@@ -154,6 +154,8 @@ Exceptions: Unknown at this point.
         Returns:
             [int]: will return 0 for errors, 1 for success
         """
+
+        #TODO: can't we just put this in init? seems like it will only run on init...
         if arg in (" ",""):
             return 1
         if arg == "t":
@@ -219,21 +221,7 @@ Exceptions: Unknown at this point.
     def from_details(cls, classname, attr, method, parents, packages, opts):
         return Inline(f"{classname}({parents}) ({packages}) : {attr} : {method} : {opts}")
 
-  
 if __name__ == "__main__":
-#     first = Inline("ClassA(barn,house) (pillow) : attr1, attr2, attr3, attr4\
-# : method1, method2, method3 : -tem")
-
-#     # print(first.exporting)
-
-#     # Default arg setting seems to be working nicely
-#     second = Inline("ClassB")
-#     # print(second.exporting)
-
-#     new = [first, second]
-#     for items in new:
-#         print(items.packages)
-
     print(Inline("Hello(Hi,Bisk,Chalp) (reindeer,dolphin):\
         attr1, sandman, CVattr2 :\
         SMname, CM*&**cone, arffff, FNnoodle, FNbasket(p, ending='cones'), CMshitbasket(x) shitcone(x,y,z), SMmotherfuck(y) :\

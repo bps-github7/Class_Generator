@@ -34,7 +34,6 @@ def cleanse_methods(methods, parsed):
     Args:
         items (str): comma delimited string listing the methods in a class.
     """
-    # TODO: you should def test this... with unittests son.
     while methods:
         # check if the first item in the string is a signiture
 
@@ -51,7 +50,7 @@ def cleanse_methods(methods, parsed):
 
             new_signature = {
                 'name' : signature.split("(")[0],
-                'params' : ",".join(signature.split("(")[1:]).strip(")")
+                'parameters' : ",".join(signature.split("(")[1:]).strip(")")
                 }
             parsed.append(new_signature)
 
@@ -75,8 +74,4 @@ def cleanse_methods(methods, parsed):
 
         # to escape the loop... reconsider where ure placing your recursive calls?
         break
-   
     return parsed
-
-# very curious output...
-print(cleanse_methods("food, tunnel, savage_bisk(a,b,c=8)",[]))
