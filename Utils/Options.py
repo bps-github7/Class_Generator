@@ -143,6 +143,8 @@ def main():
         workflow['completePath'] = rf"{workflow['path']}{tolken}{workflow['name']}"
         print(f"proposed project path: {workflow['completePath']}")
         if input("looks good? (y/n)") in ("y", "yes"):
+            print(f"Making a new directory for your project at:\n{workflow['completePath']}")
+            ### TODO: what if the directory already exists? don't want to generate a duplicate by accident.
             make_new_folder(workflow["path"], workflow["name"])
         else:
             while True:
@@ -156,7 +158,8 @@ def main():
                 elif response == 2:
                     sys.exit("user wanted to quit the current run time")
     else:
-        # shortcut- in reality we can just do that in cwd or config default path
+        # We could... if the the default configs are set - 
+        # ie. they want to generate classes in "my classes" in the cwd.
         sys.exit("cannot build your project without a name and path")
 
     if args.verbose:
@@ -174,10 +177,10 @@ def main():
         if args.verbose:
             print("using interactive mode")
         # return interactive_mode()
-
+    return workflow
     # Reaching here means the parsing was unsuccessful
     # and no files will be generated
-    return 0
+    # return 0
 
 if __name__ == '__main__':
     main()

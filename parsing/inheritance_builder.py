@@ -123,9 +123,3 @@ def main(inline : Inline):
         list<ClassDict> | ClassDict: multiple classes parsed out of inheritance Inline.
     """
     return InheritanceBuilder(inline).classes
-
-item = "classA (banana) > classB(weasel) (wombat, purse) : attr1, attr2, attr3 > mastadon,\
-bucket, shallot: method1 > method2 : -t -e > -t -e"
-
-testcase = InheritanceBuilder(item)
-print(testcase.classes)

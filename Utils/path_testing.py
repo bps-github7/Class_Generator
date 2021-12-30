@@ -163,13 +163,4 @@ def fix_relative_path(path) :
 
 
 if __name__ == "__main__":
-
-    print(fix_relative_path("/something"))
-    # print(fix_relative_path("something"))
-    # print(fix_relative_path("./something"))
-
-    # # handles both of these happily
-    # print(fix_relative_path("\\taco\\burrito"))
-    # print(fix_relative_path("taco\\burrito"))
-    # # TODO: we need a testing environment for POSIX use case handling code!
-    # print(fix_relative_path("/taco"))
+    print(fix_relative_path("./something"))

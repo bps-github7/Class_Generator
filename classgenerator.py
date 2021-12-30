@@ -20,15 +20,14 @@ def main() -> int:
     # for items in parsed_inline:
     #     class_generator(items)
     # return 1
-    try:
-        generate_workflow()
-    except Exception:
-        print("Errpr while trying to generate workflow for your project")
+    generate_workflow()
+    # try:
+    #     generate_workflow()
+    # except Exception:
+    #     print("Error while trying to generate workflow for your project")
 
 
 
-
-main()
 
 
 
@@ -44,7 +43,7 @@ def generate_workflow():
     # if options.config.exporting:
     #     []
     #     # export the files
-    status_report(options.workflow)
+    status_report(options)
 
 
 def status_report(workflow):
@@ -64,12 +63,15 @@ def status_report(workflow):
 
     """
     header()
-    body(workflow.files)
+    body(workflow['files'])
 
 # need a python  refresher first- isnt there some native way of doing this? with print?
 def header():
-    print("f{}")
+    print("status | file name | type | members | packages | parents | notes")
 
 def body(files):
     for f in files:
-        print("")
+        print(f)
+
+if __name__ == '__main__':
+    main()
