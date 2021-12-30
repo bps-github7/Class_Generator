@@ -138,7 +138,7 @@ def main():
             print("then check if we have configuration set for default path. else use CWD")
     else:
         raise NameError("You must provide a project name. (cannot generate a nameless folder.")
-    if workflow["name"] and workflow["path"]:    
+    if workflow["name"] and workflow["path"]:
         tolken = "\\" if (os.name == "nt")  else "/"
         workflow['completePath'] = rf"{workflow['path']}{tolken}{workflow['name']}"
         print(f"proposed project path: {workflow['completePath']}")
@@ -163,8 +163,8 @@ def main():
         print("determining source of input... (cmd line arg, file or interactive mode)")
     if args.inline:
         print("making an inline")
-        # this returns the Inline object as it was just parsed
-        return parse_inline(args.inline)
+        # what about when a user wants to generate many files?
+        workflow["files"] = parse_inline(args.inline)
     elif args.file:
         if args.verbose:
             print("reading classes from a file...")
@@ -176,7 +176,8 @@ def main():
         # return interactive_mode()
 
     # Reaching here means the parsing was unsuccessful
-    # and class will not be generated
+    # and no files will be generated
     return 0
 
-main()
+if __name__ == '__main__':
+    main()

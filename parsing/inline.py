@@ -44,7 +44,6 @@ Exceptions: Unknown at this point.
         "parents" : object, "packages" : 'root'}
         if self.inline[0] is None:
             print("Inline cannot be parsed if no class identifier is provided")
-            return None
         else:
             try:
                 self.extension = Extension(self.inline[0].strip())
@@ -52,27 +51,17 @@ Exceptions: Unknown at this point.
                 self.options['parents'] = self.extension.parents
                 self.options['packages'] = self.extension.packages
             except NoFileNameError:
-                # in reality, we
-                #  1. will catch a nameless or invalid identifier before this point
-                #  2. if we didn't, we should catch this exception futher up the call stack
-                #  - think options or main
+                # TODO: can define your own exception for when extension parsing goes bad.
                 print("error while parsing your extension")
-        # defensive prograamming to avoid IndexError
-        # in cases where no colons are provided or attr was skipped.
         if len(self.inline) > 1:
             self.attributes = attributes_main(cleanse(self.inline[1].strip()))
         if len(self.inline) > 2:
             self.methods = cleanse_methods(self.inline[2].strip(),[])
-            # regular_methods = methods_main(cleanse_regular_methods(self.inline[2].strip()))
-            # signitures = None
-            # if self.inline[2].count("("):
-            #     signitures = cleanse_with_signitures(self.inline[2].strip())
-            # self.methods = self.parse_methods(regular_methods, signitures)
         if len(self.inline) > 3:
             if len(self.inline) == 4:
                 self.parse_options(self.inline[3].strip())
 
-    ### getters / setters because accessing options kind of wierd with a dict
+    ### getters / setters - accessing options is kind of weird with a dictionary
     @property
     def testing(self):
         return self.options["testing"]
@@ -100,48 +89,12 @@ Exceptions: Unknown at this point.
         for items in options:
             if len(items) > 1:
                 # for collapsable args
-                for i in items:
-                    self.switch_flipper(i)
-            # for traditional args
+                for arg in items:
+                    self.switch_flipper(arg)
+            # for traditional args - does this actually get used? we can yeet switch_flipper if not.
             else:
                 self.switch_flipper(items)
-        if self.module and self.abc:
-            print("Error: You cannot make an abstract base class a module.")
-            return 0
-
-    def parse_methods(self, names : list[str], signitures = None):
-        """Determines the type of each method/function passed in
-
-        Args:
-            methods ([list]): list of methods to be parsed.
-
-        Returns:
-            all_methods ([{names} {signitures}])
-        """
-        all_methods = {"names" :
-                {"static" : [], "class" : [], "instance" : [], "functions" : []},
-                "signitures" :
-                {"static" : [], "class" : [], "instance" : [], "functions" : []}}
-        for items in names:
-            if items.startswith("sm"):
-                all_methods["names"]["static"].append(items[2:])
-            elif items.startswith("cm"):
-                all_methods["names"]["class"].append(items[2:])
-            elif items.startswith("fn"):
-                all_methods["names"]["functions"].append(items[2:])
-            else:
-                all_methods["names"]["instance"].append(items)
-        if signitures:
-            for items in signitures:
-                if items.startswith("sm"):
-                    all_methods["signitures"]["static"].append(items[2:])
-                elif items.startswith("cm"):
-                    all_methods["signitures"]["class"].append(items[2:])
-                elif items.startswith("fn"):
-                    all_methods["signitures"]["functions"].append(items[2:])
-                else:
-                    all_methods["signitures"]["instance"].append(items)
-        return all_methods
+        # raise an error if ABC and module option are provided.
 
 
     def switch_flipper(self, arg):
@@ -154,8 +107,6 @@ Exceptions: Unknown at this point.
         Returns:
             [int]: will return 0 for errors, 1 for success
         """
-
-        #TODO: can't we just put this in init? seems like it will only run on init...
         if arg in (" ",""):
             return 1
         if arg == "t":
@@ -212,17 +163,11 @@ Exceptions: Unknown at this point.
     def __str__(self):
         return "{} : {} : {} : {}".format(
             self.class_name,
-            ",".join(self.attributes),
-            ",".join(self.methods),
+            self.attributes,
+            self.methods,
             self.options)
 
-
-    @classmethod
-    def from_details(cls, classname, attr, method, parents, packages, opts):
-        return Inline(f"{classname}({parents}) ({packages}) : {attr} : {method} : {opts}")
-
 if __name__ == "__main__":
-    print(Inline("Hello(Hi,Bisk,Chalp) (reindeer,dolphin):\
-        attr1, sandman, CVattr2 :\
-        SMname, CM*&**cone, arffff, FNnoodle, FNbasket(p, ending='cones'), CMshitbasket(x) shitcone(x,y,z), SMmotherfuck(y) :\
-        -tem").__repr__())
+    print(Inline("classA(rodent) (rodent-well) : attr_a, attr_b :\
+        method_a, method_b, method_c(a,b) : -te").__str__())
+    

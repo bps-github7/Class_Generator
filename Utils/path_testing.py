@@ -21,42 +21,6 @@ to generate a file but
         self.error = error
         self.value = value
 
-# def confirm_prompt(something):
-#     return
-
-# def main(project_name, path):
-#     """Coordinates validation of user provided path
-#     and movement of runtime to this location
-
-#     Args:
-#         project_name (str): the name of directory to house files generated in the session
-#         path (str): the path to files to generate
-#     """
-#     # path = path_main(path)
-#     while True:
-#         try:
-#             path = validate_path(path)
-#         except NoPathError:
-#             print("cannot generate your files without a valid location to generate them in.")
-#         response = confirm_prompt(f"Please confirm: files will be created in\
-#         the following directory {path}.{project_name}")
-#         if response == 1:
-#             make_new_folder(path, project_name)
-#             return f"{path}/{project_name}"
-#         elif response == 0:
-#             # then try to get satisfactory path on next pass...
-#             continue
-#         else:
-#             try:
-#                 if not response["error"]:
-#                     return 0
-#                 else:
-#                     print(f"sorry, we don't understand this response: {response['error']['response']}")
-#             except AttributeError:
-#                 continue
-
-
-
 def validate_path(path = "root"):
     """The path tells the program where to generate the files, and when a path
     isn't provided during a session, the program will default on either a custom

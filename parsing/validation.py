@@ -74,7 +74,7 @@ def validate_options(items : str):
 
 
 
-def missing_field(type="class"):
+def missing_field(typ="class"):
     """
     prints appropriate message based on one of 4 missing fields.
 
@@ -89,7 +89,7 @@ def missing_field(type="class"):
         print("Error: cannot make class with no class name.")
         return 0
     else:
-        if continue_prompt(field_type = type):
+        if continue_prompt(field_type = typ):
             return 1
         else:
             return 0
@@ -232,59 +232,6 @@ delete {y} from method set {methods} (y/n)?")
         return methods
     return None
 
-
-
-def simple_method_main(methods : list):
-    """
-    simplified version of the above function.
-    gets rid of the need for inline objects' parse_methods method.
-
-    we will just validate and then deal with deal
-    with parsing during or before generation
-
-    
-
-    Args:
-        method ([type]): [description]
-    """
-    # 
-    methods = ",".join(methods)
-    # if methods has parentheseis (signitures)
-    for char in methods:
-        pass
-
-
-
-
-    # y is the actual value
-#     for x,y in enumerate(methods):
-#         if y.count("("):
-#             if corrected := validate_signiture(y):
-#                 methods[x] = corrected
-#                 # avoids parsing y as a regular identifier
-#                 continue
-#         #     
-#         if is_identifier(y):
-#             # heres where you would override the default
-#             # arg if you wanted to coerce the case
-#             if returned := case_check(y, item_type="field"):
-#                 methods[x] = returned
-#             # dont think we need an else block because ^^ always return truthy
-#         else:
-#             response = input(f"the method {y} is not a valid identifier\n\
-# delete {y} from method set {methods} (y/n)?")
-#             if response in ("y","yes"):
-#                 del methods[x]
-#     if len(methods):
-#         return methods
-#     return None
-    # i suspect youll need to loop thru the string manually. join with ','
-    # then loop over each character and split manuyally ONLY if coma is 
-    # not surrounded by parens. cooool.
-
-
-### and so on....?
-
 def validate_members(items, item_type="class"):
     """does basic validation for a standard inlines' members
         1. ensure each item is identifier
@@ -372,78 +319,6 @@ def validate_field(field : str):
     """
     return field.lower()
 
-def validate_inheritance(inline: str):
-    """[summary]
-    """
-    return NotImplemented
-
-def validate_file(filename : str):
-    """[summary]
-
-    Args:
-        filename (str): [description]
-    """
-
-def validate_packaging(inline : str):
-    """[summary]
-
-    Args:
-        inine (str): a packaging inline of the format <p:( package : files )
-        or <p:{package1 : files, package2 : files, ... packageN : files}
-    """
-    # have to be careful when parsing- not to confuse
-    #  inheritance w/ packaging because of closing >
-    if not inline.startswith('<p:(') and not inline.endswith('>'):
-        print("Error- invalid format of packaging inline")
-        return 0
-    else:
-        #expose content of syntax/ expression
-        # by removing '<p:(' and ')>'
-        contents = inline[3:-1]
-        # print(contents)
-        # print(contents[1:-1])
-        if contents.count(","):
-            # can just take the first version of contents & treat it as dict.
-            inline = {}
-            for items in contents[1:-1].split(","):
-                inline.update({str(items.split(":")[0].strip()) : str(items.split(":")[1].strip())})
-            return validate_multiple_packaging_inline(inline)
-        else:
-            return validate_single_packaging_inline(contents[1:-1])
-
-
-def validate_multiple_packaging_inline(inline):
-    """
-
-    Args:
-        inline ([type]): [description]
-    """
-    validated = {}
-    for item in inline:
-        if (valid := validate_single_packaging_inline(f"{item}:{inline[item]}")):
-            if isinstance(valid, dict):
-                validated.update(valid)
-            else:
-                return 0
-        else:
-            return 0
-    return validated
-
-def validate_single_packaging_inline(inline):
-    inline = inline.split(":")
-    # strip leading and trailing whitespace
-    # that could make it fail is_identifier test.
-    inline = list(map(lambda x: x.strip(), inline))
-    # check that it is indeed a single package inline
-    if len(inline) == 2:
-        if (package := validate_package_name(inline[0])) and (module := validate_module_name(inline[1])):
-            # does the above test fail if either return 0? ensure this!
-            return {package : module}
-        else:
-            return 0
-    else:
-        return validate_multiple_packaging_inline({inline[x] : inline[x+1] for x in range(0, len(inline), 2)})
-
 def validate_package_name(title):
     if is_identifier(title):
         if corrected := case_check(title,item_type="package"):
@@ -482,7 +357,4 @@ or special chars except for underscores.")
 
 
 if __name__ == "__main__":
-    # print(class_name_main("skone nard pumpkins"))
-    # print(attributes_main("skone,nard,pumplins, %$!I@(KD(@"))
-    # print(validate_signiture("badger(monkey,mole='!!!!$#')"))
-    print(simple_method_main("skone(x,y,z), flan(x), cucumber".split(",")))
+    print("you're running a module!")
